@@ -16,10 +16,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
-    cargo build --release --bin axum
+    cargo build --release --bin generator
 
 FROM debian:bookworm-slim
 WORKDIR /app
-COPY --from=builder /app/target/release/axum /app/axum
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /app/target/release/generator /app/generator
 
-CMD ["/app/axum"]
+CMD ["/app/generator"]

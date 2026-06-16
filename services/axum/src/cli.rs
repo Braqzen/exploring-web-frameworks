@@ -1,4 +1,4 @@
-use eyre::{eyre, Result};
+use eyre::{Result, eyre};
 use std::{net::SocketAddr, str::FromStr};
 
 pub struct Cli {
