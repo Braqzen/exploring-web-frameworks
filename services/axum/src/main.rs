@@ -2,6 +2,7 @@ mod api;
 mod cli;
 mod environment;
 mod server;
+mod task;
 
 use cli::Cli;
 use dotenvy::dotenv;

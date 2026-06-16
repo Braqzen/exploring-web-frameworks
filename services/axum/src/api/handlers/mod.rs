@@ -1,1 +1,1 @@
-pub mod rpc;
+pub mod insert;

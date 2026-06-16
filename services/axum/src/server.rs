@@ -1,23 +1,52 @@
-use crate::api::handlers::rpc::request;
+use crate::{api::handlers::insert::insert, task::Task};
 use axum::{Router, routing::post, serve};
 use eyre::Result;
-use std::net::SocketAddr;
+use std::{
+    collections::HashMap,
+    net::SocketAddr,
+    sync::{Arc, Mutex},
+};
 use tokio::net::TcpListener;
 use tracing::info;
+use uuid::Uuid;
 
 pub struct Server {
     socket: SocketAddr,
+    state: Arc<Mutex<State>>,
+}
+
+pub struct State {
+    pub tasks: HashMap<Uuid, Task>,
+}
+
+impl State {
+    pub fn new() -> Self {
+        Self {
+            tasks: HashMap::new(),
+        }
+    }
 }
 
 impl Server {
     pub async fn new(socket: SocketAddr) -> Result<Self> {
-        Ok(Self { socket })
+        Ok(Self {
+            socket,
+            state: Arc::new(Mutex::new(State::new())),
+        })
     }
 
     pub async fn run(self) -> Result<()> {
         let listener = TcpListener::bind(self.socket).await?;
 
-        let app = Router::new().route("/", post(request));
+        let app = Router::new()
+            .route(
+                "/",
+                post(insert), // .get(fetch)
+                              // .put(overwrite)
+                              // .patch(partial_update)
+                              // .delete(delete),
+            )
+            .with_state(self.state);
 
         info!(socket = self.socket.to_string(), "Starting router");
 

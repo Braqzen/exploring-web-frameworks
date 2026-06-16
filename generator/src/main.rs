@@ -31,8 +31,18 @@ async fn main() -> Result<()> {
         let payload = Payload::new();
 
         match client.post(&payload).await {
-            Ok(response) => info!(data = payload.data, response, "Sent payload"),
-            Err(error) => warn!(%error, "Failed to send payload"),
+            Ok(id) => info!(
+                secret = payload.secret,
+                operation = payload.operation.to_string(),
+                id,
+                "Sent payload"
+            ),
+            Err(error) => warn!(
+                %error,
+                secret = payload.secret,
+                operation = payload.operation.to_string(),
+                "Failed to send payload"
+            ),
         }
 
         sleep(Duration::from_millis(10)).await;
