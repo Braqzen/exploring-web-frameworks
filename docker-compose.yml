@@ -1,0 +1,15 @@
+services:
+  axum:
+    image: rust-axum-image:latest
+    command: ["/app/axum"]
+    ports:
+      - "8000:8000"
+    environment:
+      SOCKET: 0.0.0.0:8000
+    restart: unless-stopped
+
+  website:
+    image: servers-website:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
