@@ -7,10 +7,10 @@ use rand::{
     distr::{Alphanumeric, SampleString},
     rng,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// A payload sent to the server.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Payload {
     /// Arbitrary data to differentiate payloads.
     pub secret: String,
@@ -38,7 +38,7 @@ impl Payload {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Operation {
     Compute,
     Merge,

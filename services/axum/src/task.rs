@@ -1,7 +1,7 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A payload sent to the server.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Task {
     /// Arbitrary data to differentiate payloads.
     pub secret: String,
@@ -10,7 +10,7 @@ pub struct Task {
     pub operation: Operation,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum Operation {
     Compute,
     Merge,

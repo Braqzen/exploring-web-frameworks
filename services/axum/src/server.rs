@@ -1,5 +1,14 @@
-use crate::{api::handlers::insert::insert, task::Task};
-use axum::{Router, routing::post, serve};
+use crate::{
+    api::handlers::{
+        delete::remove, get::fetch, patch::partial_update, post::insert, put::overwrite,
+    },
+    task::Task,
+};
+use axum::{
+    Router,
+    routing::{get, post},
+    serve,
+};
 use eyre::Result;
 use std::{
     collections::HashMap,
@@ -39,12 +48,13 @@ impl Server {
         let listener = TcpListener::bind(self.socket).await?;
 
         let app = Router::new()
+            .route("/", post(insert))
             .route(
-                "/",
-                post(insert), // .get(fetch)
-                              // .put(overwrite)
-                              // .patch(partial_update)
-                              // .delete(delete),
+                "/{task_id}",
+                get(fetch)
+                    .put(overwrite)
+                    .patch(partial_update)
+                    .delete(remove),
             )
             .with_state(self.state);
 
