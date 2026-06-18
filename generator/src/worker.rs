@@ -36,7 +36,7 @@ impl Worker {
                 Method::Delete => self.delete().await?,
             };
 
-            sleep(Duration::from_millis(10)).await;
+            sleep(Duration::from_millis(100)).await;
         }
     }
 
