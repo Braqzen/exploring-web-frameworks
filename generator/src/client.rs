@@ -19,11 +19,6 @@ impl Client {
     }
 
     pub async fn post(&self, payload: &Payload) -> Result<String> {
-        // In the initial stage we do not care whether the payload has succeeded as that has no impact
-        // on the game except that it stops and the server must be fixed.
-        // Perhaps in a future implementation the server may have a fixed size queue with backpressure
-        // and it may be interesting to implement some additional complexity into the generator but for
-        // now we fire and forget.
         let response = self
             .client
             .post(&self.url)
