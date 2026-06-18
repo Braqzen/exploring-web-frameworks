@@ -1,5 +1,25 @@
+# Shared configuration for services
+x-common: &common-setup
+  deploy:
+    resources:
+      limits:
+        memory: 64M
+  memswap_limit: 64M
+  restart: unless-stopped
+
 services:
+  # A service that sends payloads to various api services.
+  generator:
+    <<: *common-setup
+    image: servers-generator:latest
+    command: ["/app/generator"]
+    environment:
+      RUST_LOG: info
+      SERVER_URL: http://axum:8000
+
+  # Rust API service that uses axum.
   axum:
+    <<: *common-setup
     image: servers-axum:latest
     command: ["/app/axum"]
     ports:
@@ -7,28 +27,9 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    memswap_limit: 256M
-    restart: unless-stopped
 
   website:
+    <<: *common-setup
     image: servers-ui:latest
     ports:
       - "8080:80"
-    restart: unless-stopped
-
-  generator:
-    image: servers-generator:latest
-    command: ["/app/generator"]
-    environment:
-      RUST_LOG: info
-      SERVER_URL: http://axum:8000
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    memswap_limit: 256M
-    restart: unless-stopped
