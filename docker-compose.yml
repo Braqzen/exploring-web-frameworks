@@ -37,7 +37,6 @@ services:
     ports:
       - "8080:80"
 
-  # Grafana: http://localhost:3000/
   grafana:
     image: grafana/grafana:11.0.0
     ports:

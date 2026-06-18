@@ -17,7 +17,7 @@ build-ui:
 
 run:
 	docker compose up -d
-	@echo Website: http://localhost:8080/
+	@echo Website: http://localhost:8080/ Grafana: http://localhost:3000/
 
 stop:
 	docker compose down -v
