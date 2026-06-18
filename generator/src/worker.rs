@@ -210,6 +210,8 @@ impl Worker {
 }
 
 /// Distribution mapping the method to a weight percentage for random selection.
+///
+/// I.e. call this method X% of the time.
 const REQUESTS: [(Method, u32); 5] = [
     (Method::Post, 40),   // 40%
     (Method::Get, 25),    // 25%
