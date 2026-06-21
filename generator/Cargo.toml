@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 eyre = "0.6.12"
+opentelemetry = "0.32.0"
 opentelemetry-appender-tracing = "0.32.0"
 opentelemetry-otlp = "0.32.0"
 opentelemetry_sdk = "0.32.1"

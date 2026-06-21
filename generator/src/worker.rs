@@ -3,6 +3,10 @@ use crate::{
     payload::{Operation, Payload},
 };
 use eyre::Result;
+use opentelemetry::{
+    KeyValue, global,
+    metrics::{Counter, UpDownCounter},
+};
 use rand::{
     RngExt, rng,
     seq::{IndexedRandom, IteratorRandom},
@@ -14,13 +18,17 @@ use tracing::{info, warn};
 pub struct Worker {
     client: Client,
     tasks: HashMap<String, Payload>,
+    metrics: Metrics,
 }
 
 impl Worker {
     pub fn new(client: Client) -> Self {
+        let metrics = Metrics::new();
+
         Self {
             client,
             tasks: HashMap::new(),
+            metrics,
         }
     }
 
@@ -45,7 +53,13 @@ impl Worker {
 
         match self.client.post(&payload).await {
             Ok(id) => {
+                self.metrics
+                    .increment_total_operation(&payload.operation.to_string());
+                self.metrics
+                    .increment_live_operation(&payload.operation.to_string());
+
                 self.tasks.insert(id.clone(), payload.clone());
+
                 info!(
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
@@ -107,6 +121,7 @@ impl Worker {
         };
         let payload = self.tasks.get(&task_id).unwrap().clone();
 
+        // TODO: enforce a different operation than the current one
         let random_operation = rng().random_range(0..=3);
         let operation = match random_operation {
             0 => Operation::Compute,
@@ -118,7 +133,15 @@ impl Worker {
 
         match self.client.patch(&task_id, operation.clone()).await {
             Ok(task) => {
+                self.metrics
+                    .increment_total_operation(&operation.to_string());
+                self.metrics
+                    .increment_live_operation(&operation.to_string());
+                self.metrics
+                    .decrement_live_operation(&payload.operation.to_string());
+
                 self.tasks.insert(task_id.clone(), task.clone());
+
                 info!(
                     secret = payload.secret,
                     from_operation = payload.operation.to_string(),
@@ -155,7 +178,15 @@ impl Worker {
 
         match self.client.put(&task_id, new_payload.clone()).await {
             Ok(task) => {
+                self.metrics
+                    .increment_total_operation(&new_payload.operation.to_string());
+                self.metrics
+                    .increment_live_operation(&new_payload.operation.to_string());
+                self.metrics
+                    .decrement_live_operation(&old_payload.operation.to_string());
+
                 self.tasks.insert(task_id.clone(), task.clone());
+
                 info!(
                     from_secret = old_payload.secret,
                     to_secret = new_payload.secret,
@@ -192,6 +223,9 @@ impl Worker {
         match self.client.delete(&task_id).await {
             Ok(_) => {
                 let payload = self.tasks.remove(&task_id).unwrap();
+                self.metrics
+                    .decrement_live_operation(&payload.operation.to_string());
+
                 info!(
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
@@ -227,4 +261,40 @@ enum Method {
     Patch,
     Put,
     Delete,
+}
+
+struct Metrics {
+    total_operations: Counter<u64>,
+    live_operations: UpDownCounter<i64>,
+}
+
+impl Metrics {
+    fn new() -> Self {
+        let meter = global::meter("worker");
+        // Track total operations over time
+        let total_operations = meter.u64_counter("total_operations").build();
+
+        // Track the number of live tasks
+        let live_operations = meter.i64_up_down_counter("live_operations").build();
+
+        Self {
+            total_operations,
+            live_operations,
+        }
+    }
+
+    fn increment_total_operation(&self, operation: &str) {
+        self.total_operations
+            .add(1, &[KeyValue::new("operation", operation.to_string())]);
+    }
+
+    fn increment_live_operation(&self, operation: &str) {
+        self.live_operations
+            .add(1, &[KeyValue::new("operation", operation.to_string())]);
+    }
+
+    fn decrement_live_operation(&self, operation: &str) {
+        self.live_operations
+            .add(-1, &[KeyValue::new("operation", operation.to_string())]);
+    }
 }
