@@ -3,11 +3,17 @@ use opentelemetry::global;
 use opentelemetry_appender_tracing::layer::OpenTelemetryTracingBridge;
 use opentelemetry_otlp::{LogExporter, MetricExporter};
 use opentelemetry_sdk::{Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider};
+use pyroscope::{
+    PyroscopeAgent,
+    backend::{BackendConfig, PprofConfig, pprof_backend},
+    pyroscope::{PyroscopeAgentBuilder, PyroscopeAgentReady, PyroscopeAgentRunning},
+};
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
 pub struct Telemetry {
     pub logger_provider: SdkLoggerProvider,
     pub meter_provider: SdkMeterProvider,
+    pub profiling_agent: PyroscopeAgent<PyroscopeAgentReady>,
 }
 
 impl Telemetry {
@@ -17,10 +23,12 @@ impl Telemetry {
 
         let logger_provider = Self::setup_logging(&resource)?;
         let meter_provider = Self::setup_metrics(&resource)?;
+        let profiling_agent = Self::setup_profiling()?;
 
         Ok(Self {
             logger_provider,
             meter_provider,
+            profiling_agent,
         })
     }
 
@@ -62,5 +70,36 @@ impl Telemetry {
         global::set_meter_provider(metric_provider.clone());
 
         Ok(metric_provider)
+    }
+
+    fn setup_profiling() -> Result<PyroscopeAgent<PyroscopeAgentReady>> {
+        // Create an agent that will profile the whole process / application.
+        let agent = PyroscopeAgentBuilder::new(
+            std::env::var("PYROSCOPE_URL")?,
+            "generator",
+            100,
+            "pyroscope-rs",
+            env!("CARGO_PKG_VERSION"),
+            pprof_backend(PprofConfig::default(), BackendConfig::default()),
+        )
+        .build()?;
+        Ok(agent)
+    }
+}
+
+pub fn cleanup(
+    logger_provider: &SdkLoggerProvider,
+    meter_provider: &SdkMeterProvider,
+    profiling_agent: PyroscopeAgent<PyroscopeAgentRunning>,
+) {
+    if let Err(error) = logger_provider.shutdown() {
+        eprintln!("logger provider otel shutdown failed: {error}");
+    }
+    if let Err(error) = meter_provider.shutdown() {
+        eprintln!("metric provider otel shutdown failed: {error}");
+    }
+    match profiling_agent.stop() {
+        Ok(agent) => agent.shutdown(),
+        Err(error) => eprintln!("profiling agent stop failed: {error}"),
     }
 }

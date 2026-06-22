@@ -3,7 +3,11 @@ mod payload;
 mod telemetry;
 mod worker;
 
-use crate::{client::Client, telemetry::Telemetry, worker::Worker};
+use crate::{
+    client::Client,
+    telemetry::{Telemetry, cleanup},
+    worker::Worker,
+};
 use eyre::Result;
 
 #[tokio::main]
@@ -11,6 +15,7 @@ async fn main() -> Result<()> {
     let Telemetry {
         logger_provider,
         meter_provider,
+        profiling_agent,
     } = Telemetry::init()?;
 
     // TODO: This needs to be changed to contain many server URLs
@@ -22,24 +27,16 @@ async fn main() -> Result<()> {
 
     let mut worker = Worker::new(client);
 
+    let profiling_agent = profiling_agent.start()?;
+
     tokio::select! {
         res = worker.run() => {
-            if let Err(error) = logger_provider.shutdown() {
-                eprintln!("logger provider otel shutdown failed: {error}");
-            }
-            if let Err(error) = meter_provider.shutdown() {
-                eprintln!("metric provider otel shutdown failed: {error}");
-            }
+            cleanup(&logger_provider, &meter_provider, profiling_agent);
 
             res?;
         }
         _ = tokio::signal::ctrl_c() => {
-            if let Err(error) = logger_provider.shutdown() {
-                eprintln!("logger provider otel shutdown failed: {error}");
-            }
-            if let Err(error) = meter_provider.shutdown() {
-                eprintln!("metric provider otel shutdown failed: {error}");
-            }
+            cleanup(&logger_provider, &meter_provider, profiling_agent);
         }
     }
 

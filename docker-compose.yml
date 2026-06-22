@@ -11,12 +11,18 @@ services:
   # A service that sends payloads to various api services.
   generator:
     <<: *common-setup
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    memswap_limit: 128M
     image: servers-generator:latest
     command: ["/app/generator"]
     environment:
       RUST_LOG: info
       SERVER_URL: http://axum:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      PYROSCOPE_URL: http://alloy:9999
     depends_on:
       - alloy
 
@@ -38,7 +44,7 @@ services:
       - "8080:80"
 
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:11.6
     ports:
       - "3000:3000"
     environment:
@@ -49,6 +55,8 @@ services:
       - grafana-data-volume:/var/lib/grafana
     depends_on:
       - loki
+      - pyroscope
+      - prometheus
     restart: unless-stopped
 
   prometheus:
@@ -65,12 +73,21 @@ services:
     restart: unless-stopped
 
   loki:
-    image: grafana/loki:3.0.0
+    image: grafana/loki:3.7
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
+      - ./loki/loki.yaml:/etc/loki/loki.yaml
       - loki-data-volume:/loki
+    restart: unless-stopped
+
+  pyroscope:
+    image: grafana/pyroscope:2.0.4
+    ports:
+      - "4040:4040"
+    volumes:
+      - pyroscope-data-volume:/data
     restart: unless-stopped
 
   alloy:
@@ -87,4 +104,5 @@ volumes:
   grafana-data-volume:
   loki-data-volume:
   prometheus-data-volume:
+  pyroscope-data-volume:
   alloy-data-volume:
