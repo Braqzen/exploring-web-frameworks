@@ -51,7 +51,7 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./telemetry/grafana/provisioning:/etc/grafana/provisioning
       - grafana-data-volume:/var/lib/grafana
     depends_on:
       - loki
@@ -66,7 +66,7 @@ services:
       - --storage.tsdb.path=/prometheus
       - --web.enable-remote-write-receiver
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./telemetry/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data-volume:/prometheus
     depends_on:
       - alloy
@@ -78,7 +78,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
-      - ./loki/loki.yaml:/etc/loki/loki.yaml
+      - ./telemetry/loki/loki.yaml:/etc/loki/loki.yaml
       - loki-data-volume:/loki
     restart: unless-stopped
 
@@ -93,7 +93,7 @@ services:
   alloy:
     image: grafana/alloy:v1.17.0
     volumes:
-      - ./grafana/alloy:/etc/alloy
+      - ./telemetry/grafana/alloy:/etc/alloy
       - alloy-data-volume:/var/lib/alloy/data
     command: run /etc/alloy/config.alloy
     depends_on:
