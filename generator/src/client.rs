@@ -10,7 +10,7 @@ use opentelemetry_http::HeaderInjector;
 use reqwest::{Client as ReqwestClient, header::HeaderMap};
 use serde_json::json;
 use std::time::{Duration, Instant};
-use tracing::instrument;
+use tracing::{Instrument, instrument};
 
 pub struct Client {
     url: String,
@@ -39,10 +39,14 @@ impl Client {
                     .json(payload)
                     .headers(otel_headers())
                     .send()
+                    .instrument(tracing::info_span!("send"))
                     .await?
                     .error_for_status()?;
 
-                Ok(response.json::<String>().await?)
+                Ok(response
+                    .json::<String>()
+                    .instrument(tracing::info_span!("read_and_parse_json"))
+                    .await?)
             })
             .await
     }
@@ -57,10 +61,14 @@ impl Client {
                     .get(&url)
                     .headers(otel_headers())
                     .send()
+                    .instrument(tracing::info_span!("send"))
                     .await?
                     .error_for_status()?;
 
-                Ok(response.json::<Payload>().await?)
+                Ok(response
+                    .json::<Payload>()
+                    .instrument(tracing::info_span!("read_and_parse_json"))
+                    .await?)
             })
             .await
     }
@@ -76,10 +84,14 @@ impl Client {
                     .json(&json!({ "operation": operation }))
                     .headers(otel_headers())
                     .send()
+                    .instrument(tracing::info_span!("send"))
                     .await?
                     .error_for_status()?;
 
-                Ok(response.json::<Payload>().await?)
+                Ok(response
+                    .json::<Payload>()
+                    .instrument(tracing::info_span!("read_and_parse_json"))
+                    .await?)
             })
             .await
     }
@@ -95,10 +107,14 @@ impl Client {
                     .json(&payload)
                     .headers(otel_headers())
                     .send()
+                    .instrument(tracing::info_span!("send"))
                     .await?
                     .error_for_status()?;
 
-                Ok(response.json::<Payload>().await?)
+                Ok(response
+                    .json::<Payload>()
+                    .instrument(tracing::info_span!("read_and_parse_json"))
+                    .await?)
             })
             .await
     }
@@ -112,6 +128,7 @@ impl Client {
                     .delete(&url)
                     .headers(otel_headers())
                     .send()
+                    .instrument(tracing::info_span!("send"))
                     .await?
                     .error_for_status()?;
 
