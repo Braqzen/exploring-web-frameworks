@@ -1,8 +1,10 @@
 use eyre::Result;
 use opentelemetry::global;
 use opentelemetry_appender_tracing::layer::OpenTelemetryTracingBridge;
-use opentelemetry_otlp::{LogExporter, MetricExporter};
-use opentelemetry_sdk::{Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider};
+use opentelemetry_otlp::{LogExporter, MetricExporter, SpanExporter};
+use opentelemetry_sdk::{
+    Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider, trace::SdkTracerProvider,
+};
 use pyroscope::{
     PyroscopeAgent,
     backend::{BackendConfig, PprofConfig, pprof_backend},
@@ -14,6 +16,7 @@ pub struct Telemetry {
     pub logger_provider: SdkLoggerProvider,
     pub meter_provider: SdkMeterProvider,
     pub profiling_agent: PyroscopeAgent<PyroscopeAgentReady>,
+    pub tracer_provider: SdkTracerProvider,
 }
 
 impl Telemetry {
@@ -21,6 +24,8 @@ impl Telemetry {
         // Set the service name to be able to filter in dashboards by service.
         let resource = Resource::builder().with_service_name("generator").build();
 
+        // Tracer must be run before logging because we fetch the tracer and set it on the tracing_subscriber.
+        let tracer_provider = Self::setup_tracing(&resource)?;
         let logger_provider = Self::setup_logging(&resource)?;
         let meter_provider = Self::setup_metrics(&resource)?;
         let profiling_agent = Self::setup_profiling()?;
@@ -29,6 +34,7 @@ impl Telemetry {
             logger_provider,
             meter_provider,
             profiling_agent,
+            tracer_provider,
         })
     }
 
@@ -43,13 +49,21 @@ impl Telemetry {
             .build();
 
         // Bridge "tracing" crate to OTeL SDK i.e. capture logs and send to provider.
-        let otel_layer = OpenTelemetryTracingBridge::new(&logging_provider);
+        let convert_logs_to_otel = OpenTelemetryTracingBridge::new(&logging_provider);
+
+        // Optional layer to continue to send logs to standard output.
+        // Note the console format is different than the exported format.
+        let send_logs_to_console = tracing_subscriber::fmt::layer().json().flatten_event(true);
+
+        // Convert our spans to OTel spans.
+        let convert_spans_to_otel =
+            tracing_opentelemetry::layer().with_tracer(global::tracer("generator"));
 
         // Init the tracing subscriber to export logs to ENDPOINT but also log to console for debugging.
-        // Note the console format is different than the exported format.
         tracing_subscriber::registry()
-            .with(otel_layer)
-            .with(tracing_subscriber::fmt::layer().json().flatten_event(true))
+            .with(convert_spans_to_otel)
+            .with(convert_logs_to_otel)
+            .with(send_logs_to_console)
             .with(EnvFilter::from_default_env())
             .init();
 
@@ -85,18 +99,38 @@ impl Telemetry {
         .build()?;
         Ok(agent)
     }
+
+    fn setup_tracing(resource: &Resource) -> Result<SdkTracerProvider> {
+        // When the traces are processed we need to export traces to the OTLP endpoint.
+        let span_exporter = SpanExporter::builder().with_http().build()?;
+
+        // Handles aggregation and periodic push of traces to the exporter.
+        let tracer_provider = SdkTracerProvider::builder()
+            .with_batch_exporter(span_exporter)
+            .with_resource(resource.clone())
+            .build();
+
+        // Similar to tracing's global subscriber, register the tracer provider so modules can call global::tracer().
+        global::set_tracer_provider(tracer_provider.clone());
+
+        Ok(tracer_provider)
+    }
 }
 
 pub fn cleanup(
     logger_provider: &SdkLoggerProvider,
     meter_provider: &SdkMeterProvider,
     profiling_agent: PyroscopeAgent<PyroscopeAgentRunning>,
+    tracer_provider: &SdkTracerProvider,
 ) {
     if let Err(error) = logger_provider.shutdown() {
         eprintln!("logger provider otel shutdown failed: {error}");
     }
     if let Err(error) = meter_provider.shutdown() {
         eprintln!("metric provider otel shutdown failed: {error}");
+    }
+    if let Err(error) = tracer_provider.shutdown() {
+        eprintln!("tracer provider otel shutdown failed: {error}");
     }
     match profiling_agent.stop() {
         Ok(agent) => agent.shutdown(),

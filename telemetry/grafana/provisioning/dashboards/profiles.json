@@ -85,7 +85,7 @@
               "datasource":
                 { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
               "groupBy": [],
-              "labelSelector": '{service_name="generator"}',
+              "labelSelector": "{service_name=\"generator\"}",
               "profileTypeId": "process_cpu:cpu:nanoseconds:cpu:nanoseconds",
               "queryType": "metrics",
               "refId": "A",
@@ -109,7 +109,7 @@
               "datasource":
                 { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
               "groupBy": [],
-              "labelSelector": '{service_name="generator"}',
+              "labelSelector": "{service_name=\"generator\"}",
               "profileTypeId": "process_cpu:cpu:nanoseconds:cpu:nanoseconds",
               "queryType": "profile",
               "refId": "A",

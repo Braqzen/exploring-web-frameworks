@@ -6,9 +6,11 @@ use opentelemetry::{
     KeyValue, global,
     metrics::{Counter, Histogram},
 };
-use reqwest::Client as ReqwestClient;
+use opentelemetry_http::HeaderInjector;
+use reqwest::{Client as ReqwestClient, header::HeaderMap};
 use serde_json::json;
 use std::time::{Duration, Instant};
+use tracing::instrument;
 
 pub struct Client {
     url: String,
@@ -27,6 +29,7 @@ impl Client {
         }
     }
 
+    #[instrument(name = "client.post", err, skip(self))]
     pub async fn post(&self, payload: &Payload) -> Result<String> {
         self.metrics
             .record("POST", async {
@@ -34,6 +37,7 @@ impl Client {
                     .client
                     .post(&self.url)
                     .json(payload)
+                    .headers(otel_headers())
                     .send()
                     .await?
                     .error_for_status()?;
@@ -43,17 +47,25 @@ impl Client {
             .await
     }
 
+    #[instrument(name = "client.get", err, skip(self))]
     pub async fn get(&self, task_id: &str) -> Result<Payload> {
         let url = self.task_url(task_id);
         self.metrics
             .record("GET", async {
-                let response = self.client.get(&url).send().await?.error_for_status()?;
+                let response = self
+                    .client
+                    .get(&url)
+                    .headers(otel_headers())
+                    .send()
+                    .await?
+                    .error_for_status()?;
 
                 Ok(response.json::<Payload>().await?)
             })
             .await
     }
 
+    #[instrument(name = "client.patch", err, skip(self))]
     pub async fn patch(&self, task_id: &str, operation: Operation) -> Result<Payload> {
         let url = self.task_url(task_id);
         self.metrics
@@ -62,6 +74,7 @@ impl Client {
                     .client
                     .patch(&url)
                     .json(&json!({ "operation": operation }))
+                    .headers(otel_headers())
                     .send()
                     .await?
                     .error_for_status()?;
@@ -71,6 +84,7 @@ impl Client {
             .await
     }
 
+    #[instrument(name = "client.put", err, skip(self))]
     pub async fn put(&self, task_id: &str, payload: Payload) -> Result<Payload> {
         let url = self.task_url(task_id);
         self.metrics
@@ -79,6 +93,7 @@ impl Client {
                     .client
                     .put(&url)
                     .json(&payload)
+                    .headers(otel_headers())
                     .send()
                     .await?
                     .error_for_status()?;
@@ -88,11 +103,17 @@ impl Client {
             .await
     }
 
+    #[instrument(name = "client.delete", err, skip(self))]
     pub async fn delete(&self, task_id: &str) -> Result<()> {
         let url = self.task_url(task_id);
         self.metrics
             .record("DELETE", async {
-                self.client.delete(&url).send().await?.error_for_status()?;
+                self.client
+                    .delete(&url)
+                    .headers(otel_headers())
+                    .send()
+                    .await?
+                    .error_for_status()?;
 
                 Ok(())
             })
@@ -141,4 +162,18 @@ impl Metrics {
         self.record_duration(method, start.elapsed());
         result
     }
+}
+
+/// Injects the OTel context into the HTTP headers to associate the request with the trace.
+fn otel_headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
+
+    global::get_text_map_propagator(|prop| {
+        prop.inject_context(
+            &opentelemetry::Context::current(),
+            &mut HeaderInjector(&mut headers),
+        );
+    });
+
+    headers
 }

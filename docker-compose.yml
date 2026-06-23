@@ -30,9 +30,9 @@ services:
   axum:
     <<: *common-setup
     image: servers-axum:latest
-    command: ["/app/axum"]
     ports:
       - "8000:8000"
+    command: ["/app/axum"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -50,6 +50,13 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_ANALYTICS_FEEDBACK_LINKS_ENABLED: "false"
+      GF_PLUGINS_PUBLIC_KEY_RETRIEVAL_DISABLED: "true"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
     volumes:
       - ./telemetry/grafana/provisioning:/etc/grafana/provisioning
       - grafana-data-volume:/var/lib/grafana
@@ -57,26 +64,24 @@ services:
       - loki
       - pyroscope
       - prometheus
+      - tempo
     restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:v3.5.4
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
       - --web.enable-remote-write-receiver
     volumes:
       - ./telemetry/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data-volume:/prometheus
-    depends_on:
-      - alloy
     restart: unless-stopped
 
   loki:
     image: grafana/loki:3.7
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/loki.yaml
     volumes:
       - ./telemetry/loki/loki.yaml:/etc/loki/loki.yaml
       - loki-data-volume:/loki
@@ -86,8 +91,18 @@ services:
     image: grafana/pyroscope:2.0.4
     ports:
       - "4040:4040"
+    command: -config.file=/etc/pyroscope/pyroscope.yaml
     volumes:
+      - ./telemetry/pyroscope/pyroscope.yaml:/etc/pyroscope/pyroscope.yaml
       - pyroscope-data-volume:/data
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:3.0.2
+    command: -config.file=/etc/tempo/tempo.yaml
+    volumes:
+      - ./telemetry/tempo/tempo.yaml:/etc/tempo/tempo.yaml
+      - tempo-data-volume:/var/tempo
     restart: unless-stopped
 
   alloy:
@@ -95,9 +110,12 @@ services:
     volumes:
       - ./telemetry/grafana/alloy:/etc/alloy
       - alloy-data-volume:/var/lib/alloy/data
-    command: run /etc/alloy/config.alloy
+    command: run --disable-reporting /etc/alloy/config.alloy
     depends_on:
       - loki
+      - tempo
+      - pyroscope
+      - prometheus
     restart: unless-stopped
 
 volumes:
@@ -105,4 +123,5 @@ volumes:
   loki-data-volume:
   prometheus-data-volume:
   pyroscope-data-volume:
+  tempo-data-volume:
   alloy-data-volume:

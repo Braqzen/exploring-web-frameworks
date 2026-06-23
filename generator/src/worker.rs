@@ -13,7 +13,7 @@ use rand::{
 };
 use std::{collections::HashMap, time::Duration};
 use tokio::time::sleep;
-use tracing::{info, warn};
+use tracing::{info, instrument, warn};
 
 pub struct Worker {
     client: Client,
@@ -48,6 +48,7 @@ impl Worker {
         }
     }
 
+    #[instrument(name = "worker.post", err, skip(self))]
     async fn post(&mut self) -> Result<()> {
         let payload = Payload::new();
 
@@ -82,6 +83,7 @@ impl Worker {
         }
     }
 
+    #[instrument(name = "worker.get", err, skip(self))]
     async fn get(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()) else {
             // Empty hashmap so skip this iteration
@@ -114,6 +116,7 @@ impl Worker {
         }
     }
 
+    #[instrument(name = "worker.patch", err, skip(self))]
     async fn patch(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration
@@ -167,6 +170,7 @@ impl Worker {
         }
     }
 
+    #[instrument(name = "worker.put", err, skip(self))]
     async fn put(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration
@@ -214,6 +218,7 @@ impl Worker {
         }
     }
 
+    #[instrument(name = "worker.delete", err, skip(self))]
     async fn delete(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration

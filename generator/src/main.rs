@@ -1,14 +1,10 @@
 mod client;
 mod payload;
-mod telemetry;
 mod worker;
 
-use crate::{
-    client::Client,
-    telemetry::{Telemetry, cleanup},
-    worker::Worker,
-};
+use crate::{client::Client, worker::Worker};
 use eyre::Result;
+use rust_telemetry::{Telemetry, cleanup};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -16,6 +12,7 @@ async fn main() -> Result<()> {
         logger_provider,
         meter_provider,
         profiling_agent,
+        tracer_provider,
     } = Telemetry::init()?;
 
     // TODO: This needs to be changed to contain many server URLs
@@ -31,12 +28,12 @@ async fn main() -> Result<()> {
 
     tokio::select! {
         res = worker.run() => {
-            cleanup(&logger_provider, &meter_provider, profiling_agent);
+            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
 
             res?;
         }
         _ = tokio::signal::ctrl_c() => {
-            cleanup(&logger_provider, &meter_provider, profiling_agent);
+            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
         }
     }
 

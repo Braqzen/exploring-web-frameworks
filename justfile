@@ -9,7 +9,7 @@ build-axum:
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
-	docker build -t servers-generator ./generator
+	docker build -t servers-generator -f generator/Dockerfile .
 
 build-ui:
 	docker rmi servers-ui:latest 2>/dev/null || true

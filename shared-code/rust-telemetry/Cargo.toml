@@ -1,0 +1,14 @@
+[package]
+name = "rust-telemetry"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+eyre = "0.6.12"
+opentelemetry = "0.32.0"
+opentelemetry-appender-tracing = "0.32.0"
+opentelemetry-otlp = "0.32.0"
+opentelemetry_sdk = "0.32.1"
+pyroscope = { version = "2.0.6", features = ["backend-pprof-rs"] }
+tracing-opentelemetry = "0.33.0"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter", "registry"] }

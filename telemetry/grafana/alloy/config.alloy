@@ -9,6 +9,17 @@ otelcol.receiver.otlp "default" {
   output {
     logs    = [otelcol.exporter.otlphttp.loki.input]
     metrics = [otelcol.exporter.prometheus.default.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// Send to tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
   }
 }
 
