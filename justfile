@@ -11,13 +11,9 @@ build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
 	docker build -t servers-generator -f generator/Dockerfile .
 
-build-ui:
-	docker rmi servers-ui:latest 2>/dev/null || true
-	docker build -t servers-ui -f ui/Dockerfile ui
-
 run:
 	docker compose up -d
-	@echo Website: http://localhost:8080/ Grafana: http://localhost:3000/
+	@echo Grafana: http://localhost:3000/dashboards
 
 stop:
 	docker compose down -v

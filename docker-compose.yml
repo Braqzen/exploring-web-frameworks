@@ -37,12 +37,6 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
 
-  website:
-    <<: *common-setup
-    image: servers-ui:latest
-    ports:
-      - "8080:80"
-
   grafana:
     image: grafana/grafana:11.6
     ports:
