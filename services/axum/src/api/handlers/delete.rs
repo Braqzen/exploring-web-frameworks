@@ -5,10 +5,11 @@ use axum::{
     response::IntoResponse,
 };
 use std::sync::{Arc, Mutex};
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[axum::debug_handler]
+#[instrument(name = "delete", skip_all)]
 pub async fn remove(
     State(state): State<Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,

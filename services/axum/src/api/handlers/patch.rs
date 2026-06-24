@@ -7,10 +7,11 @@ use axum::{
 };
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[axum::debug_handler]
+#[instrument(name = "patch", skip_all)]
 pub async fn partial_update(
     State(state): State<Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,

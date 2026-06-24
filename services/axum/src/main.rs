@@ -8,17 +8,19 @@ use cli::Cli;
 use dotenvy::dotenv;
 use environment::Environment;
 use eyre::Result;
+use rust_telemetry::{Telemetry, cleanup};
 use server::Server;
+use tokio::signal::unix::{SignalKind, signal};
 use tracing::error;
-use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .json()
-        .flatten_event(true)
-        .with_env_filter(EnvFilter::from_default_env())
-        .init();
+    let Telemetry {
+        logger_provider,
+        meter_provider,
+        profiling_agent,
+        tracer_provider,
+    } = Telemetry::init("axum")?;
 
     // Check for any CLI arguments to prioritize
     let args = match Cli::parse() {
@@ -49,11 +51,27 @@ async fn main() -> Result<()> {
         }
     };
 
-    match server.run().await {
-        Ok(_) => Ok(()),
-        Err(error) => {
-            error!(%error, "Server crashed");
-            return Err(error);
+    let profiling_agent = profiling_agent.start()?;
+
+    // Handle running locally and interrupting the process with ctrl+c.
+    let mut sigint = signal(SignalKind::interrupt())?;
+
+    // Handle running in a container and terminating the process with docker stop.
+    let mut sigterm = signal(SignalKind::terminate())?;
+
+    tokio::select! {
+        res = server.run() => {
+            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
+
+            res?;
+        }
+        _ = sigint.recv() => {
+            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
+        }
+        _ = sigterm.recv() => {
+            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
         }
     }
+
+    Ok(())
 }

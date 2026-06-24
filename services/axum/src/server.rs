@@ -6,10 +6,15 @@ use crate::{
 };
 use axum::{
     Router,
+    extract::Request,
+    middleware::{self, Next},
+    response::Response,
     routing::{get, post},
     serve,
 };
 use eyre::Result;
+use opentelemetry::{global, trace::FutureExt};
+use opentelemetry_http::HeaderExtractor;
 use std::{
     collections::HashMap,
     net::SocketAddr,
@@ -18,6 +23,13 @@ use std::{
 use tokio::net::TcpListener;
 use tracing::info;
 use uuid::Uuid;
+
+// Associate the trace ID from the generator to each request handler.
+async fn trace_context(request: Request, next: Next) -> Response {
+    let parent =
+        global::get_text_map_propagator(|prop| prop.extract(&HeaderExtractor(request.headers())));
+    next.run(request).with_context(parent).await
+}
 
 pub struct Server {
     socket: SocketAddr,
@@ -56,6 +68,7 @@ impl Server {
                     .patch(partial_update)
                     .delete(remove),
             )
+            .layer(middleware::from_fn(trace_context))
             .with_state(self.state);
 
         info!(socket = self.socket.to_string(), "Starting router");

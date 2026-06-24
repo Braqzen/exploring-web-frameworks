@@ -6,10 +6,11 @@ use axum::{
     response::IntoResponse,
 };
 use std::sync::{Arc, Mutex};
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[axum::debug_handler]
+#[instrument(name = "put", skip_all)]
 pub async fn overwrite(
     State(state): State<Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,

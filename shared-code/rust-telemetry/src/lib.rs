@@ -3,7 +3,8 @@ use opentelemetry::global;
 use opentelemetry_appender_tracing::layer::OpenTelemetryTracingBridge;
 use opentelemetry_otlp::{LogExporter, MetricExporter, SpanExporter};
 use opentelemetry_sdk::{
-    Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider, trace::SdkTracerProvider,
+    Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider,
+    propagation::TraceContextPropagator, trace::SdkTracerProvider,
 };
 use pyroscope::{
     PyroscopeAgent,
@@ -20,15 +21,19 @@ pub struct Telemetry {
 }
 
 impl Telemetry {
-    pub fn init() -> Result<Self> {
+    pub fn init(service_name: &str) -> Result<Self> {
+        global::set_text_map_propagator(TraceContextPropagator::new());
+
         // Set the service name to be able to filter in dashboards by service.
-        let resource = Resource::builder().with_service_name("generator").build();
+        let resource = Resource::builder()
+            .with_service_name(service_name.to_string())
+            .build();
 
         // Tracer must be run before logging because we fetch the tracer and set it on the tracing_subscriber.
         let tracer_provider = Self::setup_tracing(&resource)?;
-        let logger_provider = Self::setup_logging(&resource)?;
+        let logger_provider = Self::setup_logging(&resource, service_name)?;
         let meter_provider = Self::setup_metrics(&resource)?;
-        let profiling_agent = Self::setup_profiling()?;
+        let profiling_agent = Self::setup_profiling(service_name)?;
 
         Ok(Self {
             logger_provider,
@@ -38,7 +43,7 @@ impl Telemetry {
         })
     }
 
-    fn setup_logging(resource: &Resource) -> Result<SdkLoggerProvider> {
+    fn setup_logging(resource: &Resource, service_name: &str) -> Result<SdkLoggerProvider> {
         // When the logs are processed we need to export logs to the OTLP endpoint.
         let log_exporter = LogExporter::builder().with_http().build()?;
 
@@ -57,7 +62,7 @@ impl Telemetry {
 
         // Convert our spans to OTel spans.
         let convert_spans_to_otel =
-            tracing_opentelemetry::layer().with_tracer(global::tracer("generator"));
+            tracing_opentelemetry::layer().with_tracer(global::tracer(service_name.to_string()));
 
         // Init the tracing subscriber to export logs to ENDPOINT but also log to console for debugging.
         tracing_subscriber::registry()
@@ -86,11 +91,11 @@ impl Telemetry {
         Ok(metric_provider)
     }
 
-    fn setup_profiling() -> Result<PyroscopeAgent<PyroscopeAgentReady>> {
+    fn setup_profiling(service_name: &str) -> Result<PyroscopeAgent<PyroscopeAgentReady>> {
         // Create an agent that will profile the whole process / application.
         let agent = PyroscopeAgentBuilder::new(
             std::env::var("PYROSCOPE_URL")?,
-            "generator",
+            service_name.to_string(),
             100,
             "pyroscope-rs",
             env!("CARGO_PKG_VERSION"),
