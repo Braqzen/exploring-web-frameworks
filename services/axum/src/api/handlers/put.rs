@@ -1,4 +1,4 @@
-use crate::{server::State as ServerState, task::Task};
+use crate::{state::State as ServerState, task::Task};
 use axum::{
     Json,
     extract::{Path, State},
@@ -38,7 +38,6 @@ pub async fn overwrite(
             return StatusCode::NOT_FOUND.into_response();
         }
     }
-    drop(state);
 
     error!(%id, method = "PUT", "Poisoned lock");
 

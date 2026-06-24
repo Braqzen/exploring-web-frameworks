@@ -1,4 +1,4 @@
-use crate::server::State as ServerState;
+use crate::state::State as ServerState;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -31,7 +31,6 @@ pub async fn remove(
             return StatusCode::NOT_FOUND.into_response();
         }
     }
-    drop(state);
 
     error!(%id, method = "DELETE", "Poisoned lock");
 

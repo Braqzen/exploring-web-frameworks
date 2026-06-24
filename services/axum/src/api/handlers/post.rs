@@ -1,4 +1,4 @@
-use crate::{server::State as ServerState, task::Task};
+use crate::{state::State as ServerState, task::Task};
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use serde_json::Value;
 use std::sync::{Arc, Mutex};

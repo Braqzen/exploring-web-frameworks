@@ -1,4 +1,4 @@
-use crate::server::State as ServerState;
+use crate::state::State as ServerState;
 use axum::{
     Json,
     extract::{Path, State},
@@ -44,7 +44,6 @@ pub async fn partial_update(
             return StatusCode::NOT_FOUND.into_response();
         }
     }
-    drop(state);
 
     error!(%id, method = "PATCH", "Poisoned lock");
 

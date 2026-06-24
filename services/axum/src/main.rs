@@ -1,7 +1,9 @@
 mod api;
 mod cli;
 mod environment;
+mod router;
 mod server;
+mod state;
 mod task;
 
 use cli::Cli;
@@ -10,7 +12,6 @@ use environment::Environment;
 use eyre::Result;
 use rust_telemetry::{Telemetry, cleanup};
 use server::Server;
-use tokio::signal::unix::{SignalKind, signal};
 use tracing::error;
 
 #[tokio::main]
@@ -53,25 +54,13 @@ async fn main() -> Result<()> {
 
     let profiling_agent = profiling_agent.start()?;
 
-    // Handle running locally and interrupting the process with ctrl+c.
-    let mut sigint = signal(SignalKind::interrupt())?;
-
-    // Handle running in a container and terminating the process with docker stop.
-    let mut sigterm = signal(SignalKind::terminate())?;
-
-    tokio::select! {
-        res = server.run() => {
-            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
-
-            res?;
-        }
-        _ = sigint.recv() => {
-            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
-        }
-        _ = sigterm.recv() => {
-            cleanup(&logger_provider, &meter_provider, profiling_agent, &tracer_provider);
-        }
-    }
+    server.run().await?;
+    cleanup(
+        &logger_provider,
+        &meter_provider,
+        profiling_agent,
+        &tracer_provider,
+    );
 
     Ok(())
 }
