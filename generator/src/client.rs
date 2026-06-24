@@ -4,13 +4,15 @@ use crate::payload::{Operation, Payload};
 use eyre::Result;
 use opentelemetry::{
     KeyValue, global,
-    metrics::{Counter, Histogram},
+    metrics::{Counter, Gauge, Histogram},
 };
 use opentelemetry_http::HeaderInjector;
 use reqwest::{Client as ReqwestClient, header::HeaderMap};
 use serde_json::json;
 use std::time::{Duration, Instant};
 use tracing::{Instrument, instrument};
+
+const MILLISECONDS: f64 = 1000.0;
 
 pub struct Client {
     url: String,
@@ -144,16 +146,22 @@ impl Client {
 
 struct Metrics {
     requests: Counter<u64>,
-    duration: Histogram<f64>,
+    percentile: Histogram<f64>,
+    latency: Gauge<f64>,
 }
 
 impl Metrics {
     fn new() -> Self {
         let meter = global::meter("client");
         let requests = meter.u64_counter("requests").build();
-        let duration = meter.f64_histogram("duration").with_unit("s").build();
+        let percentile = meter.f64_histogram("percentile").with_unit("ms").build();
+        let latency = meter.f64_gauge("latency").with_unit("ms").build();
 
-        Self { requests, duration }
+        Self {
+            requests,
+            percentile,
+            latency,
+        }
     }
 
     fn increment_request(&self, method: &str) {
@@ -162,10 +170,11 @@ impl Metrics {
     }
 
     fn record_duration(&self, method: &str, elapsed: Duration) {
-        self.duration.record(
-            elapsed.as_secs_f64(),
-            &[KeyValue::new("method", method.to_string())],
-        );
+        let ms = elapsed.as_secs_f64() * MILLISECONDS;
+        let attrs = &[KeyValue::new("method", method.to_string())];
+
+        self.latency.record(ms, attrs);
+        self.percentile.record(ms, attrs);
     }
 
     async fn record<T, F>(&self, method: &str, fut: F) -> Result<T>

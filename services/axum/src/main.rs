@@ -54,7 +54,7 @@ async fn main() -> Result<()> {
 
     let profiling_agent = profiling_agent.start()?;
 
-    server.run().await?;
+    let result = server.run().await;
     cleanup(
         &logger_provider,
         &meter_provider,
@@ -62,5 +62,5 @@ async fn main() -> Result<()> {
         &tracer_provider,
     );
 
-    Ok(())
+    result
 }
