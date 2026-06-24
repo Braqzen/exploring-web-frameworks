@@ -696,7 +696,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\"\n| id=~\"(?i)$id\"\n| line_format \"{{__line__}} | id={{.id}}\"",
+          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\"\n| id=~\"(?i)$id\"\n| line_format \"{{ __line__ }}{{ if .id }} | id={{ .id }}{{ end }}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -835,7 +835,7 @@
           "spanSelector": []
         }
       ],
-      "title": "Generator: CPU",
+      "title": "CPU",
       "type": "flamegraph"
     }
   ],
@@ -958,5 +958,5 @@
   "timezone": "browser",
   "title": "Generator",
   "uid": "bfpj9xrziqiv4f",
-  "version": 1
+  "version": 4
 }
