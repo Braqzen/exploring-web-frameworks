@@ -17,11 +17,11 @@ pub struct Server {
 }
 
 impl Server {
-    pub async fn new(socket: SocketAddr) -> Result<Self> {
-        Ok(Self {
+    pub fn new(socket: SocketAddr) -> Self {
+        Self {
             socket,
             state: Arc::new(Mutex::new(State::new())),
-        })
+        }
     }
 
     pub async fn run(self) -> Result<()> {

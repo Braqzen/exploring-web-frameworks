@@ -1,18 +1,13 @@
 mod api;
-mod cli;
-mod environment;
 mod router;
 mod server;
 mod state;
 mod task;
 
-use cli::Cli;
-use dotenvy::dotenv;
-use environment::Environment;
 use eyre::Result;
 use rust_telemetry::{Telemetry, cleanup};
 use server::Server;
-use tracing::error;
+use std::{net::SocketAddr, str::FromStr};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -23,34 +18,10 @@ async fn main() -> Result<()> {
         tracer_provider,
     } = Telemetry::init("axum")?;
 
-    // Check for any CLI arguments to prioritize
-    let args = match Cli::parse() {
-        Ok(args) => args,
-        Err(error) => {
-            error!(%error, "Failed to parse CLI arguments");
-            return Err(error);
-        }
-    };
+    let socket = std::env::var("SOCKET")?;
+    let socket = SocketAddr::from_str(&socket)?;
 
-    // Load environment variables from .env file
-    dotenv().ok();
-
-    // Parse environment variables and prioritize cli
-    let environment = match Environment::new(&args) {
-        Ok(environment) => environment,
-        Err(error) => {
-            error!(%error, "Failed to parse environment variables");
-            return Err(error);
-        }
-    };
-
-    let server = match Server::new(environment.socket).await {
-        Ok(server) => server,
-        Err(error) => {
-            error!(%error, "Failed to create server");
-            return Err(error);
-        }
-    };
+    let server = Server::new(socket);
 
     let profiling_agent = profiling_agent.start()?;
 

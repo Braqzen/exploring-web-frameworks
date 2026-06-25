@@ -12,7 +12,10 @@ use rand::{
     seq::{IndexedRandom, IteratorRandom},
 };
 use std::{collections::HashMap, time::Duration};
-use tokio::time::sleep;
+use tokio::{
+    signal::unix::{SignalKind, signal},
+    time::sleep,
+};
 use tracing::{info, instrument, warn};
 
 pub struct Worker {
@@ -33,6 +36,19 @@ impl Worker {
     }
 
     pub async fn run(&mut self) -> Result<()> {
+        // Handle running locally and interrupting the process with ctrl+c.
+        let mut sigint = signal(SignalKind::interrupt())?;
+        // Handle running in a container and terminating the process with docker stop.
+        let mut sigterm = signal(SignalKind::terminate())?;
+
+        let shutdown = async {
+            tokio::select! {
+                _ = sigint.recv() => info!("Received interrupt signal"),
+                _ = sigterm.recv() => info!("Received terminate signal"),
+            }
+        };
+        tokio::pin!(shutdown);
+
         loop {
             let (method, _) = REQUESTS.choose_weighted(&mut rng(), |(_, weight)| *weight)?;
 
@@ -44,7 +60,10 @@ impl Worker {
                 Method::Delete => self.delete().await?,
             };
 
-            sleep(Duration::from_millis(100)).await;
+            tokio::select! {
+                _ = &mut shutdown => return Ok(()),
+                _ = sleep(Duration::from_millis(100)) => {},
+            }
         }
     }
 

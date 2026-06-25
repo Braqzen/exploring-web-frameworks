@@ -4,7 +4,7 @@ use crate::payload::{Operation, Payload};
 use eyre::Result;
 use opentelemetry::{
     KeyValue, global,
-    metrics::{Counter, Gauge, Histogram},
+    metrics::{Counter, Gauge},
 };
 use opentelemetry_http::HeaderInjector;
 use reqwest::{Client as ReqwestClient, header::HeaderMap};
@@ -41,7 +41,7 @@ impl Client {
                     .json(payload)
                     .headers(otel_headers())
                     .send()
-                    .instrument(tracing::info_span!("send"))
+                    .instrument(tracing::info_span!("send", method = "POST"))
                     .await?
                     .error_for_status()?;
 
@@ -63,7 +63,7 @@ impl Client {
                     .get(&url)
                     .headers(otel_headers())
                     .send()
-                    .instrument(tracing::info_span!("send"))
+                    .instrument(tracing::info_span!("send", method = "GET"))
                     .await?
                     .error_for_status()?;
 
@@ -86,7 +86,7 @@ impl Client {
                     .json(&json!({ "operation": operation }))
                     .headers(otel_headers())
                     .send()
-                    .instrument(tracing::info_span!("send"))
+                    .instrument(tracing::info_span!("send", method = "PATCH"))
                     .await?
                     .error_for_status()?;
 
@@ -109,7 +109,7 @@ impl Client {
                     .json(&payload)
                     .headers(otel_headers())
                     .send()
-                    .instrument(tracing::info_span!("send"))
+                    .instrument(tracing::info_span!("send", method = "PUT"))
                     .await?
                     .error_for_status()?;
 
@@ -130,7 +130,7 @@ impl Client {
                     .delete(&url)
                     .headers(otel_headers())
                     .send()
-                    .instrument(tracing::info_span!("send"))
+                    .instrument(tracing::info_span!("send", method = "DELETE"))
                     .await?
                     .error_for_status()?;
 
@@ -146,7 +146,6 @@ impl Client {
 
 struct Metrics {
     requests: Counter<u64>,
-    percentile: Histogram<f64>,
     latency: Gauge<f64>,
 }
 
@@ -154,14 +153,9 @@ impl Metrics {
     fn new() -> Self {
         let meter = global::meter("client");
         let requests = meter.u64_counter("requests").build();
-        let percentile = meter.f64_histogram("percentile").with_unit("ms").build();
         let latency = meter.f64_gauge("latency").with_unit("ms").build();
 
-        Self {
-            requests,
-            percentile,
-            latency,
-        }
+        Self { requests, latency }
     }
 
     fn increment_request(&self, method: &str) {
@@ -174,14 +168,12 @@ impl Metrics {
         let attrs = &[KeyValue::new("method", method.to_string())];
 
         self.latency.record(ms, attrs);
-        self.percentile.record(ms, attrs);
     }
 
     async fn record<T, F>(&self, method: &str, fut: F) -> Result<T>
     where
         F: Future<Output = Result<T>>,
     {
-        // TODO: reqwest-middleware + reqwest-metrics instead
         self.increment_request(method);
         let start = Instant::now();
         let result = fut.await;

@@ -121,9 +121,10 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "tempo",
+        "uid": "tempo"
       },
+      "description": "How long it takes the worker to send a request to the api and receive a response.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -143,7 +144,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -152,76 +153,6 @@
         "w": 12,
         "x": 12,
         "y": 0
-      },
-      "id": 12,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "value_and_name",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.6.15",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, method) (delta(percentile_bucket{job=\"generator\"}[$__range])))",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "P50 Latency",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "fieldMinMax": false,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 12,
-        "x": 12,
-        "y": 4
       },
       "id": 14,
       "options": {
@@ -246,24 +177,36 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "tempo",
+            "uid": "tempo"
           },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.90, sum by (le, method) (delta(percentile_bucket{job=\"generator\"}[$__range])))",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
+          "limit": 20,
+          "metricsQueryType": "instant",
+          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.50) by (span.method)",
+          "queryType": "traceql",
+          "refId": "A",
+          "spss": 1,
+          "tableType": "traces"
         }
       ],
-      "title": "P90 Latency",
+      "title": "P50 Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*span\\.method=\"([^\"]+)\".*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "tempo",
+        "uid": "tempo"
       },
+      "description": "How long it takes the worker to send a request to the api and receive a response.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -283,7 +226,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -291,9 +234,9 @@
         "h": 4,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 4
       },
-      "id": 13,
+      "id": 16,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -316,17 +259,110 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "tempo",
+            "uid": "tempo"
           },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, method) (delta(percentile_bucket{job=\"generator\"}[$__range])))",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
+          "limit": 20,
+          "metricsQueryType": "instant",
+          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.95) by (span.method)",
+          "queryType": "traceql",
+          "refId": "A",
+          "spss": 1,
+          "tableType": "traces"
+        }
+      ],
+      "title": "P95 Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*span\\.method=\"([^\"]+)\".*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "How long it takes the worker to send a request to the api and receive a response.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 20,
+          "metricsQueryType": "instant",
+          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.99) by (span.method)",
+          "queryType": "traceql",
+          "refId": "A",
+          "spss": 1,
+          "tableType": "traces"
         }
       ],
       "title": "P99 Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*span\\.method=\"([^\"]+)\".*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
       "type": "stat"
     },
     {
@@ -1357,5 +1393,5 @@
   "timezone": "browser",
   "title": "Generator",
   "uid": "bfpj9xrziqiv4f",
-  "version": 4
+  "version": 2
 }
