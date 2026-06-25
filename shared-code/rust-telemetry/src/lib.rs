@@ -3,8 +3,7 @@ use opentelemetry::global;
 use opentelemetry_appender_tracing::layer::OpenTelemetryTracingBridge;
 use opentelemetry_otlp::{LogExporter, MetricExporter, SpanExporter};
 use opentelemetry_sdk::{
-    Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider,
-    propagation::TraceContextPropagator, trace::SdkTracerProvider,
+    Resource, logs::SdkLoggerProvider, metrics::SdkMeterProvider, trace::SdkTracerProvider,
 };
 use pyroscope::{
     PyroscopeAgent,
@@ -22,8 +21,6 @@ pub struct Telemetry {
 
 impl Telemetry {
     pub fn init(service_name: &str) -> Result<Self> {
-        global::set_text_map_propagator(TraceContextPropagator::new());
-
         // Set the service name to be able to filter in dashboards by service.
         let resource = Resource::builder()
             .with_service_name(service_name.to_string())
