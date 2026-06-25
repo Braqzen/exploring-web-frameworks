@@ -67,7 +67,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.post", err, skip(self))]
+    #[instrument(name = "worker.post", err, skip_all)]
     async fn post(&mut self) -> Result<()> {
         let payload = Payload::new();
 
@@ -102,7 +102,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.get", err, skip(self))]
+    #[instrument(name = "worker.get", err, skip_all)]
     async fn get(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()) else {
             // Empty hashmap so skip this iteration
@@ -135,7 +135,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.patch", err, skip(self))]
+    #[instrument(name = "worker.patch", err, skip_all)]
     async fn patch(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration
@@ -189,7 +189,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.put", err, skip(self))]
+    #[instrument(name = "worker.put", err, skip_all)]
     async fn put(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration
@@ -237,7 +237,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.delete", err, skip(self))]
+    #[instrument(name = "worker.delete", err, skip_all)]
     async fn delete(&mut self) -> Result<()> {
         let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
             // Empty hashmap so skip this iteration

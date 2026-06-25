@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -121,8 +121,8 @@
     },
     {
       "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "description": "How long it takes the worker to send a request to the api and receive a response.",
       "fieldConfig": {
@@ -144,7 +144,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -171,40 +171,92 @@
         "showPercentChange": false,
         "text": {},
         "textMode": "value_and_name",
-        "wideLayout": true
+        "wideLayout": false
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "limit": 20,
-          "metricsQueryType": "instant",
-          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.50) by (span.method)",
-          "queryType": "traceql",
-          "refId": "A",
-          "spss": 1,
-          "tableType": "traces"
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "POST",
+          "range": false,
+          "refId": "POST"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PUT",
+          "range": false,
+          "refId": "PUT"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PATCH",
+          "range": false,
+          "refId": "PATCH"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "GET",
+          "range": false,
+          "refId": "GET"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "DELETE",
+          "range": false,
+          "refId": "DELETE"
         }
       ],
       "title": "P50 Latency",
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": ".*span\\.method=\"([^\"]+)\".*",
-            "renamePattern": "$1"
-          }
-        }
-      ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "description": "How long it takes the worker to send a request to the api and receive a response.",
       "fieldConfig": {
@@ -226,7 +278,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -236,7 +288,7 @@
         "x": 12,
         "y": 4
       },
-      "id": 16,
+      "id": 17,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -253,40 +305,92 @@
         "showPercentChange": false,
         "text": {},
         "textMode": "value_and_name",
-        "wideLayout": true
+        "wideLayout": false
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "limit": 20,
-          "metricsQueryType": "instant",
-          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.95) by (span.method)",
-          "queryType": "traceql",
-          "refId": "A",
-          "spss": 1,
-          "tableType": "traces"
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "POST",
+          "range": false,
+          "refId": "POST"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PUT",
+          "range": false,
+          "refId": "PUT"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PATCH",
+          "range": false,
+          "refId": "PATCH"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "GET",
+          "range": false,
+          "refId": "GET"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "DELETE",
+          "range": false,
+          "refId": "DELETE"
         }
       ],
       "title": "P95 Latency",
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": ".*span\\.method=\"([^\"]+)\".*",
-            "renamePattern": "$1"
-          }
-        }
-      ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "tempo",
-        "uid": "tempo"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "description": "How long it takes the worker to send a request to the api and receive a response.",
       "fieldConfig": {
@@ -308,7 +412,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -318,7 +422,7 @@
         "x": 12,
         "y": 8
       },
-      "id": 15,
+      "id": 18,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -335,34 +439,86 @@
         "showPercentChange": false,
         "text": {},
         "textMode": "value_and_name",
-        "wideLayout": true
+        "wideLayout": false
       },
       "pluginVersion": "11.6.15",
       "targets": [
         {
           "datasource": {
-            "type": "tempo",
-            "uid": "tempo"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "limit": 20,
-          "metricsQueryType": "instant",
-          "query": "{ resource.service.name=\"generator\" && span:name=\"send\" }\n| quantile_over_time(span:duration, 0.99) by (span.method)",
-          "queryType": "traceql",
-          "refId": "A",
-          "spss": 1,
-          "tableType": "traces"
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "POST",
+          "range": false,
+          "refId": "POST"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PUT",
+          "range": false,
+          "refId": "PUT"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "PATCH",
+          "range": false,
+          "refId": "PATCH"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "GET",
+          "range": false,
+          "refId": "GET"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "DELETE",
+          "range": false,
+          "refId": "DELETE"
         }
       ],
       "title": "P99 Latency",
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": ".*span\\.method=\"([^\"]+)\".*",
-            "renamePattern": "$1"
-          }
-        }
-      ],
       "type": "stat"
     },
     {

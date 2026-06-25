@@ -22,6 +22,7 @@ services:
       RUST_LOG: info
       SERVER_URL: http://axum:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
       PYROSCOPE_URL: http://alloy:9999
     depends_on:
       - alloy
@@ -42,6 +43,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
       PYROSCOPE_URL: http://alloy:9999
 
   grafana:

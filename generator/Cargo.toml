@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 eyre = "0.6.12"
 opentelemetry = "0.32.0"
-opentelemetry-http = "0.32.0"
 rand = "0.10.1"
 reqwest = { version = "0.13.4", features = ["json"] }
 rust-telemetry.path = "../shared-code/rust-telemetry"
