@@ -1,11 +1,15 @@
 default: build-servers
 
 # -- Docker --
-build-servers: build-axum
+build-servers: build-axum build-actix
 
 build-axum:
 	docker rmi servers-axum:latest 2>/dev/null || true
 	docker build -t servers-axum -f services/rust/axum/Dockerfile .
+
+build-actix:
+	docker rmi servers-actix:latest 2>/dev/null || true
+	docker build -t servers-actix -f services/rust/actix/Dockerfile .
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true

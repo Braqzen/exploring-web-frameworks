@@ -20,7 +20,7 @@ services:
     command: ["/app/generator"]
     environment:
       RUST_LOG: info
-      SERVER_URL: http://axum:8000
+      SERVER_URL: http://actix:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
       PYROSCOPE_URL: http://alloy:9999
@@ -36,9 +36,23 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-axum:latest
-    ports:
-      - "8000:8000"
     command: ["/app/axum"]
+    environment:
+      RUST_LOG: info
+      SOCKET: 0.0.0.0:8000
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      PYROSCOPE_URL: http://alloy:9999
+
+  actix:
+    <<: *common-setup
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    memswap_limit: 128M
+    image: servers-actix:latest
+    command: ["/app/actix"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -72,6 +86,8 @@ services:
 
   prometheus:
     image: prom/prometheus:v3.5.4
+    ports:
+      - "9090:9090"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
@@ -102,6 +118,8 @@ services:
 
   tempo:
     image: grafana/tempo:3.0.2
+    ports:
+      - "3200:3200"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
       - ./telemetry/tempo/tempo.yaml:/etc/tempo/tempo.yaml
