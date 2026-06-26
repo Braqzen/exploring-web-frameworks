@@ -1,6 +1,9 @@
 //! The client is used to send payload requests to the server.
 
-use crate::payload::{Operation, Payload};
+use crate::{
+    api::Provider,
+    payload::{Operation, Payload},
+};
 use eyre::Result;
 use opentelemetry::{
     KeyValue, global,
@@ -14,29 +17,27 @@ use tracing::{Instrument, instrument};
 const MILLISECONDS: f64 = 1000.0;
 
 pub struct Client {
-    url: String,
     client: ReqwestClient,
     metrics: Metrics,
 }
 
 impl Client {
-    pub fn new(url: String) -> Self {
+    pub fn new() -> Self {
         let metrics = Metrics::new();
 
         Self {
-            url,
             client: ReqwestClient::new(),
             metrics,
         }
     }
 
     #[instrument(name = "client.post", err, skip_all)]
-    pub async fn post(&self, payload: &Payload) -> Result<String> {
+    pub async fn post(&self, provider: &Provider, url: &str, payload: &Payload) -> Result<String> {
         let response = self
             .metrics
-            .record("POST", async {
+            .record(provider, "POST", async {
                 self.client
-                    .post(&self.url)
+                    .post(url)
                     .json(payload)
                     .send()
                     .instrument(tracing::info_span!("send", method = "POST"))
@@ -52,11 +53,11 @@ impl Client {
     }
 
     #[instrument(name = "client.get", err, skip_all)]
-    pub async fn get(&self, task_id: &str) -> Result<Payload> {
-        let url = self.task_url(task_id);
+    pub async fn get(&self, provider: &Provider, url: &str, task_id: &str) -> Result<Payload> {
+        let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record("GET", async {
+            .record(provider, "GET", async {
                 self.client
                     .get(&url)
                     .send()
@@ -73,11 +74,17 @@ impl Client {
     }
 
     #[instrument(name = "client.patch", err, skip_all)]
-    pub async fn patch(&self, task_id: &str, operation: Operation) -> Result<Payload> {
-        let url = self.task_url(task_id);
+    pub async fn patch(
+        &self,
+        provider: &Provider,
+        url: &str,
+        task_id: &str,
+        operation: Operation,
+    ) -> Result<Payload> {
+        let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record("PATCH", async {
+            .record(provider, "PATCH", async {
                 self.client
                     .patch(&url)
                     .json(&json!({ "operation": operation }))
@@ -95,11 +102,17 @@ impl Client {
     }
 
     #[instrument(name = "client.put", err, skip_all)]
-    pub async fn put(&self, task_id: &str, payload: Payload) -> Result<Payload> {
-        let url = self.task_url(task_id);
+    pub async fn put(
+        &self,
+        provider: &Provider,
+        url: &str,
+        task_id: &str,
+        payload: Payload,
+    ) -> Result<Payload> {
+        let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record("PUT", async {
+            .record(provider, "PUT", async {
                 self.client
                     .put(&url)
                     .json(&payload)
@@ -117,10 +130,10 @@ impl Client {
     }
 
     #[instrument(name = "client.delete", err, skip_all)]
-    pub async fn delete(&self, task_id: &str) -> Result<()> {
-        let url = self.task_url(task_id);
+    pub async fn delete(&self, provider: &Provider, url: &str, task_id: &str) -> Result<()> {
+        let url = self.task_url(url, task_id);
         self.metrics
-            .record("DELETE", async {
+            .record(provider, "DELETE", async {
                 self.client
                     .delete(&url)
                     .send()
@@ -133,8 +146,8 @@ impl Client {
         Ok(())
     }
 
-    fn task_url(&self, task_id: &str) -> String {
-        format!("{}/{}", self.url.trim_end_matches('/'), task_id)
+    fn task_url(&self, url: &str, task_id: &str) -> String {
+        format!("{}/{}", url.trim_end_matches('/'), task_id)
     }
 }
 
@@ -173,27 +186,40 @@ impl Metrics {
         }
     }
 
-    fn increment_request(&self, method: &str) {
-        self.requests
-            .add(1, &[KeyValue::new("method", method.to_string())]);
+    fn increment_request(&self, provider: &Provider, method: &str) {
+        self.requests.add(
+            1,
+            &[
+                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("method", method.to_string()),
+            ],
+        );
     }
 
-    fn record_duration(&self, method: &str, elapsed: Duration) {
+    fn record_duration(&self, provider: &Provider, method: &str, elapsed: Duration) {
         let ms = elapsed.as_secs_f64() * MILLISECONDS;
-        let attrs = &[KeyValue::new("method", method.to_string())];
+        let attrs = &[
+            KeyValue::new("provider", provider.to_string()),
+            KeyValue::new("method", method.to_string()),
+        ];
 
         self.latency.record(ms, attrs);
         self.latency_percentile.record(ms, attrs);
     }
 
-    async fn record<T, E, F>(&self, method: &str, fut: F) -> std::result::Result<T, E>
+    async fn record<T, E, F>(
+        &self,
+        provider: &Provider,
+        method: &str,
+        fut: F,
+    ) -> std::result::Result<T, E>
     where
         F: Future<Output = std::result::Result<T, E>>,
     {
-        self.increment_request(method);
+        self.increment_request(provider, method);
         let start = Instant::now();
         let result = fut.await;
-        self.record_duration(method, start.elapsed());
+        self.record_duration(provider, method, start.elapsed());
         result
     }
 }

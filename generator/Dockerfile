@@ -25,5 +25,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /etc/ssl /etc/ssl
 COPY --from=builder /app/target/release/generator /app/generator
+COPY generator/config.json /app/config.json
 
 CMD ["/app/generator"]

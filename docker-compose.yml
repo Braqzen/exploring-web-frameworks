@@ -20,7 +20,6 @@ services:
     command: ["/app/generator"]
     environment:
       RUST_LOG: info
-      SERVER_URL: http://actix:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
       PYROSCOPE_URL: http://alloy:9999

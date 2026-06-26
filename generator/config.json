@@ -1,0 +1,4 @@
+[
+    {"provider": "axum", "url": "http://axum:8000", "enabled": true},
+    {"provider": "actix", "url": "http://actix:8000", "enabled": true}
+]

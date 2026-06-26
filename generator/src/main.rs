@@ -1,8 +1,10 @@
+mod api;
 mod client;
+mod config;
 mod payload;
 mod worker;
 
-use crate::{client::Client, worker::Worker};
+use crate::{config::Config, worker::Worker};
 use eyre::Result;
 use rust_telemetry::{Telemetry, cleanup};
 
@@ -15,14 +17,9 @@ async fn main() -> Result<()> {
         tracer_provider,
     } = Telemetry::init("generator")?;
 
-    // TODO: This needs to be changed to contain many server URLs
-    // Docker compose will resolve the URL and we'll use it to send payloads to the server.
-    let url = std::env::var("SERVER_URL")?;
+    let config = Config::new()?;
 
-    // Dumb client that only sends created payloads
-    let client = Client::new(url);
-
-    let mut worker = Worker::new(client);
+    let mut worker = Worker::new(config);
 
     let profiling_agent = profiling_agent.start()?;
 

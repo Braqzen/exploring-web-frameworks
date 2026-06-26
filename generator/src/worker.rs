@@ -1,12 +1,11 @@
 use crate::{
+    api::Provider,
     client::Client,
+    config::Config,
     payload::{Operation, Payload},
 };
 use eyre::Result;
-use opentelemetry::{
-    KeyValue, global,
-    metrics::{Counter, UpDownCounter},
-};
+use opentelemetry::{KeyValue, global, metrics::UpDownCounter};
 use rand::{
     RngExt, rng,
     seq::{IndexedRandom, IteratorRandom},
@@ -20,18 +19,16 @@ use tracing::{info, instrument, warn};
 
 pub struct Worker {
     client: Client,
-    tasks: HashMap<String, Payload>,
+    api_manager: ApiManager,
     metrics: Metrics,
 }
 
 impl Worker {
-    pub fn new(client: Client) -> Self {
-        let metrics = Metrics::new();
-
+    pub fn new(config: Config) -> Self {
         Self {
-            client,
-            tasks: HashMap::new(),
-            metrics,
+            client: Client::new(),
+            api_manager: ApiManager::new(config.apis()),
+            metrics: Metrics::new(),
         }
     }
 
@@ -50,14 +47,14 @@ impl Worker {
         tokio::pin!(shutdown);
 
         loop {
-            let (method, _) = REQUESTS.choose_weighted(&mut rng(), |(_, weight)| *weight)?;
+            let (provider, url, method) = self.api_manager.select();
 
             match method {
-                Method::Post => self.post().await?,
-                Method::Get => self.get().await?,
-                Method::Patch => self.patch().await?,
-                Method::Put => self.put().await?,
-                Method::Delete => self.delete().await?,
+                Method::Post => self.post(provider, url).await?,
+                Method::Get => self.get(provider, url).await?,
+                Method::Patch => self.patch(provider, url).await?,
+                Method::Put => self.put(provider, url).await?,
+                Method::Delete => self.delete(provider, url).await?,
             };
 
             tokio::select! {
@@ -68,23 +65,22 @@ impl Worker {
     }
 
     #[instrument(name = "worker.post", err, skip_all)]
-    async fn post(&mut self) -> Result<()> {
+    async fn post(&mut self, provider: Provider, url: String) -> Result<()> {
         let payload = Payload::new();
 
-        match self.client.post(&payload).await {
+        match self.client.post(&provider, &url, &payload).await {
             Ok(id) => {
                 self.metrics
-                    .increment_total_operation(&payload.operation.to_string());
-                self.metrics
-                    .increment_live_operation(&payload.operation.to_string());
+                    .increment_operation(&provider, &payload.operation.to_string());
 
-                self.tasks.insert(id.clone(), payload.clone());
+                self.api_manager.insert(&provider, &id, &payload);
 
                 info!(
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
                     id,
                     method = "POST",
+                    provider = provider.to_string(),
                     "Stored task"
                 );
                 Ok(())
@@ -95,6 +91,7 @@ impl Worker {
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
                     method = "POST",
+                    provider = provider.to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -103,20 +100,17 @@ impl Worker {
     }
 
     #[instrument(name = "worker.get", err, skip_all)]
-    async fn get(&mut self) -> Result<()> {
-        let Some(task_id) = self.tasks.keys().choose(&mut rng()) else {
-            // Empty hashmap so skip this iteration
-            return Ok(());
-        };
-        let payload = self.tasks.get(task_id).unwrap();
+    async fn get(&mut self, provider: Provider, url: String) -> Result<()> {
+        let (task_id, payload) = self.api_manager.payload(&provider);
 
-        match self.client.get(task_id).await {
+        match self.client.get(&provider, &url, &task_id).await {
             Ok(task) => {
                 info!(
                     secret = task.secret,
                     operation = task.operation.to_string(),
                     id = task_id,
                     method = "GET",
+                    provider = provider.to_string(),
                     "Retrieved task"
                 );
                 Ok(())
@@ -128,6 +122,7 @@ impl Worker {
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "GET",
+                    provider = provider.to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -136,12 +131,8 @@ impl Worker {
     }
 
     #[instrument(name = "worker.patch", err, skip_all)]
-    async fn patch(&mut self) -> Result<()> {
-        let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
-            // Empty hashmap so skip this iteration
-            return Ok(());
-        };
-        let payload = self.tasks.get(&task_id).unwrap().clone();
+    async fn patch(&mut self, provider: Provider, url: String) -> Result<()> {
+        let (task_id, payload) = self.api_manager.payload(&provider);
 
         // TODO: enforce a different operation than the current one
         let random_operation = rng().random_range(0..=3);
@@ -153,16 +144,18 @@ impl Worker {
             _ => unreachable!(),
         };
 
-        match self.client.patch(&task_id, operation.clone()).await {
+        match self
+            .client
+            .patch(&provider, &url, &task_id, operation.clone())
+            .await
+        {
             Ok(task) => {
                 self.metrics
-                    .increment_total_operation(&operation.to_string());
+                    .increment_operation(&provider, &operation.to_string());
                 self.metrics
-                    .increment_live_operation(&operation.to_string());
-                self.metrics
-                    .decrement_live_operation(&payload.operation.to_string());
+                    .decrement_operation(&provider, &payload.operation.to_string());
 
-                self.tasks.insert(task_id.clone(), task.clone());
+                self.api_manager.insert(&provider, &task_id, &task);
 
                 info!(
                     secret = payload.secret,
@@ -170,6 +163,7 @@ impl Worker {
                     to_operation = task.operation.to_string(),
                     id = task_id,
                     method = "PATCH",
+                    provider = provider.to_string(),
                     "Patched task"
                 );
                 Ok(())
@@ -182,6 +176,7 @@ impl Worker {
                     to_operation = operation.to_string(),
                     id = task_id,
                     method = "PATCH",
+                    provider = provider.to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -190,25 +185,23 @@ impl Worker {
     }
 
     #[instrument(name = "worker.put", err, skip_all)]
-    async fn put(&mut self) -> Result<()> {
-        let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
-            // Empty hashmap so skip this iteration
-            return Ok(());
-        };
-        let old_payload = self.tasks.get(&task_id).unwrap().clone();
+    async fn put(&mut self, provider: Provider, url: String) -> Result<()> {
+        let (task_id, old_payload) = self.api_manager.payload(&provider);
 
         let new_payload = Payload::new();
 
-        match self.client.put(&task_id, new_payload.clone()).await {
+        match self
+            .client
+            .put(&provider, &url, &task_id, new_payload.clone())
+            .await
+        {
             Ok(task) => {
                 self.metrics
-                    .increment_total_operation(&new_payload.operation.to_string());
+                    .increment_operation(&provider, &new_payload.operation.to_string());
                 self.metrics
-                    .increment_live_operation(&new_payload.operation.to_string());
-                self.metrics
-                    .decrement_live_operation(&old_payload.operation.to_string());
+                    .decrement_operation(&provider, &old_payload.operation.to_string());
 
-                self.tasks.insert(task_id.clone(), task.clone());
+                self.api_manager.insert(&provider, &task_id, &task);
 
                 info!(
                     from_secret = old_payload.secret,
@@ -217,6 +210,7 @@ impl Worker {
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
                     method = "PUT",
+                    provider = provider.to_string(),
                     "Put task"
                 );
                 Ok(())
@@ -230,6 +224,7 @@ impl Worker {
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
                     method = "PUT",
+                    provider = provider.to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -238,33 +233,112 @@ impl Worker {
     }
 
     #[instrument(name = "worker.delete", err, skip_all)]
-    async fn delete(&mut self) -> Result<()> {
-        let Some(task_id) = self.tasks.keys().choose(&mut rng()).cloned() else {
-            // Empty hashmap so skip this iteration
-            return Ok(());
-        };
+    async fn delete(&mut self, provider: Provider, url: String) -> Result<()> {
+        let (task_id, payload) = self.api_manager.payload(&provider);
 
-        match self.client.delete(&task_id).await {
+        match self.client.delete(&provider, &url, &task_id).await {
             Ok(_) => {
-                let payload = self.tasks.remove(&task_id).unwrap();
+                self.api_manager.remove(&provider, &task_id);
                 self.metrics
-                    .decrement_live_operation(&payload.operation.to_string());
+                    .decrement_operation(&provider, &payload.operation.to_string());
 
                 info!(
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "DELETE",
+                    provider = provider.to_string(),
                     "Deleted task"
                 );
                 Ok(())
             }
             Err(error) => {
-                warn!(%error, task_id, method = "DELETE", "Failed client request");
+                warn!(%error, task_id, method = "DELETE", provider = provider.to_string(), "Failed client request");
                 Err(error)
             }
         }
     }
+}
+
+struct ApiManager {
+    apis: HashMap<Provider, ApiState>,
+}
+
+// TODO: This currently assumes worker passes provider around so safe to unwrap but API will
+//       panic if config excludes Provider and they pass that 1 in
+impl ApiManager {
+    fn new(apis: HashMap<Provider, String>) -> Self {
+        let apis = apis
+            .into_iter()
+            .map(|(provider, url)| {
+                (
+                    provider,
+                    ApiState {
+                        url,
+                        tasks: HashMap::new(),
+                    },
+                )
+            })
+            .collect();
+
+        Self { apis }
+    }
+
+    fn select(&self) -> (Provider, String, Method) {
+        // SAFETY: We hold exlusive access to apis and it's non-empty therefore cannot panic
+        let (provider, state) = self.apis.iter().choose(&mut rng()).unwrap();
+
+        if state.tasks.is_empty() {
+            (provider.clone(), state.url.clone(), Method::Post)
+        } else {
+            // SAFETY: REQUESTS is non-empty and has values greater than 0
+            let (method, _) = REQUESTS
+                .choose_weighted(&mut rng(), |(_, weight)| *weight)
+                .unwrap();
+
+            (provider.clone(), state.url.clone(), method.to_owned())
+        }
+    }
+
+    fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) {
+        // SAFETY: Currently unsafe, can panic
+        self.apis
+            .get_mut(&provider)
+            .unwrap()
+            .tasks
+            .insert(id.clone(), payload.clone());
+    }
+
+    fn remove(&mut self, provider: &Provider, task_id: &String) {
+        // SAFETY: Currently unsafe, can panic
+        self.apis
+            .get_mut(&provider)
+            .unwrap()
+            .tasks
+            .remove(task_id)
+            .unwrap();
+    }
+
+    fn payload(&self, provider: &Provider) -> (String, Payload) {
+        // SAFETY: Currently unsafe, can panic
+        let (task_id, payload) = self
+            .apis
+            .get(provider)
+            .unwrap()
+            .tasks
+            .iter()
+            .choose(&mut rng())
+            .unwrap();
+
+        (task_id.clone(), payload.clone())
+    }
+}
+
+struct ApiState {
+    /// URL of the container to send a request to
+    url: String,
+    /// Task ID -> Payload
+    tasks: HashMap<String, Payload>,
 }
 
 /// Distribution mapping the method to a weight percentage for random selection.
@@ -279,6 +353,7 @@ const REQUESTS: [(Method, u32); 5] = [
 ];
 
 /// The method of the HTTP request to send to a server.
+#[derive(Clone, PartialEq)]
 enum Method {
     Post,
     Get,
@@ -288,37 +363,36 @@ enum Method {
 }
 
 struct Metrics {
-    total_operations: Counter<u64>,
-    live_operations: UpDownCounter<i64>,
+    /// Number of operations in memory per API and operation type
+    operations: UpDownCounter<i64>,
 }
 
 impl Metrics {
     fn new() -> Self {
         let meter = global::meter("worker");
-        // Track total operations over time
-        let total_operations = meter.u64_counter("total_operations").build();
 
-        // Track the number of live tasks
-        let live_operations = meter.i64_up_down_counter("live_operations").build();
+        let operations = meter.i64_up_down_counter("live_operations").build();
 
-        Self {
-            total_operations,
-            live_operations,
-        }
+        Self { operations }
     }
 
-    fn increment_total_operation(&self, operation: &str) {
-        self.total_operations
-            .add(1, &[KeyValue::new("operation", operation.to_string())]);
+    fn increment_operation(&self, provider: &Provider, operation: &str) {
+        self.operations.add(
+            1,
+            &[
+                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("operation", operation.to_string()),
+            ],
+        );
     }
 
-    fn increment_live_operation(&self, operation: &str) {
-        self.live_operations
-            .add(1, &[KeyValue::new("operation", operation.to_string())]);
-    }
-
-    fn decrement_live_operation(&self, operation: &str) {
-        self.live_operations
-            .add(-1, &[KeyValue::new("operation", operation.to_string())]);
+    fn decrement_operation(&self, provider: &Provider, operation: &str) {
+        self.operations.add(
+            -1,
+            &[
+                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("operation", operation.to_string()),
+            ],
+        );
     }
 }
