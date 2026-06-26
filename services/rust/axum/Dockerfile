@@ -3,7 +3,7 @@ RUN cargo install --locked cargo-chef
 
 FROM chef AS planner
 WORKDIR /app
-COPY services/axum .
+COPY services/rust/axum .
 COPY shared-code /shared-code
 RUN cargo chef prepare --recipe-path recipe.json
 
@@ -14,7 +14,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     cargo chef cook --release --recipe-path recipe.json
-COPY services/axum .
+COPY services/rust/axum .
 COPY shared-code /shared-code
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
