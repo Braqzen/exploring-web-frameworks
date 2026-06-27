@@ -103,7 +103,11 @@ impl Worker {
     async fn get(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, payload) = self.api_manager.payload(&provider);
 
-        match self.client.get(&provider, &url, &task_id).await {
+        match self
+            .client
+            .get(&provider, &url, &task_id, &payload.operation)
+            .await
+        {
             Ok(task) => {
                 info!(
                     secret = task.secret,
@@ -236,7 +240,11 @@ impl Worker {
     async fn delete(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, payload) = self.api_manager.payload(&provider);
 
-        match self.client.delete(&provider, &url, &task_id).await {
+        match self
+            .client
+            .delete(&provider, &url, &task_id, &payload.operation)
+            .await
+        {
             Ok(_) => {
                 self.api_manager.remove(&provider, &task_id);
                 self.metrics

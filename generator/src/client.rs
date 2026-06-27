@@ -35,12 +35,12 @@ impl Client {
     pub async fn post(&self, provider: &Provider, url: &str, payload: &Payload) -> Result<String> {
         let response = self
             .metrics
-            .record(provider, "POST", async {
+            .record(provider, &payload.operation, "POST", async {
                 self.client
                     .post(url)
                     .json(payload)
                     .send()
-                    .instrument(tracing::info_span!("send", method = "POST"))
+                    .instrument(tracing::info_span!("send"))
                     .await
             })
             .await?
@@ -53,15 +53,21 @@ impl Client {
     }
 
     #[instrument(name = "client.get", err, skip_all)]
-    pub async fn get(&self, provider: &Provider, url: &str, task_id: &str) -> Result<Payload> {
+    pub async fn get(
+        &self,
+        provider: &Provider,
+        url: &str,
+        task_id: &str,
+        operation: &Operation,
+    ) -> Result<Payload> {
         let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record(provider, "GET", async {
+            .record(provider, &operation, "GET", async {
                 self.client
                     .get(&url)
                     .send()
-                    .instrument(tracing::info_span!("send", method = "GET"))
+                    .instrument(tracing::info_span!("send"))
                     .await
             })
             .await?
@@ -84,12 +90,12 @@ impl Client {
         let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record(provider, "PATCH", async {
+            .record(provider, &operation, "PATCH", async {
                 self.client
                     .patch(&url)
                     .json(&json!({ "operation": operation }))
                     .send()
-                    .instrument(tracing::info_span!("send", method = "PATCH"))
+                    .instrument(tracing::info_span!("send"))
                     .await
             })
             .await?
@@ -112,12 +118,12 @@ impl Client {
         let url = self.task_url(url, task_id);
         let response = self
             .metrics
-            .record(provider, "PUT", async {
+            .record(provider, &payload.operation, "PUT", async {
                 self.client
                     .put(&url)
                     .json(&payload)
                     .send()
-                    .instrument(tracing::info_span!("send", method = "PUT"))
+                    .instrument(tracing::info_span!("send"))
                     .await
             })
             .await?
@@ -130,14 +136,20 @@ impl Client {
     }
 
     #[instrument(name = "client.delete", err, skip_all)]
-    pub async fn delete(&self, provider: &Provider, url: &str, task_id: &str) -> Result<()> {
+    pub async fn delete(
+        &self,
+        provider: &Provider,
+        url: &str,
+        task_id: &str,
+        operation: &Operation,
+    ) -> Result<()> {
         let url = self.task_url(url, task_id);
         self.metrics
-            .record(provider, "DELETE", async {
+            .record(provider, &operation, "DELETE", async {
                 self.client
                     .delete(&url)
                     .send()
-                    .instrument(tracing::info_span!("send", method = "DELETE"))
+                    .instrument(tracing::info_span!("send"))
                     .await
             })
             .await?
@@ -183,20 +195,28 @@ impl Metrics {
         }
     }
 
-    fn increment_request(&self, provider: &Provider, method: &str) {
+    fn increment_request(&self, provider: &Provider, operation: &Operation, method: &str) {
         self.requests.add(
             1,
             &[
                 KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("operation", operation.to_string()),
                 KeyValue::new("method", method.to_string()),
             ],
         );
     }
 
-    fn record_duration(&self, provider: &Provider, method: &str, elapsed: Duration) {
+    fn record_duration(
+        &self,
+        provider: &Provider,
+        operation: &Operation,
+        method: &str,
+        elapsed: Duration,
+    ) {
         let ms = elapsed.as_secs_f64() * MILLISECONDS;
         let attrs = &[
             KeyValue::new("provider", provider.to_string()),
+            KeyValue::new("operation", operation.to_string()),
             KeyValue::new("method", method.to_string()),
         ];
 
@@ -207,16 +227,17 @@ impl Metrics {
     async fn record<T, E, F>(
         &self,
         provider: &Provider,
+        operation: &Operation,
         method: &str,
         fut: F,
     ) -> std::result::Result<T, E>
     where
         F: Future<Output = std::result::Result<T, E>>,
     {
-        self.increment_request(provider, method);
+        self.increment_request(provider, operation, method);
         let start = Instant::now();
         let result = fut.await;
-        self.record_duration(provider, method, start.elapsed());
+        self.record_duration(provider, operation, method, start.elapsed());
         result
     }
 }

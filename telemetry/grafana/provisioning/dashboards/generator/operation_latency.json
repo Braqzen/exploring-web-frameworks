@@ -15,10 +15,11 @@
         }
       ]
     },
+    "description": "Latency of each operation at each point in time",
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 4,
+    "id": 12,
     "links": [],
     "panels": [
       {
@@ -83,7 +84,7 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 8,
+          "h": 9,
           "w": 12,
           "x": 0,
           "y": 0
@@ -110,13 +111,13 @@
               "uid": "prometheus"
             },
             "editorMode": "code",
-            "expr": "latency{job=\"generator\", method=\"POST\"}",
+            "expr": "avg by (provider) (latency{job=\"generator\", operation=\"compute\"})",
             "legendFormat": "{{provider}}",
             "range": true,
             "refId": "A"
           }
         ],
-        "title": "POST Latency",
+        "title": "Compute Latency",
         "type": "timeseries"
       },
       {
@@ -181,12 +182,12 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 8,
+          "h": 9,
           "w": 12,
           "x": 12,
           "y": 0
         },
-        "id": 20,
+        "id": 13,
         "options": {
           "legend": {
             "calcs": [],
@@ -208,13 +209,13 @@
               "uid": "prometheus"
             },
             "editorMode": "code",
-            "expr": "latency{job=\"generator\", method=\"PATCH\"}",
+            "expr": "avg by (provider) (latency{job=\"generator\", operation=\"merge\"})",
             "legendFormat": "{{provider}}",
             "range": true,
             "refId": "A"
           }
         ],
-        "title": "PATCH Latency",
+        "title": "Merge Latency",
         "type": "timeseries"
       },
       {
@@ -279,12 +280,12 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 8,
+          "h": 9,
           "w": 12,
           "x": 0,
-          "y": 8
+          "y": 9
         },
-        "id": 19,
+        "id": 12,
         "options": {
           "legend": {
             "calcs": [],
@@ -306,13 +307,13 @@
               "uid": "prometheus"
             },
             "editorMode": "code",
-            "expr": "latency{job=\"generator\", method=\"PUT\"}",
+            "expr": "avg by (provider) (latency{job=\"generator\", operation=\"sort\"})",
             "legendFormat": "{{provider}}",
             "range": true,
             "refId": "A"
           }
         ],
-        "title": "PUT Latency",
+        "title": "Sort Latency",
         "type": "timeseries"
       },
       {
@@ -377,12 +378,12 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 8,
+          "h": 9,
           "w": 12,
           "x": 12,
-          "y": 8
+          "y": 9
         },
-        "id": 21,
+        "id": 14,
         "options": {
           "legend": {
             "calcs": [],
@@ -404,111 +405,13 @@
               "uid": "prometheus"
             },
             "editorMode": "code",
-            "expr": "latency{job=\"generator\", method=\"GET\"}",
+            "expr": "avg by (provider) (latency{job=\"generator\", operation=\"transform\"})",
             "legendFormat": "{{provider}}",
             "range": true,
             "refId": "A"
           }
         ],
-        "title": "GET Latency",
-        "type": "timeseries"
-      },
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": true,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisGridShow": true,
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 0,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "linear",
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green"
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "unit": "ms"
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 0,
-          "y": 16
-        },
-        "id": 22,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "desc"
-          }
-        },
-        "pluginVersion": "11.6.15",
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "prometheus"
-            },
-            "editorMode": "code",
-            "expr": "latency{job=\"generator\", method=\"DELETE\"}",
-            "legendFormat": "{{provider}}",
-            "range": true,
-            "refId": "A"
-          }
-        ],
-        "title": "DELETE Latency",
+        "title": "Transform Latency",
         "type": "timeseries"
       }
     ],
@@ -525,7 +428,7 @@
     },
     "timepicker": {},
     "timezone": "browser",
-    "title": "Method Latency (no aggregation)",
-    "uid": "dfqbw02rqclxcd",
+    "title": "Operation Latency",
+    "uid": "b5qh8f07i3anss",
     "version": 2
 }
