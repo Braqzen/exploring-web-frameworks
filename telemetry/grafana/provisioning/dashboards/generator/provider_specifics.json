@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 4,
   "links": [],
   "panels": [
     {
@@ -2239,25 +2239,27 @@
       {
         "allowCustomValue": false,
         "current": {
-          "text": "axum",
-          "value": "axum"
+          "text": "actix",
+          "value": "actix"
         },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(provider)",
+        "includeAll": false,
         "label": "provider",
         "name": "provider",
-        "options": [
-          {
-            "selected": true,
-            "text": "axum",
-            "value": "axum"
-          },
-          {
-            "selected": false,
-            "text": "actix",
-            "value": "actix"
-          }
-        ],
-        "query": "axum,actix",
-        "type": "custom"
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(provider)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },

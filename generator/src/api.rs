@@ -11,6 +11,7 @@ use std::collections::HashMap;
 pub enum Provider {
     Axum,
     Actix,
+    Warp,
 }
 
 impl ToString for Provider {
@@ -18,6 +19,7 @@ impl ToString for Provider {
         match self {
             Provider::Axum => "axum".to_string(),
             Provider::Actix => "actix".to_string(),
+            Provider::Warp => "warp".to_string(),
         }
     }
 }

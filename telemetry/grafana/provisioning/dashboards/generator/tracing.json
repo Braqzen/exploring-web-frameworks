@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 13,
+  "id": 5,
   "links": [],
   "panels": [
     {
@@ -244,79 +244,62 @@
   "templating": {
     "list": [
       {
-        "allValue": ".*",
         "allowCustomValue": false,
         "current": {
-          "text": [
-            "$__all"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
         },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(provider)",
         "includeAll": true,
         "label": "provider",
         "multi": true,
         "name": "provider",
-        "options": [
-          {
-            "selected": false,
-            "text": "axum",
-            "value": "axum"
-          },
-          {
-            "selected": false,
-            "text": "actix",
-            "value": "actix"
-          }
-        ],
-        "query": "axum,actix",
-        "type": "custom"
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(provider)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       },
       {
-        "allValue": ".*",
         "allowCustomValue": false,
         "current": {
           "text": [
-            "$__all"
+            "All"
           ],
           "value": [
             "$__all"
           ]
         },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(method)",
         "includeAll": true,
         "label": "method",
         "multi": true,
         "name": "method",
-        "options": [
-          {
-            "selected": false,
-            "text": "POST",
-            "value": "POST"
-          },
-          {
-            "selected": false,
-            "text": "GET",
-            "value": "GET"
-          },
-          {
-            "selected": false,
-            "text": "PUT",
-            "value": "PUT"
-          },
-          {
-            "selected": false,
-            "text": "PATCH",
-            "value": "PATCH"
-          },
-          {
-            "selected": false,
-            "text": "DELETE",
-            "value": "DELETE"
-          }
-        ],
-        "query": "POST,GET,PUT,PATCH,DELETE",
-        "type": "custom"
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(method)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -328,5 +311,5 @@
   "timezone": "browser",
   "title": "Tracing",
   "uid": "afqdvyxrduupsb",
-  "version": 3
+  "version": 2
 }

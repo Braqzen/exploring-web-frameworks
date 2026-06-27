@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 10,
   "links": [],
   "panels": [
     {
@@ -153,7 +153,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\"\n| provider=~\"(?i)$provider\"\n| detected_level=~\"(?i)$level\"\n| id=~\"(?i)$id\"\n| line_format \"{{ if .method }}{{ .method }}{{ else }}{{ __line__ }}{{ end }}{{ if .provider }} | {{ .provider }}{{ end }}{{ if .operation }} | {{ .operation }}{{ end }}{{ if .id }} | {{ .id }}{{ end }}\"",
+          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\" or to_operation=~\"(?i)$operation\"\n| provider=~\"(?i)$provider\"\n| detected_level=~\"(?i)$level\"\n| id=~\"(?i)$id\"\n| line_format \"{{ if .method }}{{ .method }}{{ else }}{{ __line__ }}{{ end }}{{ if .provider }} | {{ .provider }}{{ end }}{{ if .operation }} | {{ .operation }}{{ else if .to_operation }} | {{ .to_operation }}{{ end }}{{ if .id }} | {{ .id }}{{ end }}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -170,119 +170,96 @@
     "list": [
       {
         "allValue": ".*",
+        "allowCustomValue": false,
         "current": {
           "text": [
-            "$__all"
+            "All"
           ],
           "value": [
             "$__all"
           ]
         },
-        "description": "CRUD method to filter logs by",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(method)",
         "includeAll": true,
         "label": "method",
         "multi": true,
         "name": "method",
-        "options": [
-          {
-            "selected": false,
-            "text": "POST",
-            "value": "POST"
-          },
-          {
-            "selected": false,
-            "text": "GET",
-            "value": "GET"
-          },
-          {
-            "selected": false,
-            "text": "PATCH",
-            "value": "PATCH"
-          },
-          {
-            "selected": false,
-            "text": "PUT",
-            "value": "PUT"
-          },
-          {
-            "selected": false,
-            "text": "DELETE",
-            "value": "DELETE"
-          }
-        ],
-        "query": "POST,GET,PATCH,PUT,DELETE",
-        "type": "custom"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "text": [
-            "$__all"
-          ],
-          "value": [
-            "$__all"
-          ]
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(method)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "description": "Payload operation",
-        "includeAll": true,
-        "label": "operation",
-        "multi": true,
-        "name": "operation",
-        "options": [
-          {
-            "selected": false,
-            "text": "COMPUTE",
-            "value": "COMPUTE"
-          },
-          {
-            "selected": false,
-            "text": "MERGE",
-            "value": "MERGE"
-          },
-          {
-            "selected": false,
-            "text": "SORT",
-            "value": "SORT"
-          },
-          {
-            "selected": false,
-            "text": "TRANSFORM",
-            "value": "TRANSFORM"
-          }
-        ],
-        "query": "COMPUTE,MERGE,SORT,TRANSFORM",
-        "type": "custom"
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       },
       {
         "allValue": ".*",
         "allowCustomValue": false,
         "current": {
           "text": [
-            "$__all"
+            "All"
           ],
           "value": [
             "$__all"
           ]
         },
-        "description": "Which provider to filter logs by",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(operation)",
+        "includeAll": true,
+        "label": "operation",
+        "multi": true,
+        "name": "operation",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(operation)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(provider)",
         "includeAll": true,
         "label": "provider",
         "multi": true,
         "name": "provider",
-        "options": [
-          {
-            "selected": false,
-            "text": "axum",
-            "value": "axum"
-          },
-          {
-            "selected": false,
-            "text": "actix",
-            "value": "actix"
-          }
-        ],
-        "query": "axum,actix",
-        "type": "custom"
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(provider)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       },
       {
         "allValue": ".*",
@@ -353,5 +330,5 @@
   "timezone": "browser",
   "title": "Logs",
   "uid": "bfpj9xrziqiv4f",
-  "version": 2
+  "version": 1
 }
