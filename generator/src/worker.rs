@@ -72,7 +72,7 @@ impl Worker {
         Ok(())
     }
 
-    #[instrument(name = "worker.post", err, skip_all)]
+    #[instrument(name = "worker.post", skip_all)]
     async fn post(&mut self, provider: Provider, url: String) -> Result<()> {
         let payload = Payload::new();
 
@@ -107,7 +107,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.get", err, skip_all)]
+    #[instrument(name = "worker.get", skip_all)]
     async fn get(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
@@ -142,7 +142,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.patch", err, skip_all)]
+    #[instrument(name = "worker.patch", skip_all)]
     async fn patch(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
@@ -167,7 +167,7 @@ impl Worker {
                 self.metrics
                     .decrement_operation(&provider, &payload.operation.to_string());
 
-                self.api_manager.insert(&provider, &task_id, &task);
+                let _ = self.insert(&provider, &task_id, &task)?;
 
                 info!(
                     secret = payload.secret,
@@ -196,7 +196,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.put", err, skip_all)]
+    #[instrument(name = "worker.put", skip_all)]
     async fn put(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, old_payload) = self.payload(&provider)?;
 
@@ -244,7 +244,7 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.delete", err, skip_all)]
+    #[instrument(name = "worker.delete", skip_all)]
     async fn delete(&mut self, provider: Provider, url: String) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
@@ -311,22 +311,19 @@ impl Worker {
         }
     }
 
-    fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) -> Result<Payload> {
-        match self.api_manager.insert(&provider, &id, &payload) {
-            Some(payload) => Ok(payload),
-            None => {
-                return {
-                    warn!(
-                        provider = provider.to_string(),
-                        "Failed to insert payload for provider",
-                    );
-                    Err(eyre::eyre!(
-                        "Failed to insert payload for provider {}",
-                        provider.to_string()
-                    ))
-                };
-            }
-        }
+    fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) -> Result<()> {
+        self.api_manager
+            .insert(provider, id, payload)
+            .ok_or_else(|| {
+                warn!(
+                    provider = provider.to_string(),
+                    "Failed to insert payload for provider"
+                );
+                eyre::eyre!(
+                    "Failed to insert payload for provider {}",
+                    provider.to_string()
+                )
+            })
     }
 }
 

@@ -60,16 +60,12 @@ impl ApiManager {
         }
     }
 
-    pub fn insert(
-        &mut self,
-        provider: &Provider,
-        id: &String,
-        payload: &Payload,
-    ) -> Option<Payload> {
+    pub fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) -> Option<()> {
         self.apis
-            .get_mut(&provider)?
+            .get_mut(provider)?
             .tasks
-            .insert(id.clone(), payload.clone())
+            .insert(id.clone(), payload.clone());
+        Some(())
     }
 
     pub fn remove(&mut self, provider: &Provider, task_id: &String) -> Option<Payload> {
