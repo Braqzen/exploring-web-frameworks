@@ -1,16 +1,13 @@
 use crate::{
-    api::Provider,
+    api::{ApiManager, Method, Provider},
     client::Client,
     config::Config,
     payload::{Operation, Payload},
 };
 use eyre::Result;
 use opentelemetry::{KeyValue, global, metrics::UpDownCounter};
-use rand::{
-    RngExt, rng,
-    seq::{IndexedRandom, IteratorRandom},
-};
-use std::{collections::HashMap, time::Duration};
+use rand::{RngExt, rng};
+use std::time::Duration;
 use tokio::{
     signal::unix::{SignalKind, signal},
     time::sleep,
@@ -49,7 +46,8 @@ impl Worker {
         tokio::pin!(shutdown);
 
         loop {
-            self.send_request().await?;
+            // Ignore error try again
+            let _ = self.send_request().await;
 
             tokio::select! {
                 _ = &mut shutdown => return Ok(()),
@@ -83,7 +81,7 @@ impl Worker {
                 self.metrics
                     .increment_operation(&provider, &payload.operation.to_string());
 
-                self.api_manager.insert(&provider, &id, &payload);
+                let _ = self.insert(&provider, &id, &payload)?;
 
                 info!(
                     secret = payload.secret,
@@ -111,7 +109,7 @@ impl Worker {
 
     #[instrument(name = "worker.get", err, skip_all)]
     async fn get(&mut self, provider: Provider, url: String) -> Result<()> {
-        let (task_id, payload) = self.api_manager.payload(&provider);
+        let (task_id, payload) = self.payload(&provider)?;
 
         match self
             .client
@@ -146,7 +144,7 @@ impl Worker {
 
     #[instrument(name = "worker.patch", err, skip_all)]
     async fn patch(&mut self, provider: Provider, url: String) -> Result<()> {
-        let (task_id, payload) = self.api_manager.payload(&provider);
+        let (task_id, payload) = self.payload(&provider)?;
 
         // TODO: enforce a different operation than the current one
         let random_operation = rng().random_range(0..=3);
@@ -200,7 +198,7 @@ impl Worker {
 
     #[instrument(name = "worker.put", err, skip_all)]
     async fn put(&mut self, provider: Provider, url: String) -> Result<()> {
-        let (task_id, old_payload) = self.api_manager.payload(&provider);
+        let (task_id, old_payload) = self.payload(&provider)?;
 
         let new_payload = Payload::new();
 
@@ -215,7 +213,7 @@ impl Worker {
                 self.metrics
                     .decrement_operation(&provider, &old_payload.operation.to_string());
 
-                self.api_manager.insert(&provider, &task_id, &task);
+                let _ = self.insert(&provider, &task_id, &task)?;
 
                 info!(
                     from_secret = old_payload.secret,
@@ -248,7 +246,7 @@ impl Worker {
 
     #[instrument(name = "worker.delete", err, skip_all)]
     async fn delete(&mut self, provider: Provider, url: String) -> Result<()> {
-        let (task_id, payload) = self.api_manager.payload(&provider);
+        let (task_id, payload) = self.payload(&provider)?;
 
         match self
             .client
@@ -256,7 +254,7 @@ impl Worker {
             .await
         {
             Ok(_) => {
-                self.api_manager.remove(&provider, &task_id);
+                let _ = self.remove(&provider, &task_id)?;
                 self.metrics
                     .decrement_operation(&provider, &payload.operation.to_string());
 
@@ -276,120 +274,59 @@ impl Worker {
             }
         }
     }
-}
 
-struct ApiManager {
-    apis: HashMap<Provider, ApiState>,
-}
-
-// TODO: This currently assumes worker passes provider around so safe to unwrap but API will
-//       panic if config excludes Provider and they pass that 1 in
-impl ApiManager {
-    fn new(apis: HashMap<Provider, String>) -> Self {
-        let apis = apis
-            .into_iter()
-            .map(|(provider, url)| {
-                (
-                    provider,
-                    ApiState {
-                        url,
-                        tasks: HashMap::new(),
-                    },
-                )
-            })
-            .collect();
-
-        Self { apis }
+    fn payload(&self, provider: &Provider) -> Result<(String, Payload)> {
+        match self.api_manager.payload(&provider) {
+            Some((task_id, payload)) => return Ok((task_id, payload)),
+            None => {
+                return {
+                    warn!(
+                        provider = provider.to_string(),
+                        "Missing payload for provider",
+                    );
+                    Err(eyre::eyre!(
+                        "Missing payload for provider {}",
+                        provider.to_string()
+                    ))
+                };
+            }
+        };
     }
 
-    fn select(&self) -> (Provider, String, Method) {
-        // SAFETY: We hold exlusive access to apis and it's non-empty therefore cannot panic
-        let (provider, state) = self.apis.iter().choose(&mut rng()).unwrap();
-
-        if state.tasks.is_empty() {
-            (provider.clone(), state.url.clone(), Method::Post)
-        } else {
-            // SAFETY: REQUESTS is non-empty and has values greater than 0
-            let (method, _) = REQUESTS
-                .choose_weighted(&mut rng(), |(_, weight)| *weight)
-                .unwrap();
-
-            (provider.clone(), state.url.clone(), method.to_owned())
+    fn remove(&mut self, provider: &Provider, task_id: &String) -> Result<Payload> {
+        match self.api_manager.remove(&provider, &task_id) {
+            Some(payload) => Ok(payload),
+            None => {
+                return {
+                    warn!(
+                        provider = provider.to_string(),
+                        "Failed to remove payload for provider",
+                    );
+                    Err(eyre::eyre!(
+                        "Failed to remove payload for provider {}",
+                        provider.to_string()
+                    ))
+                };
+            }
         }
     }
 
-    fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) {
-        // SAFETY: Currently unsafe, can panic
-        self.apis
-            .get_mut(&provider)
-            .unwrap()
-            .tasks
-            .insert(id.clone(), payload.clone());
-    }
-
-    fn remove(&mut self, provider: &Provider, task_id: &String) {
-        // SAFETY: Currently unsafe, can panic
-        self.apis
-            .get_mut(&provider)
-            .unwrap()
-            .tasks
-            .remove(task_id)
-            .unwrap();
-    }
-
-    fn payload(&self, provider: &Provider) -> (String, Payload) {
-        // SAFETY: Currently unsafe, can panic
-        let (task_id, payload) = self
-            .apis
-            .get(provider)
-            .unwrap()
-            .tasks
-            .iter()
-            .choose(&mut rng())
-            .unwrap();
-
-        (task_id.clone(), payload.clone())
-    }
-}
-
-struct ApiState {
-    /// URL of the container to send a request to
-    url: String,
-    /// Task ID -> Payload
-    tasks: HashMap<String, Payload>,
-}
-
-/// Distribution mapping the method to a weight percentage for random selection.
-///
-/// I.e. call this method X% of the time.
-const REQUESTS: [(Method, u32); 5] = [
-    (Method::Post, 40),   // 40%
-    (Method::Get, 25),    // 25%
-    (Method::Patch, 15),  // 15%
-    (Method::Put, 10),    // 10%
-    (Method::Delete, 10), // 10%
-];
-
-/// The method of the HTTP request to send to a server.
-#[derive(Clone, PartialEq)]
-enum Method {
-    Post,
-    Get,
-    Patch,
-    Put,
-    Delete,
-}
-
-impl ToString for Method {
-    fn to_string(&self) -> String {
-        match self {
-            Method::Post => "POST",
-            Method::Get => "GET",
-            Method::Patch => "PATCH",
-            Method::Put => "PUT",
-            Method::Delete => "DELETE",
+    fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) -> Result<Payload> {
+        match self.api_manager.insert(&provider, &id, &payload) {
+            Some(payload) => Ok(payload),
+            None => {
+                return {
+                    warn!(
+                        provider = provider.to_string(),
+                        "Failed to insert payload for provider",
+                    );
+                    Err(eyre::eyre!(
+                        "Failed to insert payload for provider {}",
+                        provider.to_string()
+                    ))
+                };
+            }
         }
-        .to_string()
     }
 }
 
