@@ -180,7 +180,7 @@ impl Metrics {
 
         // Create histogram bucket boundaries for metrics to be rounded into
         // This means we are not getting exact values for latency
-        let boundaries: Vec<f64> = (1..=100).map(|i| i as f64 * 0.1).collect();
+        let boundaries: Vec<f64> = (1..=30).map(|i| i as f64 * 0.1).collect();
 
         let latency_percentile = meter
             .f64_histogram("latency_percentile")

@@ -1,4 +1,4 @@
-//! The payload sent to the server.
+//! The payload sent to a provider.
 //!
 //! Operation is a pointless variable used to put/patch requests and use in dashboards.
 

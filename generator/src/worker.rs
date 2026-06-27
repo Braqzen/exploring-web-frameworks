@@ -15,20 +15,22 @@ use tokio::{
     signal::unix::{SignalKind, signal},
     time::sleep,
 };
-use tracing::{info, instrument, warn};
+use tracing::{field::Empty, info, instrument, warn};
 
 pub struct Worker {
-    client: Client,
     api_manager: ApiManager,
+    client: Client,
     metrics: Metrics,
+    sleep: u64,
 }
 
 impl Worker {
     pub fn new(config: Config) -> Self {
         Self {
+            api_manager: ApiManager::new(config.api()),
             client: Client::new(),
-            api_manager: ApiManager::new(config.apis()),
             metrics: Metrics::new(),
+            sleep: config.sleep(),
         }
     }
 
@@ -47,21 +49,29 @@ impl Worker {
         tokio::pin!(shutdown);
 
         loop {
-            let (provider, url, method) = self.api_manager.select();
-
-            match method {
-                Method::Post => self.post(provider, url).await?,
-                Method::Get => self.get(provider, url).await?,
-                Method::Patch => self.patch(provider, url).await?,
-                Method::Put => self.put(provider, url).await?,
-                Method::Delete => self.delete(provider, url).await?,
-            };
+            self.send_request().await?;
 
             tokio::select! {
                 _ = &mut shutdown => return Ok(()),
-                _ = sleep(Duration::from_millis(100)) => {},
+                _ = sleep(Duration::from_millis(self.sleep)) => {},
             }
         }
+    }
+
+    #[instrument(name = "worker.send_request", skip_all, fields(provider = Empty, method = Empty))]
+    async fn send_request(&mut self) -> Result<()> {
+        let (provider, url, method) = self.api_manager.select();
+        tracing::Span::current().record("provider", provider.to_string());
+        tracing::Span::current().record("method", method.to_string());
+
+        match method {
+            Method::Post => self.post(provider, url).await?,
+            Method::Get => self.get(provider, url).await?,
+            Method::Patch => self.patch(provider, url).await?,
+            Method::Put => self.put(provider, url).await?,
+            Method::Delete => self.delete(provider, url).await?,
+        };
+        Ok(())
     }
 
     #[instrument(name = "worker.post", err, skip_all)]
@@ -368,6 +378,19 @@ enum Method {
     Patch,
     Put,
     Delete,
+}
+
+impl ToString for Method {
+    fn to_string(&self) -> String {
+        match self {
+            Method::Post => "POST",
+            Method::Get => "GET",
+            Method::Patch => "PATCH",
+            Method::Put => "PUT",
+            Method::Delete => "DELETE",
+        }
+        .to_string()
+    }
 }
 
 struct Metrics {
