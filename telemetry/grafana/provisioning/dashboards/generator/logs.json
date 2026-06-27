@@ -1,0 +1,262 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "All logs for the generator",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\"\n| provider=~\"(?i)$provider\"\n| detected_level=~\"(?i)$level\"\n| id=~\"(?i)$id\"\n| line_format \"{{ if .method }}{{ .method }}{{ else }}{{ __line__ }}{{ end }}{{ if .provider }} | {{ .provider }}{{ end }}{{ if .operation }} | {{ .operation }}{{ end }}{{ if .id }} | {{ .id }}{{ end }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Logs",
+      "type": "logs"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "description": "CRUD method to filter logs by",
+        "includeAll": true,
+        "label": "method",
+        "multi": true,
+        "name": "method",
+        "options": [
+          {
+            "selected": false,
+            "text": "POST",
+            "value": "POST"
+          },
+          {
+            "selected": false,
+            "text": "GET",
+            "value": "GET"
+          },
+          {
+            "selected": false,
+            "text": "PATCH",
+            "value": "PATCH"
+          },
+          {
+            "selected": false,
+            "text": "PUT",
+            "value": "PUT"
+          },
+          {
+            "selected": false,
+            "text": "DELETE",
+            "value": "DELETE"
+          }
+        ],
+        "query": "POST,GET,PATCH,PUT,DELETE",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "description": "Payload operation",
+        "includeAll": true,
+        "label": "operation",
+        "multi": true,
+        "name": "operation",
+        "options": [
+          {
+            "selected": false,
+            "text": "COMPUTE",
+            "value": "COMPUTE"
+          },
+          {
+            "selected": false,
+            "text": "MERGE",
+            "value": "MERGE"
+          },
+          {
+            "selected": false,
+            "text": "SORT",
+            "value": "SORT"
+          },
+          {
+            "selected": false,
+            "text": "TRANSFORM",
+            "value": "TRANSFORM"
+          }
+        ],
+        "query": "COMPUTE,MERGE,SORT,TRANSFORM",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "description": "Which provider to filter logs by",
+        "includeAll": true,
+        "label": "provider",
+        "multi": true,
+        "name": "provider",
+        "options": [
+          {
+            "selected": false,
+            "text": "axum",
+            "value": "axum"
+          },
+          {
+            "selected": false,
+            "text": "actix",
+            "value": "actix"
+          }
+        ],
+        "query": "axum,actix",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "description": "Log level to filter by",
+        "includeAll": true,
+        "label": "level",
+        "multi": true,
+        "name": "level",
+        "options": [
+          {
+            "selected": false,
+            "text": "info",
+            "value": "info"
+          },
+          {
+            "selected": false,
+            "text": "warn",
+            "value": "warn"
+          },
+          {
+            "selected": false,
+            "text": "debug",
+            "value": "debug"
+          },
+          {
+            "selected": false,
+            "text": "error",
+            "value": "error"
+          }
+        ],
+        "query": "info,warn,debug,error",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "description": "Task UUID",
+        "label": "id",
+        "name": "id",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Logs",
+  "uid": "bfpj9xrziqiv4f",
+  "version": 2
+}
