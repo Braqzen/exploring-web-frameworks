@@ -1,218 +1,332 @@
 {
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": {
-            "type": "grafana",
-            "uid": "-- Grafana --"
-          },
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "type": "dashboard"
-        }
-      ]
-    },
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 10,
-    "links": [],
-    "panels": [
+  "annotations": {
+    "list": [
       {
+        "builtIn": 1,
         "datasource": {
-          "type": "tempo",
-          "uid": "tempo"
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "custom": {
-              "align": "center",
-              "cellOptions": {
-                "type": "auto"
-              },
-              "inspect": false
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green"
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 13,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "description": "Grab 200 traces and sort by duration (no current way to get the slowest traces, need to other telemetry to drill into slowness)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Start time"
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
               },
-              "properties": [
-                {
-                  "id": "custom.width",
-                  "value": 207
-                }
-              ]
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Start time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 315
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 179
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Span ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 323
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace Name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 189
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Trace Service"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 143
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "provider"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 356
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "method"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 251
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "filters": [
+            {
+              "id": "46cac3d8",
+              "operator": "=",
+              "scope": "span"
             },
             {
-              "matcher": {
-                "id": "byName",
-                "options": "Duration"
-              },
-              "properties": [
-                {
-                  "id": "custom.width",
-                  "value": 114
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Span ID"
-              },
-              "properties": [
-                {
-                  "id": "custom.width",
-                  "value": 213
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Trace Name"
-              },
-              "properties": [
-                {
-                  "id": "custom.width",
-                  "value": 189
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Trace Service"
-              },
-              "properties": [
-                {
-                  "id": "custom.width",
-                  "value": 143
-                }
-              ]
+              "id": "service-name",
+              "operator": "=",
+              "scope": "resource",
+              "tag": "service.name",
+              "value": [
+                "generator"
+              ],
+              "valueType": "string"
             }
+          ],
+          "limit": 200,
+          "metricsQueryType": "range",
+          "query": "{ resource.service.name=\"generator\" && name = trace:rootName && span.provider=~\"$provider\" && span.method=~\"$method\" } | select(span.provider, span.method)",
+          "queryType": "traceql",
+          "refId": "A",
+          "spss": 1,
+          "tableType": "spans"
+        }
+      ],
+      "title": "Recent Traces",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Duration"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Name": true,
+              "Trace Name": true,
+              "Trace Service": true,
+              "service.name": true,
+              "traceIdHidden": false
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Duration": 3,
+              "Name": 8,
+              "Span ID": 6,
+              "Start time": 7,
+              "Trace Name": 5,
+              "Trace Service": 4,
+              "method": 2,
+              "provider": 1,
+              "service.name": 9,
+              "traceIdHidden": 0
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
           ]
         },
-        "gridPos": {
-          "h": 12,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        },
-        "id": 1,
-        "options": {
-          "cellHeight": "sm",
-          "footer": {
-            "countRows": false,
-            "fields": "",
-            "reducer": [
-              "sum"
-            ],
-            "show": false
-          },
-          "showHeader": true,
-          "sortBy": []
-        },
-        "pluginVersion": "11.6.15",
-        "targets": [
+        "includeAll": true,
+        "label": "provider",
+        "multi": true,
+        "name": "provider",
+        "options": [
           {
-            "datasource": {
-              "type": "tempo",
-              "uid": "tempo"
-            },
-            "filters": [
-              {
-                "id": "46cac3d8",
-                "operator": "=",
-                "scope": "span"
-              },
-              {
-                "id": "service-name",
-                "operator": "=",
-                "scope": "resource",
-                "tag": "service.name",
-                "value": [
-                  "generator"
-                ],
-                "valueType": "string"
-              }
-            ],
-            "limit": 200,
-            "metricsQueryType": "range",
-            "query": "{ resource.service.name=\"generator\" && name = trace:rootName }",
-            "queryType": "traceql",
-            "refId": "A",
-            "spss": 1,
-            "tableType": "spans"
-          }
-        ],
-        "title": "Slowest Traces",
-        "transformations": [
-          {
-            "id": "sortBy",
-            "options": {
-              "fields": {},
-              "sort": [
-                {
-                  "desc": true,
-                  "field": "Duration"
-                }
-              ]
-            }
+            "selected": false,
+            "text": "axum",
+            "value": "axum"
           },
           {
-            "id": "organize",
-            "options": {
-              "excludeByName": {
-                "Name": true,
-                "service.name": true,
-                "traceIdHidden": false
-              },
-              "includeByName": {},
-              "indexByName": {},
-              "renameByName": {}
-            }
+            "selected": false,
+            "text": "actix",
+            "value": "actix"
           }
         ],
-        "type": "table"
+        "query": "axum,actix",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "method",
+        "multi": true,
+        "name": "method",
+        "options": [
+          {
+            "selected": false,
+            "text": "POST",
+            "value": "POST"
+          },
+          {
+            "selected": false,
+            "text": "GET",
+            "value": "GET"
+          },
+          {
+            "selected": false,
+            "text": "PUT",
+            "value": "PUT"
+          },
+          {
+            "selected": false,
+            "text": "PATCH",
+            "value": "PATCH"
+          },
+          {
+            "selected": false,
+            "text": "DELETE",
+            "value": "DELETE"
+          }
+        ],
+        "query": "POST,GET,PUT,PATCH,DELETE",
+        "type": "custom"
       }
-    ],
-    "preload": false,
-    "refresh": "5s",
-    "schemaVersion": 41,
-    "tags": [],
-    "templating": {
-      "list": []
-    },
-    "time": {
-      "from": "now-5m",
-      "to": "now"
-    },
-    "timepicker": {},
-    "timezone": "browser",
-    "title": "Tracing",
-    "uid": "afqdvyxrduupsb",
-    "version": 1
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Tracing",
+  "uid": "afqdvyxrduupsb",
+  "version": 3
 }
