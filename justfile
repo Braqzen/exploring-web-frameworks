@@ -1,7 +1,7 @@
 default: build-servers
 
 # -- Docker --
-build-servers: build-axum build-actix build-warp build-rocket
+build-servers: build-axum build-actix build-warp build-rocket build-poem
 
 build-axum:
 	docker rmi servers-axum:latest 2>/dev/null || true
@@ -18,6 +18,10 @@ build-warp:
 build-rocket:
 	docker rmi servers-rocket:latest 2>/dev/null || true
 	docker build -t servers-rocket -f services/rust/rocket/Dockerfile .
+
+build-poem:
+	docker rmi servers-poem:latest 2>/dev/null || true
+	docker build -t servers-poem -f services/rust/poem/Dockerfile .
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
