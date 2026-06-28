@@ -2,7 +2,8 @@
     "api": [
         {"provider": "axum", "url": "http://axum:8000", "enabled": true},
         {"provider": "actix", "url": "http://actix:8000", "enabled": true},
-        {"provider": "warp", "url": "http://warp:8000", "enabled": true}
+        {"provider": "warp", "url": "http://warp:8000", "enabled": true},
+        {"provider": "rocket", "url": "http://rocket:8000", "enabled": true}
     ],
     "sleep": 100
 }

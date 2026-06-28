@@ -12,6 +12,7 @@ pub enum Provider {
     Axum,
     Actix,
     Warp,
+    Rocket,
 }
 
 impl ToString for Provider {
@@ -20,6 +21,7 @@ impl ToString for Provider {
             Provider::Axum => "axum".to_string(),
             Provider::Actix => "actix".to_string(),
             Provider::Warp => "warp".to_string(),
+            Provider::Rocket => "rocket".to_string(),
         }
     }
 }
