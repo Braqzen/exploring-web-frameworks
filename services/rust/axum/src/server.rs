@@ -25,27 +25,21 @@ impl Server {
     }
 
     pub async fn run(self) -> Result<()> {
-        let listener = TcpListener::bind(self.socket).await?;
-
-        let app = router(self.state);
-
         // Handle running locally and interrupting the process with ctrl+c.º
         let mut sigint = signal(SignalKind::interrupt())?;
 
         // Handle running in a container and terminating the process with docker stop.
         let mut sigterm = signal(SignalKind::terminate())?;
 
+        let listener = TcpListener::bind(self.socket).await?;
+
         info!(socket = self.socket.to_string(), "Starting router");
 
-        serve(listener, app)
+        serve(listener, router(self.state))
             .with_graceful_shutdown(async move {
                 tokio::select! {
-                    _ = sigint.recv() => {
-                        info!("Received interrupt signal");
-                    }
-                    _ = sigterm.recv() => {
-                        info!("Received terminate signal");
-                    }
+                    _ = sigint.recv() => info!("Received interrupt signal"),
+                    _ = sigterm.recv() => info!("Received terminate signal"),
                 }
             })
             .await?;

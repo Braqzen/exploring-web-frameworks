@@ -1,51 +1,48 @@
-use crate::state::State as ServerState;
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+    task::PatchedTask,
+};
 use axum::{
     Json,
-    extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
+    extract::{Extension, State},
+    response::{IntoResponse, Response},
 };
-use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[axum::debug_handler]
-#[instrument(name = "patch", skip_all)]
-pub async fn partial_update(
+#[instrument(skip_all)]
+pub async fn patch_handler(
     State(state): State<Arc<Mutex<ServerState>>>,
-    Path(id): Path<Uuid>,
-    Json(request): Json<Value>,
-) -> impl IntoResponse {
+    Extension(id): Extension<Uuid>,
+    Extension(patched_task): Extension<PatchedTask>,
+) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             // Code assumes only operation is changed
-            if let Some(operation) = request.get("operation").and_then(|v| v.as_str()) {
-                if let Ok(operation) = operation.try_into() {
-                    let previous_operation = task.operation.clone();
-                    task.operation = operation;
+            let previous_operation = task.operation.clone();
+            task.operation = patched_task.operation.clone();
 
-                    info!(
-                        %id,
-                        secret = task.secret,
-                        from_operation = previous_operation.to_string(),
-                        to_operation = task.operation.to_string(),
-                        method = "PATCH",
-                        "Patched task"
-                    );
+            info!(
+                %id,
+                secret = task.secret,
+                from_operation = previous_operation.to_string(),
+                to_operation = task.operation.to_string(),
+                method = "PATCH",
+                "Patched task"
+            );
 
-                    return Json(task).into_response();
-                }
-            }
-            return StatusCode::BAD_REQUEST.into_response();
+            return Json(task).into_response();
         } else {
             drop(state);
             warn!(%id, method = "PATCH", "Task not found");
-            return StatusCode::NOT_FOUND.into_response();
+            return task_not_found();
         }
     }
 
     error!(%id, method = "PATCH", "Poisoned lock");
 
-    StatusCode::INTERNAL_SERVER_ERROR.into_response()
+    internal_server_error()
 }

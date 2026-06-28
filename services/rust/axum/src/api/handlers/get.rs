@@ -1,20 +1,22 @@
-use crate::state::State as ServerState;
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+};
 use axum::{
     Json,
-    extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
+    extract::{Extension, State},
+    response::{IntoResponse, Response},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
 #[axum::debug_handler]
-#[instrument(name = "get", skip_all)]
-pub async fn fetch(
+#[instrument(skip_all)]
+pub async fn get_handler(
     State(state): State<Arc<Mutex<ServerState>>>,
-    Path(id): Path<Uuid>,
-) -> impl IntoResponse {
+    Extension(id): Extension<Uuid>,
+) -> Response {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);
@@ -30,11 +32,11 @@ pub async fn fetch(
         } else {
             drop(state);
             warn!(%id, method = "GET", "Task not found");
-            return StatusCode::NOT_FOUND.into_response();
+            return task_not_found();
         }
     }
 
     error!(%id, method = "GET", "Poisoned lock");
 
-    StatusCode::INTERNAL_SERVER_ERROR.into_response()
+    internal_server_error()
 }

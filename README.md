@@ -7,7 +7,13 @@ TODO:
 - update all rust docker files to use the same version
 - error handling for bad requests / rejections
 - insert random error rate into generator (configurable)
+  - unknown operations e.g. filter
+  - wrong method (HEAD, etc.)
+  - oversize body
+  - bad UUID
+  - malformed JSON
 - insert random error rate into each api (configurable)
+  - apis may just fail randomly so perhaps just return an error, sleep or something
 - consider injecting langtype into telemetry instead of just service name
 - Consider APIs
   - Python: fastapi, django, flask, starlette, sanic, quart, tornado
