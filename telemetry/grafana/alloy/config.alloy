@@ -16,7 +16,7 @@ otelcol.receiver.otlp "default" {
 // Send to tempo
 otelcol.exporter.otlp "tempo" {
   client {
-    endpoint = "tempo:4317"
+    endpoint = "telemetry-tempo:4317"
     tls {
       insecure = true
     }
@@ -26,7 +26,7 @@ otelcol.exporter.otlp "tempo" {
 // Send to loki
 otelcol.exporter.otlphttp "loki" {
   client {
-    endpoint = "http://loki:3100/otlp"
+    endpoint = "http://telemetry-loki:3100/otlp"
   }
 }
 
@@ -40,14 +40,14 @@ otelcol.exporter.prometheus "default" {
 // Send to prometheus
 prometheus.remote_write "default" {
   endpoint {
-    url = "http://prometheus:9090/api/v1/write"
+    url = "http://telemetry-prometheus:9090/api/v1/write"
   }
 }
 
 // Send to Pyroscope
 pyroscope.write "backend" {
   endpoint {
-    url = "http://pyroscope:4040"
+    url = "http://telemetry-pyroscope:4040"
   }
 }
 

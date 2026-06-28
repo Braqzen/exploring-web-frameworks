@@ -20,14 +20,14 @@ services:
     command: ["/app/generator"]
     environment:
       RUST_LOG: info
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
     depends_on:
-      - alloy
+      - telemetry-alloy
 
   # Rust API service that uses axum.
-  axum:
+  rust-axum:
     <<: *common-setup
     deploy:
       resources:
@@ -39,11 +39,11 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
 
-  actix:
+  rust-actix:
     <<: *common-setup
     deploy:
       resources:
@@ -55,11 +55,11 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
 
-  warp:
+  rust-warp:
     <<: *common-setup
     deploy:
       resources:
@@ -71,11 +71,11 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
 
-  rocket:
+  rust-rocket:
     <<: *common-setup
     deploy:
       resources:
@@ -87,12 +87,12 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
       ROCKET_CLI_COLORS: "false"
 
-  poem:
+  rust-poem:
     <<: *common-setup
     deploy:
       resources:
@@ -104,11 +104,11 @@ services:
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4318
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_URL: http://alloy:9999
+      PYROSCOPE_URL: http://telemetry-alloy:9999
 
-  grafana:
+  telemetry-grafana:
     image: grafana/grafana:11.6
     ports:
       - "3000:3000"
@@ -126,13 +126,13 @@ services:
       - ./telemetry/grafana/provisioning:/etc/grafana/provisioning
       - grafana-data-volume:/var/lib/grafana
     depends_on:
-      - loki
-      - pyroscope
-      - prometheus
-      - tempo
+      - telemetry-loki
+      - telemetry-pyroscope
+      - telemetry-prometheus
+      - telemetry-tempo
     restart: unless-stopped
 
-  prometheus:
+  telemetry-prometheus:
     image: prom/prometheus:v3.5.4
     ports:
       - "9090:9090"
@@ -144,7 +144,7 @@ services:
       - prometheus-data-volume:/prometheus
     restart: unless-stopped
 
-  loki:
+  telemetry-loki:
     image: grafana/loki:3.7
     ports:
       - "3100:3100"
@@ -154,7 +154,7 @@ services:
       - loki-data-volume:/loki
     restart: unless-stopped
 
-  pyroscope:
+  telemetry-pyroscope:
     image: grafana/pyroscope:2.0.4
     ports:
       - "4040:4040"
@@ -164,7 +164,7 @@ services:
       - pyroscope-data-volume:/data
     restart: unless-stopped
 
-  tempo:
+  telemetry-tempo:
     image: grafana/tempo:3.0.2
     ports:
       - "3200:3200"
@@ -174,17 +174,17 @@ services:
       - tempo-data-volume:/var/tempo
     restart: unless-stopped
 
-  alloy:
+  telemetry-alloy:
     image: grafana/alloy:v1.17.0
     volumes:
       - ./telemetry/grafana/alloy:/etc/alloy
       - alloy-data-volume:/var/lib/alloy/data
     command: run --disable-reporting /etc/alloy/config.alloy
     depends_on:
-      - loki
-      - tempo
-      - pyroscope
-      - prometheus
+      - telemetry-loki
+      - telemetry-tempo
+      - telemetry-pyroscope
+      - telemetry-prometheus
     restart: unless-stopped
 
 volumes:
