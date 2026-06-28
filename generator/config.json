@@ -4,7 +4,8 @@
         {"provider": "actix", "url": "http://rust-actix:8000", "enabled": true},
         {"provider": "warp", "url": "http://rust-warp:8000", "enabled": true},
         {"provider": "rocket", "url": "http://rust-rocket:8000", "enabled": true},
-        {"provider": "poem", "url": "http://rust-poem:8000", "enabled": true}
+        {"provider": "poem", "url": "http://rust-poem:8000", "enabled": true},
+        {"provider": "salvo", "url": "http://rust-salvo:8000", "enabled": true}
     ],
     "sleep": 100
 }

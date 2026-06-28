@@ -108,6 +108,22 @@ services:
       OTEL_METRIC_EXPORT_INTERVAL: "10000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
+  rust-salvo:
+    <<: *common-setup
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    memswap_limit: 128M
+    image: servers-salvo:latest
+    command: ["/app/salvo"]
+    environment:
+      RUST_LOG: info
+      SOCKET: 0.0.0.0:8000
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      PYROSCOPE_URL: http://telemetry-alloy:9999
+
   telemetry-grafana:
     image: grafana/grafana:11.6
     ports:
