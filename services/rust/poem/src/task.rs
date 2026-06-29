@@ -42,3 +42,9 @@ impl ToString for Operation {
         }
     }
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct PatchedTask {
+    /// The operation to perform on the payload.
+    pub operation: Operation,
+}

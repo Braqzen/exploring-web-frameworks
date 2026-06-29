@@ -1,7 +1,11 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+    task::Task,
+};
 use poem::{
-    http::StatusCode,
-    web::{Data, Json, Path},
+    Response,
+    web::{Data, IntoResponse, Json},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
@@ -11,13 +15,13 @@ use uuid::Uuid;
 #[instrument(skip_all)]
 pub async fn put_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Path(id): Path<Uuid>,
-    Json(request): Json<Task>,
-) -> Result<Json<Task>, StatusCode> {
+    Data(id): Data<&Uuid>,
+    Data(new_task): Data<&Task>,
+) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();
-            *task = request.clone();
+            *task = new_task.clone();
 
             info!(
                 %id,
@@ -29,15 +33,15 @@ pub async fn put_handler(
                 "Overwrote task"
             );
 
-            return Ok(Json(task.to_owned()));
+            return Json(task.to_owned()).into_response();
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            return task_not_found();
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error()
 }

@@ -1,7 +1,10 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+};
 use poem::{
-    http::StatusCode,
-    web::{Data, Json, Path},
+    Response,
+    web::{Data, IntoResponse, Json},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
@@ -11,8 +14,8 @@ use uuid::Uuid;
 #[instrument(skip_all)]
 pub async fn get_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Path(id): Path<Uuid>,
-) -> Result<Json<Task>, StatusCode> {
+    Data(id): Data<&Uuid>,
+) -> Response {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);
@@ -24,15 +27,15 @@ pub async fn get_handler(
                 "Retrieved task"
             );
 
-            return Ok(Json(task));
+            return Json(task).into_response();
         } else {
             drop(state);
             warn!(%id, method = "GET", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            return task_not_found();
         }
     }
 
     error!(%id, method = "GET", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error()
 }

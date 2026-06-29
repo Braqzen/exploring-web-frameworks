@@ -1,5 +1,8 @@
 use crate::{
-    api::handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
+    api::{
+        handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
+        middleware::validate_request,
+    },
     state::State,
 };
 use poem::{EndpointExt, IntoEndpoint, Route, get, post};
@@ -16,4 +19,5 @@ pub fn router(state: Arc<Mutex<State>>) -> impl IntoEndpoint {
                 .delete(delete_handler),
         )
         .data(state)
+        .around(validate_request)
 }

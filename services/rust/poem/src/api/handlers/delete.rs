@@ -1,8 +1,8 @@
-use crate::state::State as ServerState;
-use poem::{
-    http::StatusCode,
-    web::{Data, Path},
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
 };
+use poem::{IntoResponse, Response, http::StatusCode, web::Data};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
@@ -11,8 +11,8 @@ use uuid::Uuid;
 #[instrument(skip_all)]
 pub async fn delete_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Path(id): Path<Uuid>,
-) -> Result<StatusCode, StatusCode> {
+    Data(id): Data<&Uuid>,
+) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);
@@ -23,15 +23,15 @@ pub async fn delete_handler(
                 method = "DELETE",
                 "Removed task"
             );
-            return Ok(StatusCode::NO_CONTENT);
+            return StatusCode::NO_CONTENT.into_response();
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            return task_not_found();
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error()
 }

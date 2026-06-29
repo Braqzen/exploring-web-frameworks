@@ -1,9 +1,10 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{api::errors::internal_server_error, state::State as ServerState, task::Task};
 use poem::{
+    Response,
     http::StatusCode,
-    web::{Data, Json},
+    web::{Data, IntoResponse, Json},
 };
-use serde_json::Value;
+use serde_json::json;
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument};
 use uuid::Uuid;
@@ -12,32 +13,32 @@ use uuid::Uuid;
 #[instrument(skip_all)]
 pub async fn post_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Json(request): Json<Task>,
-) -> Result<Json<Value>, StatusCode> {
+    Data(task): Data<&Task>,
+) -> Response {
     let id = Uuid::new_v4();
 
     if let Ok(mut state) = state.lock() {
-        state.tasks.insert(id, request.clone());
+        state.tasks.insert(id, task.clone());
         drop(state);
 
         info!(
             %id,
-            secret = request.secret,
-            operation = request.operation.to_string(),
+            secret = task.secret,
+            operation = task.operation.to_string(),
             method = "POST",
             "Inserted new task"
         );
 
-        return Ok(Json(Value::String(id.to_string())));
+        return (StatusCode::CREATED, Json(json!({"id": id.to_string()}))).into_response();
     }
 
     error!(
         %id,
-        secret = request.secret,
-        operation = request.operation.to_string(),
+        secret = task.secret,
+        operation = task.operation.to_string(),
         method = "POST",
         "Poisoned lock"
     );
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error()
 }
