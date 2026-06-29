@@ -8,9 +8,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "patch", skip_all)]
 #[poem::handler]
-pub async fn partial_update(
+#[instrument(skip_all)]
+pub async fn patch_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,
     Json(request): Json<Value>,

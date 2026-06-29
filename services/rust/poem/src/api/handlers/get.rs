@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "get", skip_all)]
 #[poem::handler]
-pub async fn fetch(
+#[instrument(skip_all)]
+pub async fn get_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Task>, StatusCode> {

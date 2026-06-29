@@ -8,9 +8,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 
-#[instrument(name = "insert", skip_all)]
 #[poem::handler]
-pub async fn insert(
+#[instrument(skip_all)]
+pub async fn post_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
     Json(request): Json<Task>,
 ) -> Result<Json<Value>, StatusCode> {

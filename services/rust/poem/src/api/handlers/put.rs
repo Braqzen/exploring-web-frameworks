@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "put", skip_all)]
 #[poem::handler]
-pub async fn overwrite(
+#[instrument(skip_all)]
+pub async fn put_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,
     Json(request): Json<Task>,

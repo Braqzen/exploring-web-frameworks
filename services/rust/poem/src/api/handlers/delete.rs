@@ -7,9 +7,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "delete", skip_all)]
 #[poem::handler]
-pub async fn remove(
+#[instrument(skip_all)]
+pub async fn delete_handler(
     Data(state): Data<&Arc<Mutex<ServerState>>>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, StatusCode> {
