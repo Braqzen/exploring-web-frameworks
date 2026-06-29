@@ -4,9 +4,9 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 
-#[instrument(name = "insert", skip_all)]
 #[post("/", data = "<request>")]
-pub async fn insert(
+#[instrument(skip_all)]
+pub async fn post_handler(
     state: &State<Arc<Mutex<ServerState>>>,
     request: Json<Task>,
 ) -> Result<Json<String>, Status> {

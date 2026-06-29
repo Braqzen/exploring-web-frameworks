@@ -4,9 +4,12 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "get", skip_all)]
 #[get("/<id>")]
-pub async fn fetch(id: Uuid, state: &State<Arc<Mutex<ServerState>>>) -> Result<Json<Task>, Status> {
+#[instrument(skip_all)]
+pub async fn get_handler(
+    id: Uuid,
+    state: &State<Arc<Mutex<ServerState>>>,
+) -> Result<Json<Task>, Status> {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);

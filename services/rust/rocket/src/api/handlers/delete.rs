@@ -4,9 +4,12 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "delete", skip_all)]
 #[delete("/<id>")]
-pub async fn remove(id: Uuid, state: &State<Arc<Mutex<ServerState>>>) -> Result<NoContent, Status> {
+#[instrument(skip_all)]
+pub async fn delete_handler(
+    id: Uuid,
+    state: &State<Arc<Mutex<ServerState>>>,
+) -> Result<NoContent, Status> {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);
