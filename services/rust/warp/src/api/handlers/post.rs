@@ -10,8 +10,11 @@ use warp::{
     reply::{Reply, Response, json, reply, with_status},
 };
 
-#[instrument(name = "insert", skip_all)]
-pub async fn insert(state: Arc<Mutex<ServerState>>, request: Task) -> Result<Response, Infallible> {
+#[instrument(skip_all)]
+pub async fn post_handler(
+    state: Arc<Mutex<ServerState>>,
+    request: Task,
+) -> Result<Response, Infallible> {
     let id = Uuid::new_v4();
 
     if let Ok(mut state) = state.lock() {

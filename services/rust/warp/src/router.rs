@@ -1,7 +1,5 @@
 use crate::{
-    api::handlers::{
-        delete::remove, get::fetch, patch::partial_update, post::insert, put::overwrite,
-    },
+    api::handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
     state::State,
     task::Task,
 };
@@ -20,7 +18,7 @@ pub fn router(
             move || state.clone()
         }))
         .and(warp::body::json::<Task>())
-        .and_then(insert);
+        .and_then(post_handler);
 
     let put = warp::path!(Uuid)
         .and(warp::put())
@@ -29,7 +27,7 @@ pub fn router(
             move || state.clone()
         }))
         .and(warp::body::json::<Task>())
-        .and_then(overwrite);
+        .and_then(put_handler);
 
     let delete = warp::path!(Uuid)
         .and(warp::delete())
@@ -37,7 +35,7 @@ pub fn router(
             let state = state.clone();
             move || state.clone()
         }))
-        .and_then(remove);
+        .and_then(delete_handler);
 
     let get = warp::path!(Uuid)
         .and(warp::get())
@@ -45,7 +43,7 @@ pub fn router(
             let state = state.clone();
             move || state.clone()
         }))
-        .and_then(fetch);
+        .and_then(get_handler);
 
     let patch = warp::path!(Uuid)
         .and(warp::patch())
@@ -54,7 +52,7 @@ pub fn router(
             move || state.clone()
         }))
         .and(warp::body::json::<Value>())
-        .and_then(partial_update);
+        .and_then(patch_handler);
 
     post.or(put).or(delete).or(get).or(patch)
 }

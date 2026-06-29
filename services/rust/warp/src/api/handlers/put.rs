@@ -10,8 +10,8 @@ use warp::{
     reply::{Reply, Response, json, reply, with_status},
 };
 
-#[instrument(name = "put", skip_all)]
-pub async fn overwrite(
+#[instrument(skip_all)]
+pub async fn put_handler(
     id: Uuid,
     state: Arc<Mutex<ServerState>>,
     request: Task,

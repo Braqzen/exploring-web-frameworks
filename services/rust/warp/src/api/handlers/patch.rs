@@ -11,8 +11,8 @@ use warp::{
     reply::{Reply, Response, json, reply, with_status},
 };
 
-#[instrument(name = "patch", skip_all)]
-pub async fn partial_update(
+#[instrument(skip_all)]
+pub async fn patch_handler(
     id: Uuid,
     state: Arc<Mutex<ServerState>>,
     request: Value,

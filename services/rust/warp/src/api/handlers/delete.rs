@@ -10,8 +10,11 @@ use warp::{
     reply::{Reply, Response, reply, with_status},
 };
 
-#[instrument(name = "delete", skip_all)]
-pub async fn remove(id: Uuid, state: Arc<Mutex<ServerState>>) -> Result<Response, Infallible> {
+#[instrument(skip_all)]
+pub async fn delete_handler(
+    id: Uuid,
+    state: Arc<Mutex<ServerState>>,
+) -> Result<Response, Infallible> {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);

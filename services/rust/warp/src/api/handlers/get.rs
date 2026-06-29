@@ -10,8 +10,8 @@ use warp::{
     reply::{Reply, Response, json, reply, with_status},
 };
 
-#[instrument(name = "get", skip_all)]
-pub async fn fetch(id: Uuid, state: Arc<Mutex<ServerState>>) -> Result<Response, Infallible> {
+#[instrument(skip_all)]
+pub async fn get_handler(id: Uuid, state: Arc<Mutex<ServerState>>) -> Result<Response, Infallible> {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);
