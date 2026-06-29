@@ -1,7 +1,7 @@
 use crate::{
     api::{
         handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
-        validate_request,
+        middleware::validate_request,
     },
     state::State,
 };

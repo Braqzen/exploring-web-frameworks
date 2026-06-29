@@ -1,25 +1,33 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+    task::Task,
+};
 use actix_web::{
     HttpResponse,
-    web::{Data, Json, Path},
+    web::{Data, ReqData},
 };
 use std::sync::Mutex;
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
 
-#[instrument(name = "put", skip_all)]
-pub async fn overwrite(
+#[instrument(skip_all)]
+pub async fn put_handler(
     state: Data<Mutex<ServerState>>,
-    id: Path<(Uuid,)>,
-    request: Json<Task>,
+    id: ReqData<Uuid>,
+    request: ReqData<Task>,
 ) -> HttpResponse {
+    let id = id.into_inner();
+
     if let Ok(mut state) = state.lock() {
-        if let Some(task) = state.tasks.get_mut(&id.0) {
+        if let Some(task) = state.tasks.get_mut(&id) {
+            let request = request.into_inner();
+
             let previous_task = task.clone();
             *task = request.clone();
 
             info!(
-                id = %id.0,
+                %id,
                 from_secret = previous_task.secret,
                 to_secret = task.secret,
                 from_operation = previous_task.operation.to_string(),
@@ -31,12 +39,12 @@ pub async fn overwrite(
             return HttpResponse::Ok().json(task);
         } else {
             drop(state);
-            warn!(id = %id.0, method = "PUT", "Task not found");
-            return HttpResponse::NotFound().finish();
+            warn!(%id, method = "PUT", "Task not found");
+            return task_not_found();
         }
     }
 
-    error!(id = %id.0, method = "PUT", "Poisoned lock");
+    error!(%id, method = "PUT", "Poisoned lock");
 
-    HttpResponse::InternalServerError().finish()
+    internal_server_error()
 }

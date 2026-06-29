@@ -176,7 +176,7 @@ fn deserialize<T: DeserializeOwned>(
         Err(error) => {
             warn!(%method, %path, "Invalid body JSON");
 
-            if error.is_syntax() || error.is_eof() {
+            if error.is_syntax() {
                 return Err((
                     StatusCode::BAD_REQUEST,
                     Json(json!({"error": "Invalid body JSON"})),

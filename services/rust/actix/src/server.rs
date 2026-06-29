@@ -1,5 +1,5 @@
-use crate::{router::router, state::State};
-use actix_web::{App, HttpServer, web::Data};
+use crate::{api::middleware::validate_request, router::router, state::State};
+use actix_web::{App, HttpServer, middleware::from_fn, web::Data};
 use eyre::Result;
 use std::{
     net::SocketAddr,
@@ -25,6 +25,7 @@ impl Server {
 
         HttpServer::new(move || {
             App::new()
+                .wrap(from_fn(validate_request))
                 .app_data(Data::from(self.state.clone()))
                 .configure(router)
         })
