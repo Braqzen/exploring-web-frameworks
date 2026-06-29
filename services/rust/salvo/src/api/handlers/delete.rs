@@ -1,19 +1,15 @@
-use crate::api::handlers::{state, task_id};
-use salvo::{Depot, Request, http::StatusCode};
+use crate::api::{
+    errors::{internal_server_error, task_not_found},
+    handlers::{state, task_id},
+};
+use salvo::{Depot, Response, http::StatusCode};
 use tracing::{error, info, instrument, warn};
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn delete_handler(
-    depot: &mut Depot,
-    request: &mut Request,
-) -> Result<StatusCode, StatusCode> {
-    let state = state(depot);
-    let id = task_id(&request);
-    if id.is_none() {
-        return Err(StatusCode::BAD_REQUEST);
-    }
-    let id = id.unwrap();
+pub async fn delete_handler(depot: &mut Depot, res: &mut Response) {
+    let state = state(depot, "DELETE");
+    let id = task_id(depot, "DELETE");
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
@@ -25,15 +21,17 @@ pub async fn delete_handler(
                 method = "DELETE",
                 "Removed task"
             );
-            return Ok(StatusCode::NO_CONTENT);
+            res.status_code(StatusCode::NO_CONTENT);
+            return;
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            task_not_found(res);
+            return;
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error(res);
 }

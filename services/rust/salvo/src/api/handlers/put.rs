@@ -1,32 +1,21 @@
-use crate::{
-    api::handlers::{state, task_id},
-    task::Task,
+use crate::api::{
+    errors::{internal_server_error, task_not_found},
+    handlers::{state, task, task_id},
 };
-use salvo::{Depot, Request, http::StatusCode, writing::Json};
+use salvo::{Depot, Response, http::StatusCode, writing::Json};
 use tracing::{error, info, instrument, warn};
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn put_handler(
-    depot: &mut Depot,
-    request: &mut Request,
-) -> Result<Json<Task>, StatusCode> {
-    let state = state(depot);
-    let id = task_id(request);
-    if id.is_none() {
-        return Err(StatusCode::BAD_REQUEST);
-    }
-    let id = id.unwrap();
-
-    let request = request
-        .parse_json::<Task>()
-        .await
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
+pub async fn put_handler(depot: &mut Depot, res: &mut Response) {
+    let state = state(depot, "PUT");
+    let id = task_id(depot, "PUT");
+    let request = task(depot, "PUT");
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();
-            *task = request.clone();
+            *task = request.to_owned();
 
             info!(
                 %id,
@@ -38,15 +27,17 @@ pub async fn put_handler(
                 "Overwrote task"
             );
 
-            return Ok(Json(task.to_owned()));
+            res.stuff(StatusCode::OK, Json(task.to_owned()));
+            return;
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            task_not_found(res);
+            return;
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error(res)
 }

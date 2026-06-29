@@ -1,21 +1,17 @@
-use crate::{api::handlers::state, task::Task};
-use salvo::{Depot, Request, http::StatusCode, writing::Json};
-use serde_json::Value;
+use crate::api::{
+    errors::internal_server_error,
+    handlers::{state, task},
+};
+use salvo::{Depot, Response, http::StatusCode, writing::Json};
+use serde_json::json;
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn post_handler(
-    depot: &mut Depot,
-    request: &mut Request,
-) -> Result<Json<Value>, StatusCode> {
-    let state = state(depot);
-
-    let request = request
-        .parse_json::<Task>()
-        .await
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
+pub async fn post_handler(depot: &mut Depot, res: &mut Response) {
+    let state = state(depot, "POST");
+    let request = task(depot, "POST");
 
     let id = Uuid::new_v4();
 
@@ -31,7 +27,8 @@ pub async fn post_handler(
             "Inserted new task"
         );
 
-        return Ok(Json(Value::String(id.to_string())));
+        res.stuff(StatusCode::CREATED, Json(json!({"id": id.to_string()})));
+        return;
     }
 
     error!(
@@ -42,5 +39,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error(res)
 }

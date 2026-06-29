@@ -1,22 +1,15 @@
-use crate::{
-    api::handlers::{state, task_id},
-    task::Task,
+use crate::api::{
+    errors::{internal_server_error, task_not_found},
+    handlers::{state, task_id},
 };
-use salvo::{Depot, Request, http::StatusCode, writing::Json};
+use salvo::{Depot, Response, http::StatusCode, writing::Json};
 use tracing::{error, info, instrument, warn};
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn get_handler(
-    depot: &mut Depot,
-    request: &mut Request,
-) -> Result<Json<Task>, StatusCode> {
-    let state = state(depot);
-    let id = task_id(request);
-    if id.is_none() {
-        return Err(StatusCode::BAD_REQUEST);
-    }
-    let id = id.unwrap();
+pub async fn get_handler(depot: &mut Depot, res: &mut Response) {
+    let state = state(depot, "GET");
+    let id = task_id(depot, "GET");
 
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
@@ -29,15 +22,17 @@ pub async fn get_handler(
                 "Retrieved task"
             );
 
-            return Ok(Json(task));
+            res.stuff(StatusCode::OK, Json(task));
+            return;
         } else {
             drop(state);
             warn!(%id, method = "GET", "Task not found");
-            return Err(StatusCode::NOT_FOUND);
+            task_not_found(res);
+            return;
         }
     }
 
     error!(%id, method = "GET", "Poisoned lock");
 
-    Err(StatusCode::INTERNAL_SERVER_ERROR)
+    internal_server_error(res)
 }
