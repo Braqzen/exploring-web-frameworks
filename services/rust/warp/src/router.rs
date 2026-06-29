@@ -1,58 +1,55 @@
 use crate::{
-    api::handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
+    api::{
+        handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
+        middleware::{handle_rejection, patched_body, task_body, task_id},
+    },
     state::State,
-    task::Task,
 };
-use serde_json::Value;
-use std::sync::{Arc, Mutex};
-use uuid::Uuid;
-use warp::{Filter, reject::Rejection, reply::Reply};
+use std::{
+    convert::Infallible,
+    sync::{Arc, Mutex},
+};
+use warp::{Filter, reply::Reply};
 
 pub fn router(
     state: Arc<Mutex<State>>,
-) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    let post = warp::path::end()
-        .and(warp::post())
-        .and(warp::any().map({
-            let state = state.clone();
-            move || state.clone()
-        }))
-        .and(warp::body::json::<Task>())
+) -> impl Filter<Extract = impl Reply, Error = Infallible> + Clone {
+    let warp_state = warp::any().map({
+        let state = state.clone();
+        move || state.clone()
+    });
+
+    let post = warp::post()
+        .and(warp::path::end())
+        .and(warp_state.clone())
+        .and(task_body())
         .and_then(post_handler);
 
-    let put = warp::path!(Uuid)
-        .and(warp::put())
-        .and(warp::any().map({
-            let state = state.clone();
-            move || state.clone()
-        }))
-        .and(warp::body::json::<Task>())
+    let put = warp::put()
+        .and(task_id())
+        .and(warp_state.clone())
+        .and(task_body())
         .and_then(put_handler);
 
-    let delete = warp::path!(Uuid)
-        .and(warp::delete())
-        .and(warp::any().map({
-            let state = state.clone();
-            move || state.clone()
-        }))
+    let delete = warp::delete()
+        .and(task_id())
+        .and(warp_state.clone())
         .and_then(delete_handler);
 
-    let get = warp::path!(Uuid)
-        .and(warp::get())
-        .and(warp::any().map({
-            let state = state.clone();
-            move || state.clone()
-        }))
+    let get = warp::get()
+        .and(task_id())
+        .and(warp_state.clone())
         .and_then(get_handler);
 
-    let patch = warp::path!(Uuid)
-        .and(warp::patch())
-        .and(warp::any().map({
-            let state = state.clone();
-            move || state.clone()
-        }))
-        .and(warp::body::json::<Value>())
+    let patch = warp::patch()
+        .and(task_id())
+        .and(warp_state)
+        .and(patched_body())
         .and_then(patch_handler);
 
-    post.or(put).or(delete).or(get).or(patch)
+    post.or(put)
+        .or(delete)
+        .or(get)
+        .or(patch)
+        .recover(handle_rejection)
 }

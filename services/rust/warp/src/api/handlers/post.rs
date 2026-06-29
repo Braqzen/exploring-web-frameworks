@@ -1,4 +1,5 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{api::errors::internal_server_error, state::State as ServerState, task::Task};
+use serde_json::json;
 use std::{
     convert::Infallible,
     sync::{Arc, Mutex},
@@ -7,7 +8,7 @@ use tracing::{error, info, instrument};
 use uuid::Uuid;
 use warp::{
     http::StatusCode,
-    reply::{Reply, Response, json, reply, with_status},
+    reply::{Reply, Response, json, with_status},
 };
 
 #[instrument(skip_all)]
@@ -29,7 +30,10 @@ pub async fn post_handler(
             "Inserted new task"
         );
 
-        return Ok(json(&id.to_string()).into_response());
+        return Ok(
+            with_status(json(&json!({ "id": id.to_string() })), StatusCode::CREATED)
+                .into_response(),
+        );
     }
 
     error!(
@@ -40,5 +44,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    Ok(with_status(reply(), StatusCode::INTERNAL_SERVER_ERROR).into_response())
+    Ok(internal_server_error())
 }
