@@ -4,9 +4,12 @@ use serde_json::Value;
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 
-#[instrument(name = "insert", skip_all)]
 #[salvo::handler]
-pub async fn insert(depot: &mut Depot, request: &mut Request) -> Result<Json<Value>, StatusCode> {
+#[instrument(skip_all)]
+pub async fn post_handler(
+    depot: &mut Depot,
+    request: &mut Request,
+) -> Result<Json<Value>, StatusCode> {
     let state = state(depot);
 
     let request = request

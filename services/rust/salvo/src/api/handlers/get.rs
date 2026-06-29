@@ -5,9 +5,12 @@ use crate::{
 use salvo::{Depot, Request, http::StatusCode, writing::Json};
 use tracing::{error, info, instrument, warn};
 
-#[instrument(name = "get", skip_all)]
 #[salvo::handler]
-pub async fn fetch(depot: &mut Depot, request: &mut Request) -> Result<Json<Task>, StatusCode> {
+#[instrument(skip_all)]
+pub async fn get_handler(
+    depot: &mut Depot,
+    request: &mut Request,
+) -> Result<Json<Task>, StatusCode> {
     let state = state(depot);
     let id = task_id(request);
     if id.is_none() {

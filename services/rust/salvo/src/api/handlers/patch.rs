@@ -6,9 +6,9 @@ use salvo::{Depot, Request, http::StatusCode, writing::Json};
 use serde_json::Value;
 use tracing::{error, info, instrument, warn};
 
-#[instrument(name = "patch", skip_all)]
 #[salvo::handler]
-pub async fn partial_update(
+#[instrument(skip_all)]
+pub async fn patch_handler(
     depot: &mut Depot,
     request: &mut Request,
 ) -> Result<Json<Task>, StatusCode> {

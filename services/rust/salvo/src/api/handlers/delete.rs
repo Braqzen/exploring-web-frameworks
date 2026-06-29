@@ -2,9 +2,12 @@ use crate::api::handlers::{state, task_id};
 use salvo::{Depot, Request, http::StatusCode};
 use tracing::{error, info, instrument, warn};
 
-#[instrument(name = "delete", skip_all)]
 #[salvo::handler]
-pub async fn remove(depot: &mut Depot, request: &mut Request) -> Result<StatusCode, StatusCode> {
+#[instrument(skip_all)]
+pub async fn delete_handler(
+    depot: &mut Depot,
+    request: &mut Request,
+) -> Result<StatusCode, StatusCode> {
     let state = state(depot);
     let id = task_id(&request);
     if id.is_none() {
