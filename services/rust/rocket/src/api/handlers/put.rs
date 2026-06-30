@@ -1,5 +1,13 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{
+    api::{
+        errors::{internal_server_error, task_not_found},
+        guard::Extract,
+    },
+    state::State as ServerState,
+    task::Task,
+};
 use rocket::{State, http::Status, put, serde::json::Json};
+use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
@@ -9,8 +17,8 @@ use uuid::Uuid;
 pub async fn put_handler(
     id: Uuid,
     state: &State<Arc<Mutex<ServerState>>>,
-    request: Json<Task>,
-) -> Result<Json<Task>, Status> {
+    request: Extract<Task>,
+) -> (Status, Json<Value>) {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();
@@ -26,15 +34,15 @@ pub async fn put_handler(
                 "Overwrote task"
             );
 
-            return Ok(Json(task.to_owned()));
+            return (Status::Ok, Json(json!(task.to_owned())));
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return Err(Status::NotFound);
+            return task_not_found();
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    Err(Status::InternalServerError)
+    internal_server_error()
 }

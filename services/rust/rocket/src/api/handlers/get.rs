@@ -1,5 +1,9 @@
-use crate::{state::State as ServerState, task::Task};
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+};
 use rocket::{State, get, http::Status, serde::json::Json};
+use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
@@ -9,7 +13,7 @@ use uuid::Uuid;
 pub async fn get_handler(
     id: Uuid,
     state: &State<Arc<Mutex<ServerState>>>,
-) -> Result<Json<Task>, Status> {
+) -> (Status, Json<Value>) {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);
@@ -21,15 +25,15 @@ pub async fn get_handler(
                 "Retrieved task"
             );
 
-            return Ok(Json(task));
+            return (Status::Ok, Json(json!(task)));
         } else {
             drop(state);
             warn!(%id, method = "GET", "Task not found");
-            return Err(Status::NotFound);
+            return task_not_found();
         }
     }
 
     error!(%id, method = "GET", "Poisoned lock");
 
-    Err(Status::InternalServerError)
+    internal_server_error()
 }

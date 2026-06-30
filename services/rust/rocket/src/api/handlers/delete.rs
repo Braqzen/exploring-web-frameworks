@@ -1,5 +1,9 @@
-use crate::state::State as ServerState;
-use rocket::{State, delete, http::Status, response::status::NoContent};
+use crate::{
+    api::errors::{internal_server_error, task_not_found},
+    state::State as ServerState,
+};
+use rocket::{State, delete, http::Status, response::status::NoContent, serde::json::Json};
+use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
 use uuid::Uuid;
@@ -9,7 +13,7 @@ use uuid::Uuid;
 pub async fn delete_handler(
     id: Uuid,
     state: &State<Arc<Mutex<ServerState>>>,
-) -> Result<NoContent, Status> {
+) -> Result<NoContent, (Status, Json<Value>)> {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);
@@ -24,11 +28,11 @@ pub async fn delete_handler(
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return Err(Status::NotFound);
+            return Err(task_not_found());
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    Err(Status::InternalServerError)
+    Err(internal_server_error())
 }
