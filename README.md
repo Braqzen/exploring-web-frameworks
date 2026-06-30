@@ -21,6 +21,7 @@ TODO:
   - Ts : express, fastify, koa, hono, nestjs
   - Zig : zap, http.zig
   - C++ : drogon, crow, boost-beast, pistache, Restinio, CppCMS
+  - Odin: ?
 - Lookup
   - Python: PyPi
   - Ts: pnpm

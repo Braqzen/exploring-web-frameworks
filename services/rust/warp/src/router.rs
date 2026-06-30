@@ -1,7 +1,7 @@
 use crate::{
     api::{
+        filters::{handle_rejection, patched_body, task_body, task_id},
         handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
-        middleware::{handle_rejection, patched_body, task_body, task_id},
     },
     state::State,
 };

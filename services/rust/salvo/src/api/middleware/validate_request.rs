@@ -1,7 +1,7 @@
 use crate::task::{PatchedTask, Task};
 use salvo::{
     Depot, FlowCtrl, Request, Response,
-    http::{Method, ParseError, StatusCode},
+    http::{HeaderValue, Method, ParseError, StatusCode, header},
     writing::Json,
 };
 use serde::de::DeserializeOwned;
@@ -123,10 +123,18 @@ pub async fn validate_request_fn(
         }
         _ => {
             warn!(%method, %path, "Method not allowed");
+            let allow = if path == "/" {
+                "POST"
+            } else {
+                "GET, PUT, PATCH, DELETE"
+            };
+
             res.stuff(
                 StatusCode::METHOD_NOT_ALLOWED,
                 Json(json!({"error": "Method not allowed"})),
             );
+            res.headers_mut()
+                .insert(header::ALLOW, HeaderValue::from_static(allow));
             ctrl.skip_rest();
         }
     }

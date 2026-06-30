@@ -3,7 +3,10 @@ use actix_web::{
     Error, HttpMessage, HttpRequest, HttpResponse,
     body::{self, BodyStream, BoxBody},
     dev::{Payload, ServiceRequest, ServiceResponse},
-    http::Method,
+    http::{
+        Method,
+        header::{self, HeaderValue},
+    },
     middleware::Next,
     web::Bytes,
 };
@@ -119,8 +122,16 @@ pub async fn validate_request(
         }
         _ => {
             warn!(%method, %path, "Method not allowed");
+            let allow = if path == "/" {
+                "POST"
+            } else {
+                "GET, PUT, PATCH, DELETE"
+            };
+
             return Ok(req.into_response(
-                HttpResponse::MethodNotAllowed().json(json!({"error": "Method not allowed"})),
+                HttpResponse::MethodNotAllowed()
+                    .append_header((header::ALLOW, HeaderValue::from_static(allow)))
+                    .json(json!({"error": "Method not allowed"})),
             ));
         }
     }

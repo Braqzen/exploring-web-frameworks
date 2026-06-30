@@ -3,7 +3,7 @@ use axum::{
     Json,
     body::{self, Body, Bytes},
     extract::Request,
-    http::{Method, StatusCode},
+    http::{HeaderValue, Method, StatusCode, header},
     middleware::Next,
     response::{IntoResponse, Response},
 };
@@ -113,8 +113,15 @@ pub async fn validate_request(req: Request, next: Next) -> Response {
         }
         _ => {
             warn!(%method, %path, "Method not allowed");
+            let allow = if path == "/" {
+                "POST"
+            } else {
+                "GET, PUT, PATCH, DELETE"
+            };
+
             return (
                 StatusCode::METHOD_NOT_ALLOWED,
+                [(header::ALLOW, HeaderValue::from_static(allow))],
                 Json(json!({"error": "Method not allowed"})),
             )
                 .into_response();

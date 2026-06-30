@@ -2,7 +2,7 @@ use crate::task::{PatchedTask, Task};
 use poem::{
     Body, Endpoint, IntoResponse, Request, Response, Result,
     error::ReadBodyError,
-    http::{Method, StatusCode},
+    http::{HeaderValue, Method, StatusCode, header},
     web::Json,
 };
 use serde::de::DeserializeOwned;
@@ -119,10 +119,17 @@ pub async fn validate_request<E: Endpoint>(next: E, mut req: Request) -> Result<
         }
         _ => {
             warn!(%method, %path, "Method not allowed");
+            let allow = if path == "/" {
+                "POST"
+            } else {
+                "GET, PUT, PATCH, DELETE"
+            };
+
             Ok((
                 StatusCode::METHOD_NOT_ALLOWED,
                 Json(json!({"error": "Method not allowed"})),
             )
+                .with_header(header::ALLOW, HeaderValue::from_static(allow))
                 .into_response())
         }
     }
