@@ -1,6 +1,6 @@
 use crate::{
     api::{
-        catchers::{bad_request, too_large, unprocessable},
+        catchers::{bad_request, method_not_allowed, not_found, too_large, unprocessable},
         handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
     },
     state::State,
@@ -16,5 +16,14 @@ pub fn router(state: Arc<Mutex<State>>) -> Rocket<Build> {
             "/",
             routes![get_handler, put_handler, patch_handler, delete_handler],
         )
-        .register("/", catchers![bad_request, too_large, unprocessable])
+        .register(
+            "/",
+            catchers![
+                bad_request,
+                too_large,
+                unprocessable,
+                not_found,
+                method_not_allowed
+            ],
+        )
 }

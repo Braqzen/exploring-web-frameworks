@@ -1,6 +1,6 @@
 use crate::{
     api::{
-        errors::{internal_server_error, task_not_found},
+        errors::{internal_server_error, invalid_path, task_not_found},
         guard::Extract,
     },
     state::State as ServerState,
@@ -15,10 +15,18 @@ use uuid::Uuid;
 #[put("/<id>", data = "<request>")]
 #[instrument(skip_all)]
 pub async fn put_handler(
-    id: Uuid,
+    id: &str,
     state: &State<Arc<Mutex<ServerState>>>,
     request: Extract<Task>,
 ) -> (Status, Json<Value>) {
+    let id = match Uuid::parse_str(id) {
+        Ok(id) => id,
+        Err(_) => {
+            warn!(path = format!("/{id}"), method = "PUT", "Invalid path");
+            return invalid_path();
+        }
+    };
+
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();

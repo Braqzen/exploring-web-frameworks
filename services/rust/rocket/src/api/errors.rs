@@ -11,3 +11,7 @@ pub fn internal_server_error() -> (Status, Json<Value>) {
         Json(json!({"error": "Internal server error"})),
     )
 }
+
+pub fn invalid_path() -> (Status, Json<Value>) {
+    (Status::NotFound, Json(json!({"error": "Invalid path"})))
+}

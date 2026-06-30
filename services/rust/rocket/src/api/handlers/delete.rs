@@ -1,5 +1,5 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
+    api::errors::{internal_server_error, invalid_path, task_not_found},
     state::State as ServerState,
 };
 use rocket::{State, delete, http::Status, response::status::NoContent, serde::json::Json};
@@ -11,9 +11,17 @@ use uuid::Uuid;
 #[delete("/<id>")]
 #[instrument(skip_all)]
 pub async fn delete_handler(
-    id: Uuid,
+    id: &str,
     state: &State<Arc<Mutex<ServerState>>>,
 ) -> Result<NoContent, (Status, Json<Value>)> {
+    let id = match Uuid::parse_str(id) {
+        Ok(id) => id,
+        Err(_) => {
+            warn!(path = format!("/{id}"), method = "DELETE", "Invalid path");
+            return Err(invalid_path());
+        }
+    };
+
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);
