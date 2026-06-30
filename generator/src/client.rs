@@ -159,6 +159,30 @@ impl Client {
         Ok(())
     }
 
+    #[instrument(name = "client.head", err, skip_all)]
+    pub async fn head(
+        &self,
+        provider: &Provider,
+        url: &str,
+        task_id: &str,
+        operation: &Operation,
+    ) -> Result<()> {
+        // Head is not implemented in frameworks and is intended to fail
+        let url = self.task_url(url, task_id);
+        self.metrics
+            .record(provider, &operation, "HEAD", async {
+                self.client
+                    .head(&url)
+                    .send()
+                    .instrument(tracing::info_span!("send"))
+                    .await
+            })
+            .await?
+            .error_for_status()?;
+
+        Ok(())
+    }
+
     fn task_url(&self, url: &str, task_id: &str) -> String {
         format!("{}/{}", url.trim_end_matches('/'), task_id)
     }

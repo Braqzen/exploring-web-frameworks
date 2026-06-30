@@ -68,6 +68,7 @@ impl Worker {
             Method::Patch => self.patch(provider, url).await?,
             Method::Put => self.put(provider, url).await?,
             Method::Delete => self.delete(provider, url).await?,
+            Method::Head => self.head(provider, url).await?,
         };
         Ok(())
     }
@@ -270,6 +271,34 @@ impl Worker {
             }
             Err(error) => {
                 warn!(%error, task_id, method = "DELETE", provider = provider.to_string(), "Failed client request");
+                Err(error)
+            }
+        }
+    }
+
+    #[instrument(name = "worker.head", skip_all)]
+    async fn head(&mut self, provider: Provider, url: String) -> Result<()> {
+        // This intentionally is made to always hit the error path
+        let (task_id, payload) = self.payload(&provider)?;
+
+        match self
+            .client
+            .head(&provider, &url, &task_id, &payload.operation)
+            .await
+        {
+            Ok(_) => {
+                info!(
+                    secret = payload.secret,
+                    operation = payload.operation.to_string(),
+                    id = task_id,
+                    method = "HEAD",
+                    provider = provider.to_string(),
+                    "Headed task"
+                );
+                Ok(())
+            }
+            Err(error) => {
+                warn!(%error, task_id, method = "HEAD", provider = provider.to_string(), "Failed client request");
                 Err(error)
             }
         }

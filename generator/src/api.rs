@@ -97,12 +97,13 @@ struct ApiState {
 /// Distribution mapping the method to a weight percentage for random selection.
 ///
 /// I.e. call this method X% of the time.
-const REQUESTS: [(Method, u32); 5] = [
-    (Method::Post, 40),   // 40%
+const REQUESTS: [(Method, u32); 6] = [
+    (Method::Post, 30),   // 30%
     (Method::Get, 25),    // 25%
     (Method::Patch, 15),  // 15%
     (Method::Put, 10),    // 10%
-    (Method::Delete, 10), // 10%
+    (Method::Delete, 15), // 10%
+    (Method::Head, 5),    // 5%
 ];
 
 /// The method of the HTTP request to send to a server.
@@ -113,6 +114,7 @@ pub enum Method {
     Patch,
     Put,
     Delete,
+    Head,
 }
 
 impl ToString for Method {
@@ -123,6 +125,7 @@ impl ToString for Method {
             Method::Patch => "PATCH",
             Method::Put => "PUT",
             Method::Delete => "DELETE",
+            Method::Head => "HEAD",
         }
         .to_string()
     }
