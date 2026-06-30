@@ -4,8 +4,6 @@ Grafana: http://localhost:3000/dashboards
 
 TODO:
 
-- update all rust docker files to use the same version
-- error handling for bad requests / rejections
 - insert random error rate into generator (configurable)
   - unknown operations e.g. filter
   - wrong method (HEAD, etc.)

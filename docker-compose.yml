@@ -8,7 +8,6 @@ x-common: &common-setup
   restart: unless-stopped
 
 services:
-  # A service that sends payloads to various api services.
   generator:
     <<: *common-setup
     deploy:
@@ -26,7 +25,6 @@ services:
     depends_on:
       - telemetry-alloy
 
-  # Rust API service that uses axum.
   rust-axum:
     <<: *common-setup
     deploy:
@@ -35,7 +33,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-axum:latest
-    command: ["/app/axum"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -51,7 +49,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-actix:latest
-    command: ["/app/actix"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -67,7 +65,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-warp:latest
-    command: ["/app/warp"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -83,7 +81,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-rocket:latest
-    command: ["/app/rocket"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -100,7 +98,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-poem:latest
-    command: ["/app/poem"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
@@ -116,7 +114,7 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-salvo:latest
-    command: ["/app/salvo"]
+    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000

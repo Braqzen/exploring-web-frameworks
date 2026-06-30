@@ -5,35 +5,38 @@ build-servers: build-axum build-actix build-warp build-rocket build-poem build-s
 
 build-axum:
 	docker rmi servers-axum:latest 2>/dev/null || true
-	docker build -t servers-axum -f services/rust/axum/Dockerfile .
+	docker buildx bake -f docker/build.hcl axum
 
 build-actix:
 	docker rmi servers-actix:latest 2>/dev/null || true
-	docker build -t servers-actix -f services/rust/actix/Dockerfile .
+	docker buildx bake -f docker/build.hcl actix
 
 build-warp:
 	docker rmi servers-warp:latest 2>/dev/null || true
-	docker build -t servers-warp -f services/rust/warp/Dockerfile .
+	docker buildx bake -f docker/build.hcl warp
 
 build-rocket:
 	docker rmi servers-rocket:latest 2>/dev/null || true
-	docker build -t servers-rocket -f services/rust/rocket/Dockerfile .
+	docker buildx bake -f docker/build.hcl rocket
 
 build-poem:
 	docker rmi servers-poem:latest 2>/dev/null || true
-	docker build -t servers-poem -f services/rust/poem/Dockerfile .
+	docker buildx bake -f docker/build.hcl poem
 
 build-salvo:
 	docker rmi servers-salvo:latest 2>/dev/null || true
-	docker build -t servers-salvo -f services/rust/salvo/Dockerfile .
+	docker buildx bake -f docker/build.hcl salvo
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
-	docker build -t servers-generator -f generator/Dockerfile .
+	docker buildx bake -f docker/build.hcl generator
 
 run:
 	docker compose up -d
 	@echo Grafana: http://localhost:3000/dashboards
 
 stop:
+	docker compose down
+
+clean:
 	docker compose down -v
