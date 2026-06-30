@@ -46,17 +46,11 @@ impl Client {
             .await?
             .error_for_status()?;
 
-        // TODO: Update to type once services are updated
-        let body = response.text().await?;
-        if let Ok(created) = serde_json::from_str::<CreatedTask>(&body) {
-            return Ok(created.id);
-        }
-        serde_json::from_str::<String>(&body).map_err(Into::into)
-
-        // Ok(response
-        //     .json::<String>()
-        //     .instrument(tracing::info_span!("read_and_parse_json"))
-        //     .await?)
+        Ok(response
+            .json::<CreatedTask>()
+            .instrument(tracing::info_span!("read_and_parse_json"))
+            .await?
+            .id)
     }
 
     #[instrument(name = "client.get", err, skip_all)]
