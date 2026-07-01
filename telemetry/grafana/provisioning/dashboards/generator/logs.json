@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 9,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -49,12 +49,12 @@
         "sortOrder": "Descending",
         "wrapLogMessage": false
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?i)Randomised requests\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised requests)\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -90,12 +90,12 @@
         "sortOrder": "Descending",
         "wrapLogMessage": false
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?i)Randomised operations\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised operations)\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -139,6 +139,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -153,7 +154,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -184,7 +186,7 @@
           "sort": "asc"
         }
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "direction": "backward",
@@ -226,7 +228,7 @@
         "sortOrder": "Descending",
         "wrapLogMessage": false
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -246,7 +248,7 @@
   ],
   "preload": false,
   "refresh": "5s",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": [
@@ -400,5 +402,5 @@
   "timezone": "browser",
   "title": "Logs",
   "uid": "bfpj9xrziqiv4f",
-  "version": 2
+  "version": 1
 }
