@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 9,
   "links": [],
   "panels": [
     {
@@ -32,8 +32,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 24,
+        "h": 12,
+        "w": 12,
         "x": 0,
         "y": 0
       },
@@ -54,12 +54,53 @@
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?i)Randomised request distribution\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?i)Randomised requests\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
       "title": "Request Distribution",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Operations are randomised periodically. This panel shows the operation distribution",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "11.6.15",
+      "targets": [
+        {
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?i)Randomised operations\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Operation Distribution",
       "type": "logs"
     },
     {
@@ -127,7 +168,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 12
       },
       "id": 2,
       "options": {
@@ -171,7 +212,7 @@
         "h": 19,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 22
       },
       "id": 1,
       "options": {
@@ -359,5 +400,5 @@
   "timezone": "browser",
   "title": "Logs",
   "uid": "bfpj9xrziqiv4f",
-  "version": 4
+  "version": 2
 }

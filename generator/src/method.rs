@@ -1,13 +1,7 @@
-use rand::{
-    RngExt, rng,
-    seq::{IndexedRandom, SliceRandom},
-};
-use std::{
-    sync::{Arc, Mutex},
-    time::Duration,
-};
-use tokio::time::sleep;
-use tracing::{error, info};
+use crate::randomiser::Randomiser;
+use rand::{rng, seq::IndexedRandom};
+use std::sync::{Arc, Mutex};
+use tracing::error;
 
 pub struct MethodManager {
     requests: Arc<Mutex<[(Method, u16); 6]>>,
@@ -56,7 +50,6 @@ impl MethodManager {
         if post {
             Method::Post
         } else {
-            // SAFETY: REQUESTS is non-empty and has values greater than 0
             let guard = match self.requests.lock() {
                 Ok(guard) => guard,
                 Err(error) => {
@@ -73,6 +66,7 @@ impl MethodManager {
                 }
             };
 
+            // SAFETY: REQUESTS is non-empty and has values greater than 0
             let (method, _) = guard
                 .choose_weighted(&mut rng(), |(_, weight)| *weight)
                 .unwrap();
@@ -104,99 +98,5 @@ impl ToString for Method {
             Method::Head => "HEAD",
         }
         .to_string()
-    }
-}
-
-struct Randomiser;
-
-impl Randomiser {
-    /// Randomly create a distribution of methods to send to a server.
-    ///
-    /// I.e. call this method X% of the time.
-    ///
-    /// The call selection assumes that at least 1 method is non-zero so return None if all were set to 0.
-    fn try_randomise() -> Option<[(Method, u16); 6]> {
-        // Select a random number to use to spread out the method weights
-        let mut tokens: u16 = 1000;
-
-        // Track if at least 1 method is non-zero
-        let mut non_zero = false;
-
-        let mut requests = [
-            (Method::Post, 0),
-            (Method::Get, 0),
-            (Method::Patch, 0),
-            (Method::Put, 0),
-            (Method::Delete, 0),
-            (Method::Head, 0),
-        ];
-
-        requests.shuffle(&mut rng());
-
-        // For the sake of logging (and reducing performance) track each value
-        let mut post = 0;
-        let mut get = 0;
-        let mut patch = 0;
-        let mut put = 0;
-        let mut delete = 0;
-        let mut head = 0;
-
-        // Randomly set a weight for each method
-        requests.iter_mut().for_each(|(method, weight)| {
-            let random_weight = rng().random_range(0..=tokens);
-
-            tokens -= random_weight;
-            *weight = random_weight;
-
-            match method {
-                Method::Post => post = random_weight,
-                Method::Get => get = random_weight,
-                Method::Patch => patch = random_weight,
-                Method::Put => put = random_weight,
-                Method::Delete => delete = random_weight,
-                Method::Head => head = random_weight,
-            }
-
-            if 0 < random_weight {
-                non_zero = true;
-            }
-        });
-
-        if non_zero {
-            let total = post + get + patch + put + delete + head;
-            info!(
-                post = ((post as f64 / total as f64) * 1000.0).round() / 10.0,
-                get = ((get as f64 / total as f64) * 1000.0).round() / 10.0,
-                patch = ((patch as f64 / total as f64) * 1000.0).round() / 10.0,
-                put = ((put as f64 / total as f64) * 1000.0).round() / 10.0,
-                delete = ((delete as f64 / total as f64) * 1000.0).round() / 10.0,
-                head = ((head as f64 / total as f64) * 1000.0).round() / 10.0,
-                total,
-                "Randomised request distribution"
-            );
-            Some(requests)
-        } else {
-            None
-        }
-    }
-
-    fn requests() -> [(Method, u16); 6] {
-        let mut requests = Self::try_randomise();
-
-        // Realistically this will never trigger and if it does it likely won't loop a 2nd time
-        while requests.is_none() {
-            requests = Self::try_randomise();
-        }
-
-        requests.unwrap()
-    }
-
-    async fn sleep() {
-        const MILLISECONDS: u64 = 1000;
-
-        // Randomly sleep for 5 to 15 seconds after each randomisation to buffer updates
-        let sleep_duration = rng().random_range(5 * MILLISECONDS..=15 * MILLISECONDS);
-
-        sleep(Duration::from_millis(sleep_duration)).await;
     }
 }

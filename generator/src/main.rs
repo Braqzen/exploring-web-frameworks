@@ -2,8 +2,10 @@ mod api;
 mod client;
 mod config;
 mod method;
+mod operation;
 mod payload;
 mod provider;
+mod randomiser;
 mod worker;
 
 use crate::{config::Config, worker::Worker};

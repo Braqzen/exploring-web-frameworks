@@ -3,7 +3,8 @@ use crate::{
     client::Client,
     config::Config,
     method::{Method, MethodManager},
-    payload::{Operation, Payload},
+    operation::Operation,
+    payload::{Payload, PayloadManager},
     provider::Provider,
 };
 use eyre::Result;
@@ -19,6 +20,7 @@ use tracing::{field::Empty, info, instrument, warn};
 pub struct Worker {
     api_manager: ApiManager,
     method_manager: MethodManager,
+    payload_manager: PayloadManager,
     client: Client,
     metrics: Metrics,
     sleep: u64,
@@ -29,6 +31,7 @@ impl Worker {
         Self {
             api_manager: ApiManager::new(config.api()),
             method_manager: MethodManager::new(),
+            payload_manager: PayloadManager::new(),
             client: Client::new(),
             metrics: Metrics::new(),
             sleep: config.sleep(),
@@ -80,7 +83,7 @@ impl Worker {
 
     #[instrument(name = "worker.post", skip_all)]
     async fn post(&mut self, provider: Provider) -> Result<()> {
-        let payload = Payload::new();
+        let payload = self.payload_manager.payload();
 
         match self.client.post(&provider, &payload).await {
             Ok(id) => {
@@ -206,7 +209,7 @@ impl Worker {
     async fn put(&mut self, provider: Provider) -> Result<()> {
         let (task_id, old_payload) = self.payload(&provider)?;
 
-        let new_payload = Payload::new();
+        let new_payload = self.payload_manager.payload();
 
         match self
             .client
