@@ -1,7 +1,8 @@
 use crate::task::{PatchedTask, Task};
+use rand::{RngExt, rng};
 use serde::de::DeserializeOwned;
 use serde_json::json;
-use std::convert::Infallible;
+use std::{convert::Infallible, time::Duration};
 use tracing::{instrument, warn};
 use uuid::Uuid;
 use warp::{
@@ -63,6 +64,24 @@ pub fn patched_body() -> impl Filter<Extract = (PatchedTask,), Error = Rejection
         .and(warp::method())
         .and(warp::body::bytes())
         .and_then(parse_patched_task_body)
+}
+
+pub fn chaos() -> impl Filter<Extract = (), Error = Rejection> + Copy {
+    warp::any().and_then(chaos_impl).untuple_one()
+}
+
+async fn chaos_impl() -> Result<(), Rejection> {
+    if rng().random_range(0..=100) < 5 {
+        let duration = Duration::from_micros(rng().random_range(500..=1500));
+        tokio::time::sleep(duration).await;
+    }
+    if rng().random_range(0..=100) < 5 {
+        return Err(warp::reject::custom(ValidationError {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: "Internal server error",
+        }));
+    }
+    Ok(())
 }
 
 #[instrument(skip_all)]

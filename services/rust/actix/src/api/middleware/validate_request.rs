@@ -8,10 +8,13 @@ use actix_web::{
         header::{self, HeaderValue},
     },
     middleware::Next,
+    rt::time::sleep,
     web::Bytes,
 };
+use rand::{RngExt, rng};
 use serde::de::DeserializeOwned;
 use serde_json::json;
+use std::time::Duration;
 use tracing::{instrument, warn};
 use uuid::Uuid;
 
@@ -25,6 +28,15 @@ pub async fn validate_request(
     req: ServiceRequest,
     next: Next<BoxBody>,
 ) -> Result<ServiceResponse<BoxBody>, Error> {
+    if rng().random_range(0..=100) < 5 {
+        sleep(Duration::from_micros(rng().random_range(500..=1500))).await;
+    }
+    if rng().random_range(0..=100) < 5 {
+        return Ok(req.into_response(
+            HttpResponse::InternalServerError().json(json!({"error": "Internal server error"})),
+        ));
+    }
+
     let method = req.method().clone();
     let path = req.path().to_string();
 

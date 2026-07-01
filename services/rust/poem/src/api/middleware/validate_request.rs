@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::task::{PatchedTask, Task};
 use poem::{
     Body, Endpoint, IntoResponse, Request, Response, Result,
@@ -5,8 +7,10 @@ use poem::{
     http::{HeaderValue, Method, StatusCode, header},
     web::Json,
 };
+use rand::{RngExt, rng};
 use serde::de::DeserializeOwned;
 use serde_json::json;
+use tokio::time::sleep;
 use tracing::{instrument, warn};
 use uuid::Uuid;
 
@@ -17,6 +21,18 @@ const MAX_BODY_SIZE: usize = 1024 * 64;
 
 #[instrument(skip_all)]
 pub async fn validate_request<E: Endpoint>(next: E, mut req: Request) -> Result<Response> {
+    if rng().random_range(0..=100) < 5 {
+        let duration = Duration::from_micros(rng().random_range(500..=1500));
+        sleep(duration).await;
+    }
+    if rng().random_range(0..=100) < 5 {
+        return Ok((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error": "Internal server error"})),
+        )
+            .into_response());
+    }
+
     let method = req.method().clone();
     let path = req.uri().path().to_string();
 

@@ -1,5 +1,8 @@
 use crate::{
-    api::{errors::internal_server_error, guard::Extract},
+    api::{
+        errors::internal_server_error,
+        guard::{Chaos, Extract},
+    },
     state::State as ServerState,
     task::Task,
 };
@@ -12,6 +15,7 @@ use uuid::Uuid;
 #[post("/", data = "<request>")]
 #[instrument(skip_all)]
 pub async fn post_handler(
+    _chaos: Chaos,
     state: &State<Arc<Mutex<ServerState>>>,
     request: Extract<Task>,
 ) -> (Status, Json<Value>) {

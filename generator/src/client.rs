@@ -39,6 +39,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()
@@ -67,6 +68,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()
@@ -95,6 +97,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()
@@ -123,6 +126,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()
@@ -149,6 +153,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()
@@ -173,6 +178,7 @@ impl Client {
                     .send()
                     .instrument(tracing::info_span!("send"))
                     .await
+                    .map_err(|e| e.without_url())
             })
             .await?
             .error_for_status()

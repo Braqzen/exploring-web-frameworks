@@ -1,7 +1,7 @@
 use crate::{
     api::{
         errors::{internal_server_error, invalid_path, task_not_found},
-        guard::Extract,
+        guard::{Chaos, Extract},
     },
     state::State as ServerState,
     task::Task,
@@ -15,6 +15,7 @@ use uuid::Uuid;
 #[put("/<id>", data = "<request>")]
 #[instrument(skip_all)]
 pub async fn put_handler(
+    _chaos: Chaos,
     id: &str,
     state: &State<Arc<Mutex<ServerState>>>,
     request: Extract<Task>,

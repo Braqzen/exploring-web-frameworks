@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::task::{PatchedTask, Task};
 use axum::{
     Json,
@@ -7,8 +9,10 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
+use rand::{RngExt, rng};
 use serde::de::DeserializeOwned;
 use serde_json::json;
+use tokio::time::sleep;
 use tracing::{instrument, warn};
 use uuid::Uuid;
 
@@ -19,6 +23,18 @@ const MAX_BODY_SIZE: usize = 1024 * 64;
 
 #[instrument(skip_all)]
 pub async fn validate_request(req: Request, next: Next) -> Response {
+    if rng().random_range(0..=100) < 5 {
+        let duration = Duration::from_micros(rng().random_range(500..=1500));
+        sleep(duration).await;
+    }
+    if rng().random_range(0..=100) < 5 {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error": "Internal server error"})),
+        )
+            .into_response();
+    }
+
     let (mut parts, request_body) = req.into_parts();
     let method = parts.method.clone();
     let path = parts.uri.path();

@@ -1,5 +1,8 @@
 use crate::{
-    api::errors::{internal_server_error, invalid_path, task_not_found},
+    api::{
+        errors::{internal_server_error, invalid_path, task_not_found},
+        guard::Chaos,
+    },
     state::State as ServerState,
 };
 use rocket::{State, delete, http::Status, response::status::NoContent, serde::json::Json};
@@ -11,6 +14,7 @@ use uuid::Uuid;
 #[delete("/<id>")]
 #[instrument(skip_all)]
 pub async fn delete_handler(
+    _chaos: Chaos,
     id: &str,
     state: &State<Arc<Mutex<ServerState>>>,
 ) -> Result<NoContent, (Status, Json<Value>)> {

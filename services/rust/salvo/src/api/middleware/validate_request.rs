@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use crate::task::{PatchedTask, Task};
+use rand::{RngExt, rng};
 use salvo::{
     Depot, FlowCtrl, Request, Response,
     http::{HeaderValue, Method, ParseError, StatusCode, header},
@@ -6,6 +9,7 @@ use salvo::{
 };
 use serde::de::DeserializeOwned;
 use serde_json::json;
+use tokio::time::sleep;
 use tracing::warn;
 use uuid::Uuid;
 
@@ -22,6 +26,18 @@ pub async fn validate_request_fn(
     res: &mut Response,
     ctrl: &mut FlowCtrl,
 ) {
+    if rng().random_range(0..=100) < 5 {
+        let duration = Duration::from_micros(rng().random_range(500..=1500));
+        sleep(duration).await;
+    }
+    if rng().random_range(0..=100) < 5 {
+        res.stuff(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error": "Internal server error"})),
+        );
+        return;
+    }
+
     let method = req.method().clone();
     let path = req.uri().path().to_string();
 

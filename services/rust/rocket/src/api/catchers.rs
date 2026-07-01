@@ -26,3 +26,8 @@ pub fn not_found(_req: &Request) -> Json<Value> {
 pub fn method_not_allowed(_: &Request) -> Json<Value> {
     Json(json!({"error": "Method not allowed"}))
 }
+
+#[catch(500)]
+pub fn internal_error(_: &Request) -> Json<Value> {
+    Json(json!({"error": "Internal server error"}))
+}
