@@ -1,8 +1,10 @@
 use crate::{
-    api::{ApiManager, Method, Provider},
+    api::ApiManager,
     client::Client,
     config::Config,
+    method::{Method, MethodManager},
     payload::{Operation, Payload},
+    provider::Provider,
 };
 use eyre::Result;
 use opentelemetry::{KeyValue, global, metrics::UpDownCounter};
@@ -16,6 +18,7 @@ use tracing::{field::Empty, info, instrument, warn};
 
 pub struct Worker {
     api_manager: ApiManager,
+    method_manager: MethodManager,
     client: Client,
     metrics: Metrics,
     sleep: u64,
@@ -25,6 +28,7 @@ impl Worker {
     pub fn new(config: Config) -> Self {
         Self {
             api_manager: ApiManager::new(config.api()),
+            method_manager: MethodManager::new(),
             client: Client::new(),
             metrics: Metrics::new(),
             sleep: config.sleep(),
@@ -58,26 +62,27 @@ impl Worker {
 
     #[instrument(name = "worker.send_request", skip_all, fields(provider = Empty, method = Empty))]
     async fn send_request(&mut self) -> Result<()> {
-        let (provider, url, method) = self.api_manager.select();
-        tracing::Span::current().record("provider", provider.to_string());
+        let (provider, post) = self.api_manager.select();
+        let method = self.method_manager.select(post);
+        tracing::Span::current().record("provider", provider.name().to_string());
         tracing::Span::current().record("method", method.to_string());
 
         match method {
-            Method::Post => self.post(provider, url).await?,
-            Method::Get => self.get(provider, url).await?,
-            Method::Patch => self.patch(provider, url).await?,
-            Method::Put => self.put(provider, url).await?,
-            Method::Delete => self.delete(provider, url).await?,
-            Method::Head => self.head(provider, url).await?,
+            Method::Post => self.post(provider).await?,
+            Method::Get => self.get(provider).await?,
+            Method::Patch => self.patch(provider).await?,
+            Method::Put => self.put(provider).await?,
+            Method::Delete => self.delete(provider).await?,
+            Method::Head => self.head(provider).await?,
         };
         Ok(())
     }
 
     #[instrument(name = "worker.post", skip_all)]
-    async fn post(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn post(&mut self, provider: Provider) -> Result<()> {
         let payload = Payload::new();
 
-        match self.client.post(&provider, &url, &payload).await {
+        match self.client.post(&provider, &payload).await {
             Ok(id) => {
                 self.metrics
                     .increment_operation(&provider, &payload.operation.to_string());
@@ -89,7 +94,7 @@ impl Worker {
                     operation = payload.operation.to_string(),
                     id,
                     method = "POST",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Stored task"
                 );
                 Ok(())
@@ -100,7 +105,7 @@ impl Worker {
                     secret = payload.secret,
                     operation = payload.operation.to_string(),
                     method = "POST",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -109,12 +114,12 @@ impl Worker {
     }
 
     #[instrument(name = "worker.get", skip_all)]
-    async fn get(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn get(&mut self, provider: Provider) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
         match self
             .client
-            .get(&provider, &url, &task_id, &payload.operation)
+            .get(&provider, &task_id, &payload.operation)
             .await
         {
             Ok(task) => {
@@ -123,7 +128,7 @@ impl Worker {
                     operation = task.operation.to_string(),
                     id = task_id,
                     method = "GET",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Retrieved task"
                 );
                 Ok(())
@@ -135,7 +140,7 @@ impl Worker {
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "GET",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -144,7 +149,7 @@ impl Worker {
     }
 
     #[instrument(name = "worker.patch", skip_all)]
-    async fn patch(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn patch(&mut self, provider: Provider) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
         // TODO: enforce a different operation than the current one
@@ -159,7 +164,7 @@ impl Worker {
 
         match self
             .client
-            .patch(&provider, &url, &task_id, operation.clone())
+            .patch(&provider, &task_id, operation.clone())
             .await
         {
             Ok(task) => {
@@ -176,7 +181,7 @@ impl Worker {
                     to_operation = task.operation.to_string(),
                     id = task_id,
                     method = "PATCH",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Patched task"
                 );
                 Ok(())
@@ -189,7 +194,7 @@ impl Worker {
                     to_operation = operation.to_string(),
                     id = task_id,
                     method = "PATCH",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -198,14 +203,14 @@ impl Worker {
     }
 
     #[instrument(name = "worker.put", skip_all)]
-    async fn put(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn put(&mut self, provider: Provider) -> Result<()> {
         let (task_id, old_payload) = self.payload(&provider)?;
 
         let new_payload = Payload::new();
 
         match self
             .client
-            .put(&provider, &url, &task_id, new_payload.clone())
+            .put(&provider, &task_id, new_payload.clone())
             .await
         {
             Ok(task) => {
@@ -223,7 +228,7 @@ impl Worker {
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
                     method = "PUT",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Put task"
                 );
                 Ok(())
@@ -237,7 +242,7 @@ impl Worker {
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
                     method = "PUT",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Failed client request"
                 );
                 Err(error)
@@ -246,12 +251,12 @@ impl Worker {
     }
 
     #[instrument(name = "worker.delete", skip_all)]
-    async fn delete(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn delete(&mut self, provider: Provider) -> Result<()> {
         let (task_id, payload) = self.payload(&provider)?;
 
         match self
             .client
-            .delete(&provider, &url, &task_id, &payload.operation)
+            .delete(&provider, &task_id, &payload.operation)
             .await
         {
             Ok(_) => {
@@ -264,26 +269,32 @@ impl Worker {
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "DELETE",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Deleted task"
                 );
                 Ok(())
             }
             Err(error) => {
-                warn!(%error, task_id, method = "DELETE", provider = provider.to_string(), "Failed client request");
+                warn!(
+                    %error,
+                    task_id,
+                    method = "DELETE",
+                    provider = provider.name().to_string(),
+                    "Failed client request"
+                );
                 Err(error)
             }
         }
     }
 
     #[instrument(name = "worker.head", skip_all)]
-    async fn head(&mut self, provider: Provider, url: String) -> Result<()> {
+    async fn head(&mut self, provider: Provider) -> Result<()> {
         // This intentionally is made to always hit the error path
         let (task_id, payload) = self.payload(&provider)?;
 
         match self
             .client
-            .head(&provider, &url, &task_id, &payload.operation)
+            .head(&provider, &task_id, &payload.operation)
             .await
         {
             Ok(_) => {
@@ -292,30 +303,36 @@ impl Worker {
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "HEAD",
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Headed task"
                 );
                 Ok(())
             }
             Err(error) => {
-                warn!(%error, task_id, method = "HEAD", provider = provider.to_string(), "Failed client request");
+                warn!(
+                    %error,
+                    task_id,
+                    method = "HEAD",
+                    provider = provider.name().to_string(),
+                    "Failed client request"
+                );
                 Err(error)
             }
         }
     }
 
     fn payload(&self, provider: &Provider) -> Result<(String, Payload)> {
-        match self.api_manager.payload(&provider) {
+        match self.api_manager.payload(&provider.name()) {
             Some((task_id, payload)) => return Ok((task_id, payload)),
             None => {
                 return {
                     warn!(
-                        provider = provider.to_string(),
+                        provider = provider.name().to_string(),
                         "Missing payload for provider",
                     );
                     Err(eyre::eyre!(
                         "Missing payload for provider {}",
-                        provider.to_string()
+                        provider.name().to_string()
                     ))
                 };
             }
@@ -323,17 +340,17 @@ impl Worker {
     }
 
     fn remove(&mut self, provider: &Provider, task_id: &String) -> Result<Payload> {
-        match self.api_manager.remove(&provider, &task_id) {
+        match self.api_manager.remove(&provider.name(), &task_id) {
             Some(payload) => Ok(payload),
             None => {
                 return {
                     warn!(
-                        provider = provider.to_string(),
+                        provider = provider.name().to_string(),
                         "Failed to remove payload for provider",
                     );
                     Err(eyre::eyre!(
                         "Failed to remove payload for provider {}",
-                        provider.to_string()
+                        provider.name().to_string()
                     ))
                 };
             }
@@ -342,15 +359,15 @@ impl Worker {
 
     fn insert(&mut self, provider: &Provider, id: &String, payload: &Payload) -> Result<()> {
         self.api_manager
-            .insert(provider, id, payload)
+            .insert(&provider.name(), id, payload)
             .ok_or_else(|| {
                 warn!(
-                    provider = provider.to_string(),
+                    provider = provider.name().to_string(),
                     "Failed to insert payload for provider"
                 );
                 eyre::eyre!(
                     "Failed to insert payload for provider {}",
-                    provider.to_string()
+                    provider.name().to_string()
                 )
             })
     }
@@ -374,7 +391,7 @@ impl Metrics {
         self.operations.add(
             1,
             &[
-                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
             ],
         );
@@ -384,7 +401,7 @@ impl Metrics {
         self.operations.add(
             -1,
             &[
-                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
             ],
         );

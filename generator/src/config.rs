@@ -1,12 +1,35 @@
-use crate::api::Provider;
 use eyre::Result;
 use serde::Deserialize;
 use std::collections::HashMap;
 
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum ProviderName {
+    Axum,
+    Actix,
+    Warp,
+    Rocket,
+    Poem,
+    Salvo,
+}
+
+impl ToString for ProviderName {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Axum => "axum".to_string(),
+            Self::Actix => "actix".to_string(),
+            Self::Warp => "warp".to_string(),
+            Self::Rocket => "rocket".to_string(),
+            Self::Poem => "poem".to_string(),
+            Self::Salvo => "salvo".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct ApiService {
     /// Name to identify the provider
-    provider: Provider,
+    provider: ProviderName,
     /// URL to send requests to
     url: String,
     /// Whether the provider is loaded into the worker
@@ -41,7 +64,7 @@ impl Config {
         Ok(config)
     }
 
-    pub fn api(&self) -> HashMap<Provider, String> {
+    pub fn api(&self) -> HashMap<ProviderName, String> {
         self.api
             .iter()
             .map(|api| (api.provider.clone(), api.url.clone()))

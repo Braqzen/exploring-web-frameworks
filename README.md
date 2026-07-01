@@ -6,7 +6,6 @@ TODO:
 
 - insert random error rate into generator (configurable)
   - unknown operations e.g. filter
-  - wrong method (HEAD, etc.)
   - oversize body
   - bad UUID
   - malformed JSON

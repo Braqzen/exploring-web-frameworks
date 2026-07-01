@@ -1,7 +1,9 @@
 mod api;
 mod client;
 mod config;
+mod method;
 mod payload;
+mod provider;
 mod worker;
 
 use crate::{config::Config, worker::Worker};

@@ -1,8 +1,8 @@
 //! The client is used to send payload requests to the server.
 
 use crate::{
-    api::Provider,
     payload::{Operation, Payload},
+    provider::Provider,
 };
 use eyre::Result;
 use opentelemetry::{
@@ -31,13 +31,13 @@ impl Client {
         }
     }
 
-    #[instrument(name = "client.post", err, skip_all)]
-    pub async fn post(&self, provider: &Provider, url: &str, payload: &Payload) -> Result<String> {
+    #[instrument(name = "client.post", skip_all)]
+    pub async fn post(&self, provider: &Provider, payload: &Payload) -> Result<String> {
         let response = self
             .metrics
             .record(provider, &payload.operation, "POST", async {
                 self.client
-                    .post(url)
+                    .post(&provider.url())
                     .json(payload)
                     .send()
                     .instrument(tracing::info_span!("send"))
@@ -53,15 +53,14 @@ impl Client {
             .id)
     }
 
-    #[instrument(name = "client.get", err, skip_all)]
+    #[instrument(name = "client.get", skip_all)]
     pub async fn get(
         &self,
         provider: &Provider,
-        url: &str,
         task_id: &str,
         operation: &Operation,
     ) -> Result<Payload> {
-        let url = self.task_url(url, task_id);
+        let url = self.task_url(&provider.url(), task_id);
         let response = self
             .metrics
             .record(provider, &operation, "GET", async {
@@ -80,15 +79,14 @@ impl Client {
             .await?)
     }
 
-    #[instrument(name = "client.patch", err, skip_all)]
+    #[instrument(name = "client.patch", skip_all)]
     pub async fn patch(
         &self,
         provider: &Provider,
-        url: &str,
         task_id: &str,
         operation: Operation,
     ) -> Result<Payload> {
-        let url = self.task_url(url, task_id);
+        let url = self.task_url(&provider.url(), task_id);
         let response = self
             .metrics
             .record(provider, &operation, "PATCH", async {
@@ -108,15 +106,14 @@ impl Client {
             .await?)
     }
 
-    #[instrument(name = "client.put", err, skip_all)]
+    #[instrument(name = "client.put", skip_all)]
     pub async fn put(
         &self,
         provider: &Provider,
-        url: &str,
         task_id: &str,
         payload: Payload,
     ) -> Result<Payload> {
-        let url = self.task_url(url, task_id);
+        let url = self.task_url(&provider.url(), task_id);
         let response = self
             .metrics
             .record(provider, &payload.operation, "PUT", async {
@@ -136,15 +133,14 @@ impl Client {
             .await?)
     }
 
-    #[instrument(name = "client.delete", err, skip_all)]
+    #[instrument(name = "client.delete", skip_all)]
     pub async fn delete(
         &self,
         provider: &Provider,
-        url: &str,
         task_id: &str,
         operation: &Operation,
     ) -> Result<()> {
-        let url = self.task_url(url, task_id);
+        let url = self.task_url(&provider.url(), task_id);
         self.metrics
             .record(provider, &operation, "DELETE", async {
                 self.client
@@ -159,16 +155,15 @@ impl Client {
         Ok(())
     }
 
-    #[instrument(name = "client.head", err, skip_all)]
+    #[instrument(name = "client.head", skip_all)]
     pub async fn head(
         &self,
         provider: &Provider,
-        url: &str,
         task_id: &str,
         operation: &Operation,
     ) -> Result<()> {
         // Head is not implemented in frameworks and is intended to fail
-        let url = self.task_url(url, task_id);
+        let url = self.task_url(&provider.url(), task_id);
         self.metrics
             .record(provider, &operation, "HEAD", async {
                 self.client
@@ -224,7 +219,7 @@ impl Metrics {
         self.requests.add(
             1,
             &[
-                KeyValue::new("provider", provider.to_string()),
+                KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
                 KeyValue::new("method", method.to_string()),
             ],
@@ -240,7 +235,7 @@ impl Metrics {
     ) {
         let ms = elapsed.as_secs_f64() * MILLISECONDS;
         let attrs = &[
-            KeyValue::new("provider", provider.to_string()),
+            KeyValue::new("provider", provider.name().to_string()),
             KeyValue::new("operation", operation.to_string()),
             KeyValue::new("method", method.to_string()),
         ];
