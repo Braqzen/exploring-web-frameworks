@@ -41,7 +41,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(response
             .json::<CreatedTask>()
@@ -68,7 +69,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(response
             .json::<Payload>()
@@ -95,7 +97,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(response
             .json::<Payload>()
@@ -122,7 +125,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(response
             .json::<Payload>()
@@ -147,7 +151,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(())
     }
@@ -170,7 +175,8 @@ impl Client {
                     .await
             })
             .await?
-            .error_for_status()?;
+            .error_for_status()
+            .map_err(|e| e.without_url())?;
 
         Ok(())
     }
