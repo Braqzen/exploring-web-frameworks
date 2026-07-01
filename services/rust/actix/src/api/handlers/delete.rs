@@ -18,7 +18,7 @@ pub async fn delete_handler(state: Data<Mutex<ServerState>>, id: ReqData<Uuid>) 
             drop(state);
             info!(
                 %id,
-                secret = task.secret,
+                secret = task.secret.len(),
                 operation = task.operation.to_string(),
                 method = "DELETE",
                 "Removed task"

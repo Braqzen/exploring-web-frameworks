@@ -19,8 +19,8 @@ pub async fn put_handler(depot: &mut Depot, res: &mut Response) {
 
             info!(
                 %id,
-                from_secret = previous_task.secret,
-                to_secret = task.secret,
+                from_secret = previous_task.secret.len(),
+                to_secret = task.secret.len(),
                 from_operation = previous_task.operation.to_string(),
                 to_operation = task.operation.to_string(),
                 method = "PUT",

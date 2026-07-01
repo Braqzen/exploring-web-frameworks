@@ -19,7 +19,7 @@ pub async fn post_handler(state: Data<Mutex<ServerState>>, request: ReqData<Task
 
         info!(
             %id,
-            secret = request.secret,
+            secret = request.secret.len(),
             operation = request.operation.to_string(),
             method = "POST",
             "Inserted new task"
@@ -30,7 +30,7 @@ pub async fn post_handler(state: Data<Mutex<ServerState>>, request: ReqData<Task
 
     error!(
         %id,
-        secret = request.secret,
+        secret = request.secret.len(),
         operation = request.operation.to_string(),
         method = "POST",
         "Poisoned lock"

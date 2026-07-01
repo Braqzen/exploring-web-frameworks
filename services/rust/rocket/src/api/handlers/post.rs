@@ -24,7 +24,7 @@ pub async fn post_handler(
 
         info!(
             %id,
-            secret = request.secret,
+            secret = request.secret.len(),
             operation = request.operation.to_string(),
             method = "POST",
             "Inserted new task"
@@ -35,7 +35,7 @@ pub async fn post_handler(
 
     error!(
         %id,
-        secret = request.secret,
+        secret = request.secret.len(),
         operation = request.operation.to_string(),
         method = "POST",
         "Poisoned lock"

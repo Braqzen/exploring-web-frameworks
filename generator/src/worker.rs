@@ -93,7 +93,7 @@ impl Worker {
                 let _ = self.insert(&provider, &id, &payload)?;
 
                 info!(
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     operation = payload.operation.to_string(),
                     id,
                     method = "POST",
@@ -105,7 +105,7 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     operation = payload.operation.to_string(),
                     method = "POST",
                     provider = provider.name().to_string(),
@@ -127,7 +127,7 @@ impl Worker {
         {
             Ok(task) => {
                 info!(
-                    secret = task.secret,
+                    secret = task.secret.len(),
                     operation = task.operation.to_string(),
                     id = task_id,
                     method = "GET",
@@ -139,7 +139,7 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "GET",
@@ -179,7 +179,7 @@ impl Worker {
                 let _ = self.insert(&provider, &task_id, &task)?;
 
                 info!(
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     from_operation = payload.operation.to_string(),
                     to_operation = task.operation.to_string(),
                     id = task_id,
@@ -192,7 +192,7 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     from_operation = payload.operation.to_string(),
                     to_operation = operation.to_string(),
                     id = task_id,
@@ -225,8 +225,8 @@ impl Worker {
                 let _ = self.insert(&provider, &task_id, &task)?;
 
                 info!(
-                    from_secret = old_payload.secret,
-                    to_secret = new_payload.secret,
+                    from_secret = old_payload.secret.len(),
+                    to_secret = new_payload.secret.len(),
                     from_operation = old_payload.operation.to_string(),
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
@@ -239,8 +239,8 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    from_secret = old_payload.secret,
-                    to_secret = new_payload.secret,
+                    from_secret = old_payload.secret.len(),
+                    to_secret = new_payload.secret.len(),
                     from_operation = old_payload.operation.to_string(),
                     to_operation = new_payload.operation.to_string(),
                     id = task_id,
@@ -268,7 +268,7 @@ impl Worker {
                     .decrement_operation(&provider, &payload.operation.to_string());
 
                 info!(
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "DELETE",
@@ -280,7 +280,9 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    task_id,
+                    secret = payload.secret.len(),
+                    operation = payload.operation.to_string(),
+                    id = task_id,
                     method = "DELETE",
                     provider = provider.name().to_string(),
                     "Failed client request"
@@ -302,7 +304,7 @@ impl Worker {
         {
             Ok(_) => {
                 info!(
-                    secret = payload.secret,
+                    secret = payload.secret.len(),
                     operation = payload.operation.to_string(),
                     id = task_id,
                     method = "HEAD",
@@ -314,7 +316,9 @@ impl Worker {
             Err(error) => {
                 warn!(
                     %error,
-                    task_id,
+                    secret = payload.secret.len(),
+                    operation = payload.operation.to_string(),
+                    id = task_id,
                     method = "HEAD",
                     provider = provider.name().to_string(),
                     "Failed client request"

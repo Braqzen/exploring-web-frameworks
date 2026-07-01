@@ -6,7 +6,6 @@ TODO:
 
 - insert random error rate into generator (configurable)
   - unknown operations e.g. filter
-  - oversize body
   - bad UUID
   - malformed JSON
 - insert random error rate into each api (configurable)

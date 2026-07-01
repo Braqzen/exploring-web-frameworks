@@ -4,7 +4,6 @@
 
 use crate::{operation::Operation, randomiser::Randomiser};
 use rand::{
-    RngExt,
     distr::{Alphanumeric, SampleString},
     rng,
     seq::IndexedRandom,
@@ -57,14 +56,18 @@ impl PayloadManager {
     }
 
     pub fn payload(&self) -> Payload {
-        let secret_size = rng().random_range(10..=32);
-        let secret = Alphanumeric
-            .sample_string(&mut rng(), secret_size)
-            .to_string();
-
+        let secret = self.secret();
         let operation = self.operation();
 
         Payload::new(secret, operation)
+    }
+
+    fn secret(&self) -> String {
+        let secret_size = Randomiser::secret_size();
+
+        Alphanumeric
+            .sample_string(&mut rng(), secret_size)
+            .to_string()
     }
 
     fn operation(&self) -> Operation {

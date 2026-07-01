@@ -22,7 +22,7 @@ pub async fn delete_handler(
             drop(state);
             info!(
                 %id,
-                secret = task.secret,
+                secret = task.secret.len(),
                 operation = task.operation.to_string(),
                 method = "DELETE",
                 "Removed task"

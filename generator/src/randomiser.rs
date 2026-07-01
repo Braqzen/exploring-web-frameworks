@@ -29,6 +29,14 @@ impl Randomiser {
         operations.unwrap()
     }
 
+    pub fn secret_size() -> usize {
+        if rng().random_range(0..=100) < 5 {
+            rng().random_range(65506..=65550)
+        } else {
+            rng().random_range(10..=32)
+        }
+    }
+
     pub async fn sleep() {
         const MILLISECONDS: u64 = 1000;
 

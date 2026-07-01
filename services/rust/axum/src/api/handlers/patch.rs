@@ -27,7 +27,7 @@ pub async fn patch_handler(
 
             info!(
                 %id,
-                secret = task.secret,
+                secret = task.secret.len(),
                 from_operation = previous_operation.to_string(),
                 to_operation = task.operation.to_string(),
                 method = "PATCH",
