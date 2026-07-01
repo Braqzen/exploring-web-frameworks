@@ -1,8 +1,14 @@
 use crate::{method::Method, operation::Operation};
-use rand::{RngExt, rng, seq::SliceRandom};
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+    rng,
+    seq::SliceRandom,
+};
 use std::time::Duration;
 use tokio::time::sleep;
 use tracing::info;
+use uuid::Uuid;
 
 pub struct Randomiser;
 
@@ -34,6 +40,16 @@ impl Randomiser {
             rng().random_range(65506..=65550)
         } else {
             rng().random_range(10..=32)
+        }
+    }
+
+    pub fn id() -> String {
+        if rng().random_range(0..=100) < 50 {
+            Uuid::new_v4().to_string()
+        } else {
+            Alphanumeric
+                .sample_string(&mut rng(), rng().random_range(10..=32))
+                .to_string()
         }
     }
 

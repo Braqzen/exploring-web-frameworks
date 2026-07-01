@@ -6,6 +6,7 @@ use crate::{
     operation::Operation,
     payload::{Payload, PayloadManager},
     provider::Provider,
+    randomiser::Randomiser,
 };
 use eyre::Result;
 use opentelemetry::{KeyValue, global, metrics::UpDownCounter};
@@ -330,7 +331,12 @@ impl Worker {
 
     fn payload(&self, provider: &Provider) -> Result<(String, Payload)> {
         match self.api_manager.payload(&provider.name()) {
-            Some((task_id, payload)) => return Ok((task_id, payload)),
+            Some((task_id, payload)) => {
+                if rng().random_range(0..=100) < 5 {
+                    return Ok((Randomiser::id(), payload));
+                }
+                Ok((task_id, payload))
+            }
             None => {
                 return {
                     warn!(
@@ -343,7 +349,7 @@ impl Worker {
                     ))
                 };
             }
-        };
+        }
     }
 
     fn remove(&mut self, provider: &Provider, task_id: &String) -> Result<Payload> {

@@ -4,9 +4,6 @@ Grafana: http://localhost:3000/dashboards
 
 TODO:
 
-- insert random error rate into generator (configurable)
-  - bad UUID
-  - malformed JSON
 - insert random error rate into each api (configurable)
   - apis may just fail randomly so perhaps just return an error, sleep or something
 - Consider APIs
