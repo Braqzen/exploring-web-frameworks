@@ -6,6 +6,7 @@ pub enum Operation {
     Merge,
     Sort,
     Transform,
+    Filter, // Intentionally unsupported in apis to cause errors
 }
 
 impl ToString for Operation {
@@ -15,6 +16,7 @@ impl ToString for Operation {
             Operation::Merge => "merge".to_string(),
             Operation::Sort => "sort".to_string(),
             Operation::Transform => "transform".to_string(),
+            Operation::Filter => "filter".to_string(),
         }
     }
 }

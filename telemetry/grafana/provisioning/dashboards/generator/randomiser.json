@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 13,
+  "id": 12,
   "links": [],
   "panels": [
     {
@@ -95,7 +95,7 @@
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised operations)\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised operations)\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | FILTER={{.filter}}% | TOTAL={{.total}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -379,7 +379,8 @@
                 "compute",
                 "merge",
                 "sort",
-                "transform"
+                "transform",
+                "filter"
               ]
             }
           }
@@ -403,6 +404,10 @@
               {
                 "destinationType": "number",
                 "targetField": "sort"
+              },
+              {
+                "destinationType": "number",
+                "targetField": "filter"
               }
             ],
             "fields": {}

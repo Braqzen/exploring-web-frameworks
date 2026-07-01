@@ -13,7 +13,7 @@ use std::sync::{Arc, Mutex};
 use tracing::error;
 
 pub struct PayloadManager {
-    operations: Arc<Mutex<[(Operation, u16); 4]>>,
+    operations: Arc<Mutex<[(Operation, u16); 5]>>,
 }
 
 impl PayloadManager {

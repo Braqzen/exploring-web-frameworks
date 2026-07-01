@@ -18,7 +18,7 @@ impl Randomiser {
         requests.unwrap()
     }
 
-    pub fn operations() -> [(Operation, u16); 4] {
+    pub fn operations() -> [(Operation, u16); 5] {
         let mut operations = Self::try_randomise_operations();
 
         // Realistically this will never trigger and if it does it likely won't loop a 2nd time
@@ -116,7 +116,7 @@ impl Randomiser {
         }
     }
 
-    fn try_randomise_operations() -> Option<[(Operation, u16); 4]> {
+    fn try_randomise_operations() -> Option<[(Operation, u16); 5]> {
         // Select a random number to use to spread out the operation weights
         let mut tokens: u16 = 1000;
 
@@ -128,6 +128,7 @@ impl Randomiser {
             (Operation::Merge, 0),
             (Operation::Sort, 0),
             (Operation::Transform, 0),
+            (Operation::Filter, 0),
         ];
 
         operations.shuffle(&mut rng());
@@ -137,6 +138,7 @@ impl Randomiser {
         let mut merge = 0;
         let mut sort = 0;
         let mut transform = 0;
+        let mut filter = 0;
 
         // Randomly set a weight for each operation
         operations.iter_mut().for_each(|(operation, weight)| {
@@ -150,6 +152,7 @@ impl Randomiser {
                 Operation::Merge => merge = random_weight,
                 Operation::Sort => sort = random_weight,
                 Operation::Transform => transform = random_weight,
+                Operation::Filter => filter = random_weight,
             }
 
             if 0 < random_weight {
@@ -158,12 +161,13 @@ impl Randomiser {
         });
 
         if non_zero {
-            let total = compute + merge + sort + transform;
+            let total = compute + merge + sort + transform + filter;
             info!(
                 compute = ((compute as f64 / total as f64) * 1000.0).round() / 10.0,
                 merge = ((merge as f64 / total as f64) * 1000.0).round() / 10.0,
                 sort = ((sort as f64 / total as f64) * 1000.0).round() / 10.0,
                 transform = ((transform as f64 / total as f64) * 1000.0).round() / 10.0,
+                filter = ((filter as f64 / total as f64) * 1000.0).round() / 10.0,
                 total,
                 "Randomised operations"
             );
