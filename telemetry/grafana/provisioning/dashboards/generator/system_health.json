@@ -18,91 +18,9 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 4,
   "links": [],
   "panels": [
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "Requests are randomised periodically. This panel shows the method distribution",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 3,
-      "options": {
-        "dedupStrategy": "none",
-        "enableInfiniteScrolling": false,
-        "enableLogDetails": true,
-        "prettifyLogMessage": false,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": false
-      },
-      "pluginVersion": "12.2.10",
-      "targets": [
-        {
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised requests)\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Request Distribution",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "description": "Operations are randomised periodically. This panel shows the operation distribution",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "dedupStrategy": "none",
-        "enableInfiniteScrolling": false,
-        "enableLogDetails": true,
-        "prettifyLogMessage": false,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": false
-      },
-      "pluginVersion": "12.2.10",
-      "targets": [
-        {
-          "direction": "backward",
-          "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised operations)\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Operation Distribution",
-      "type": "logs"
-    },
     {
       "datasource": {
         "type": "loki",
@@ -168,9 +86,9 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 12
+        "y": 0
       },
       "id": 2,
       "options": {
@@ -191,7 +109,7 @@
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (detected_level) (\n  count_over_time(\n    {service_name=\"generator\"}\n    | detected_level=~\"(?i)(warn|error)\"\n    | provider=~\"(?i)$provider\"\n    [$__auto]\n  )\n)",
+          "expr": "sum by (detected_level) (\n  count_over_time(\n    {service_name=\"generator\"}\n    | detected_level=~\"(?i)(warn|error)\"\n    [$__auto]\n  )\n)",
           "legendFormat": "{{detected_level}}",
           "queryType": "range",
           "refId": "A"
@@ -205,16 +123,201 @@
         "type": "loki",
         "uid": "loki"
       },
-      "description": "All logs for the generator",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.10",
+      "targets": [
+        {
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "sum by (line, detected_level) (\n  count_over_time(\n    {service_name=\"generator\"}\n    | detected_level=~\"(?i)(warn|error)\"\n    | label_format line=\"{{ __line__ }}\"\n    [$__range]\n  )\n)",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Warn/Errors",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Value #A": 3,
+              "detected_level": 2,
+              "line": 1
+            },
+            "renameByName": {
+              "Value #A": "Count",
+              "detected_level": "Level",
+              "line": "Message"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Count"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
       },
       "gridPos": {
-        "h": 19,
+        "h": 14,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "12.2.10",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\" or to_operation=~\"(?i)$operation\"\n| provider=~\"(?i)$provider\"\n| detected_level=~\"(?i)warn\"\n| id=~\"(?i)$id\"\n| line_format \"| {{ if .error }}{{ .error }}{{ end }} | {{ if .method }}{{ .method }}{{ end }}{{ if .provider }} | {{ .provider }}{{ end }}{{ if .operation }} | {{ .operation }}{{ else if .to_operation }} | {{ .to_operation }}{{ end }}{{ if .id }} | {{ .id }}{{ end }} | {{ if .secret }}{{ .secret }}{{ end }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Warnings",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 7,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "12.2.10",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n| method=~\"(?i)$method\"\n| operation=~\"(?i)$operation\" or to_operation=~\"(?i)$operation\"\n| provider=~\"(?i)$provider\"\n| detected_level=~\"(?i)error\"\n| id=~\"(?i)$id\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Errors",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 24
       },
       "id": 1,
       "options": {
@@ -242,7 +345,7 @@
           "refId": "A"
         }
       ],
-      "title": "Logs",
+      "title": "All Logs",
       "type": "logs"
     }
   ],
@@ -400,7 +503,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Logs",
+  "title": "System Health",
   "uid": "bfpj9xrziqiv4f",
   "version": 1
 }

@@ -18,9 +18,91 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 9,
+  "id": 13,
   "links": [],
   "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Requests are randomised periodically. This panel shows the method distribution",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "12.2.10",
+      "targets": [
+        {
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised requests)\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Request Distribution",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Operations are randomised periodically. This panel shows the operation distribution",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "12.2.10",
+      "targets": [
+        {
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised operations)\"\n| line_format \"{{ __line__ }} | COMPUTE={{.compute}}% | SORT={{.sort}}% | TRANSFORM={{.transform}}% | MERGE={{.merge}}% | TOTAL={{.total}}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Operation Distribution",
+      "type": "logs"
+    },
     {
       "datasource": {
         "type": "loki",
@@ -89,7 +171,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 10
       },
       "id": 1,
       "options": {
@@ -248,7 +330,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 10
       },
       "id": 3,
       "options": {
@@ -396,7 +478,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 10
+        "y": 20
       },
       "id": 2,
       "options": {
@@ -529,7 +611,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 20
       },
       "id": 4,
       "options": {

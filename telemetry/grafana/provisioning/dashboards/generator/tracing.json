@@ -37,6 +37,9 @@
             "cellOptions": {
               "type": "auto"
             },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
@@ -44,7 +47,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -62,7 +66,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 315
+                "value": 262
               }
             ]
           },
@@ -86,7 +90,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 323
+                "value": 258
               }
             ]
           },
@@ -122,7 +126,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 356
+                "value": 171
               }
             ]
           },
@@ -134,7 +138,19 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 251
+                "value": 154
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "language"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 162
               }
             ]
           }
@@ -149,18 +165,10 @@
       "id": 1,
       "options": {
         "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -186,9 +194,10 @@
           ],
           "limit": 200,
           "metricsQueryType": "range",
-          "query": "{ resource.service.name=\"generator\" && name = trace:rootName && span.provider=~\"$provider\" && span.method=~\"$method\" } | select(span.provider, span.method)",
+          "query": "{ resource.service.name=\"generator\" && name = trace:rootName && span.provider=~\"$provider\" && span.method=~\"$method\" } | select(span.provider, span.method, resource.telemetry.sdk.language)",
           "queryType": "traceql",
           "refId": "A",
+          "serviceMapUseNativeHistograms": false,
           "spss": 1,
           "tableType": "spans"
         }
@@ -228,9 +237,12 @@
               "method": 2,
               "provider": 1,
               "service.name": 9,
-              "traceIdHidden": 0
+              "telemetry.sdk.language": 0,
+              "traceIdHidden": 10
             },
-            "renameByName": {}
+            "renameByName": {
+              "telemetry.sdk.language": "language"
+            }
           }
         }
       ],
@@ -239,7 +251,7 @@
   ],
   "preload": false,
   "refresh": "5s",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": [
@@ -311,5 +323,5 @@
   "timezone": "browser",
   "title": "Tracing",
   "uid": "afqdvyxrduupsb",
-  "version": 2
+  "version": 1
 }

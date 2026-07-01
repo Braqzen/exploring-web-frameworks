@@ -10,7 +10,6 @@ TODO:
   - malformed JSON
 - insert random error rate into each api (configurable)
   - apis may just fail randomly so perhaps just return an error, sleep or something
-- consider injecting langtype into telemetry instead of just service name
 - Consider APIs
   - Python: fastapi, django, flask, starlette, sanic, quart, tornado
   - Go : gin, chi, echo, fiber, std/net
