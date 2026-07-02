@@ -6,7 +6,8 @@ This repository attempts to create the same API in different web-frameworks acro
 
 The goal is to explore what a "web-framework" is, how different frameworks implement and expose common design concepts/functionality, inherent benefits provided to the framework by its programming language, and to explore each language's ecosystem to develop a minimal prod-adjacent server.
 
-For more information about the technical aspects of the repo [click here](./docs/repository_overview.ms).\
+For information about the technical aspects of the repo [click here](./docs/repository_overview.md).\
+For information about which language/frameworks are/may be implemented [click here](./docs/framework_list.md).\
 For a breakdown of what a framework is [click here](./docs/framework.md).\
 For a web-framework tier-list [click here](./docs/tier-list.md).
 
@@ -67,21 +68,3 @@ Stop everything and delete all previous telemetry
 ```shell
 just clean
 ```
-
-TODO:
-
-- Consider APIs
-  - Python: fastapi, django, flask, starlette, sanic, quart, tornado
-  - Go : gin, chi, echo, fiber, std/net
-  - Ts : express, fastify, koa, hono, nestjs
-  - Zig : zap, http.zig
-  - C++ : drogon, crow, boost-beast, pistache, Restinio, CppCMS
-  - Odin: ?
-  - Nim: ?
-  - Elixir: ?
-- Lookup
-  - Python: PyPi
-  - Ts: pnpm
-  - Go: pkg.go.dev
-  - Zig: Github
-  - C++: vcpkg

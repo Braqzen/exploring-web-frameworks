@@ -1,6 +1,5 @@
 default: build-generator build-apis
 
-# -- Docker --
 build-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 
 build-axum:
@@ -32,11 +31,11 @@ build-generator:
 	docker buildx bake -f docker/build.hcl generator
 
 run:
-	docker compose up -d
+	docker compose -f docker/docker-compose.yml up -d
 	@echo Grafana: http://localhost:3000/dashboards
 
 stop:
-	docker compose down
+	docker compose -f docker/docker-compose.yml down
 
 clean:
-	docker compose down -v
+	docker compose -f docker/docker-compose.yml down -v

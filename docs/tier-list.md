@@ -13,18 +13,32 @@ Judgements are based on
 - Writing middleware
 - Route function handlers and their arguments
 
-| Tier | Frameworks                                                                                       |
-| ---- | ------------------------------------------------------------------------------------------------ |
-| S    | **Rust:** Axum, Poem                                                                             |
-| A    | **Rust:** <br>**Python:** ?<br>**Go:** ?<br>**Ts:** ?<br>**Zig:** ?<br>**C++:** ?<br>**Odin:** ? |
-| B    | **Rust:** Actix, Salvo                                                                           |
-| C    |                                                                                                  |
-| D    | **Rust:** Warp                                                                                   |
-| F    | **Rust:** Rocket                                                                                 |
+| Tier | Frameworks             |
+| ---- | ---------------------- |
+| S    | **Rust:** Axum, Poem   |
+| A    |                        |
+| B    | **Rust:** Actix, Salvo |
+| C    |                        |
+| D    | **Rust:** Warp         |
+| F    | **Rust:** Rocket       |
 
 ## Likes / Dislikes
 
 This section covers what I like and/or dislike about a framework
+
+### Rust
+
+#### Axum
+
+#### Poem
+
+#### Salvo
+
+#### Actix
+
+#### Warp
+
+#### Rocket
 
 ## Ideal DevEx
 

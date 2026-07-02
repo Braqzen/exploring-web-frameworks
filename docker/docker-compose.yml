@@ -137,7 +137,7 @@ services:
       GF_PLUGINS_PREINSTALL_DISABLED: "true"
       GF_NEWS_NEWS_FEED_ENABLED: "false"
     volumes:
-      - ./telemetry/grafana/provisioning:/etc/grafana/provisioning
+      - ../telemetry/grafana/provisioning:/etc/grafana/provisioning
       - grafana-data-volume:/var/lib/grafana
     depends_on:
       - telemetry-loki
@@ -154,7 +154,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
     volumes:
-      - ./telemetry/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../telemetry/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data-volume:/prometheus
     restart: unless-stopped
 
@@ -164,7 +164,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/loki.yaml
     volumes:
-      - ./telemetry/loki/loki.yaml:/etc/loki/loki.yaml
+      - ../telemetry/loki/loki.yaml:/etc/loki/loki.yaml
       - loki-data-volume:/loki
     restart: unless-stopped
 
@@ -174,7 +174,7 @@ services:
       - "4040:4040"
     command: -config.file=/etc/pyroscope/pyroscope.yaml
     volumes:
-      - ./telemetry/pyroscope/pyroscope.yaml:/etc/pyroscope/pyroscope.yaml
+      - ../telemetry/pyroscope/pyroscope.yaml:/etc/pyroscope/pyroscope.yaml
       - pyroscope-data-volume:/data
     restart: unless-stopped
 
@@ -184,14 +184,14 @@ services:
       - "3200:3200"
     command: -config.file=/etc/tempo/tempo.yaml
     volumes:
-      - ./telemetry/tempo/tempo.yaml:/etc/tempo/tempo.yaml
+      - ../telemetry/tempo/tempo.yaml:/etc/tempo/tempo.yaml
       - tempo-data-volume:/var/tempo
     restart: unless-stopped
 
   telemetry-alloy:
     image: grafana/alloy:v1.17.0
     volumes:
-      - ./telemetry/grafana/alloy:/etc/alloy
+      - ../telemetry/grafana/alloy:/etc/alloy
       - alloy-data-volume:/var/lib/alloy/data
     command: run --disable-reporting /etc/alloy/config.alloy
     depends_on:
