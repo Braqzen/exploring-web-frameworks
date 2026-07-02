@@ -1,7 +1,7 @@
-default: build-servers
+default: build-generator build-apis
 
 # -- Docker --
-build-servers: build-axum build-actix build-warp build-rocket build-poem build-salvo
+build-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 
 build-axum:
 	docker rmi servers-axum:latest 2>/dev/null || true
