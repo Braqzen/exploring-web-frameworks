@@ -1,3 +1,10 @@
 .vscode
+
+# Rust
 target
 *.lock
+
+# Node
+pnpm-lock.yaml
+node_modules
+dist

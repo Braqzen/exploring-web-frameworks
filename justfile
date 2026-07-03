@@ -1,7 +1,18 @@
+# If you run "just" it will default to building everything
 default: build-generator build-apis
 
-build-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
+# Shorthand to build all the APIs
+build-apis: build-rust-apis build-typescript-apis
 
+# Shorthand to build the APIs per language
+build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
+build-typescript-apis: build-express
+
+build-generator:
+	docker rmi servers-generator:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl generator
+
+# Rust APIs
 build-axum:
 	docker rmi servers-axum:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl axum
@@ -26,10 +37,12 @@ build-salvo:
 	docker rmi servers-salvo:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl salvo
 
-build-generator:
-	docker rmi servers-generator:latest 2>/dev/null || true
-	docker buildx bake -f docker/build.hcl generator
+# TypeScript APIs
+build-express:
+	docker rmi servers-express:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl express
 
+# Docker Compose Commands
 run:
 	docker compose -f docker/docker-compose.yml up -d
 	@echo Grafana: http://localhost:3000/dashboards

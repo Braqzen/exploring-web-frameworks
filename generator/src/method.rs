@@ -1,19 +1,32 @@
-use crate::randomiser::Randomiser;
+use crate::{
+    config::{ProviderName, ProviderOptions},
+    randomiser::Randomiser,
+};
 use rand::{rng, seq::IndexedRandom};
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 use tracing::error;
 
 pub struct MethodManager {
-    requests: Arc<Mutex<[(Method, u16); 6]>>,
+    requests: Arc<Mutex<HashMap<ProviderName, Vec<(Method, u16)>>>>,
 }
 
 impl MethodManager {
-    pub fn new() -> Self {
-        // Randomly set the requests for the first time
-        let random_requests = Randomiser::requests();
+    pub fn new(api: Vec<ProviderOptions>) -> Self {
+        let requests: HashMap<ProviderName, Vec<(Method, u16)>> = api
+            .into_iter()
+            .map(|options| {
+                (
+                    options.provider.clone(),
+                    Randomiser::requests(&options.provider, &options.methods),
+                )
+            })
+            .collect();
 
         // Enable background mutation of requests
-        let requests = Arc::new(Mutex::new(random_requests));
+        let requests = Arc::new(Mutex::new(requests));
 
         // Sprinkle in the fun part of rust to make the compiler happy
         let task_requests = Arc::clone(&requests);
@@ -24,18 +37,43 @@ impl MethodManager {
                 Randomiser::sleep().await;
 
                 {
-                    let requests = Randomiser::requests();
-
                     match task_requests.lock() {
                         Ok(mut guard) => {
-                            *guard = requests;
+                            let mut new_requests = HashMap::new();
+                            for (provider, methods) in guard.iter() {
+                                new_requests.insert(
+                                    provider.clone(),
+                                    Randomiser::requests(
+                                        provider,
+                                        &methods
+                                            .iter()
+                                            .map(|(method, _)| method.clone())
+                                            .collect::<Vec<_>>(),
+                                    ),
+                                );
+                            }
+                            *guard = new_requests;
                         }
                         Err(error) => {
                             error!(%error, "Poisoned request lock in background randomiser task of MethodManager");
 
                             // Requests is non-sensitive so recovery is just wiping the data with a new distribution
                             let mut guard = error.into_inner();
-                            *guard = requests;
+
+                            let mut new_requests = HashMap::new();
+                            for (provider, methods) in guard.iter() {
+                                new_requests.insert(
+                                    provider.clone(),
+                                    Randomiser::requests(
+                                        provider,
+                                        &methods
+                                            .iter()
+                                            .map(|(method, _)| method.clone())
+                                            .collect::<Vec<_>>(),
+                                    ),
+                                );
+                            }
+                            *guard = new_requests;
                             task_requests.clear_poison();
                         }
                     }
@@ -46,7 +84,7 @@ impl MethodManager {
         Self { requests }
     }
 
-    pub fn select(&self, post: bool) -> Method {
+    pub fn select(&self, provider: ProviderName, post: bool) -> Method {
         if post {
             Method::Post
         } else {
@@ -55,19 +93,34 @@ impl MethodManager {
                 Err(error) => {
                     error!(%error, "Poisoned request lock in select method of ApiManager");
 
-                    // Requests is non-sensitive so recovery is just wiping the data with a new distribution
-                    let requests = Randomiser::requests();
-
                     let mut guard = error.into_inner();
-                    *guard = requests;
+
+                    // Requests is non-sensitive so recovery is just wiping the data with a new distribution
+                    let mut new_requests = HashMap::new();
+                    for (provider, methods) in guard.iter() {
+                        new_requests.insert(
+                            provider.clone(),
+                            Randomiser::requests(
+                                provider,
+                                &methods
+                                    .iter()
+                                    .map(|(method, _)| method.clone())
+                                    .collect::<Vec<_>>(),
+                            ),
+                        );
+                    }
+                    *guard = new_requests;
                     self.requests.clear_poison();
 
                     guard
                 }
             };
 
+            // TODO: unsafe if caller passes a disabled provider
+            let provider_methods = guard.get(&provider).unwrap();
+
             // SAFETY: REQUESTS is non-empty and has values greater than 0
-            let (method, _) = guard
+            let (method, _) = provider_methods
                 .choose_weighted(&mut rng(), |(_, weight)| *weight)
                 .unwrap();
 
@@ -77,7 +130,7 @@ impl MethodManager {
 }
 
 /// The method of the HTTP request to send to a server.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Method {
     Post,
     Get,

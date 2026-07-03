@@ -20,7 +20,7 @@ The following table lists languages and frameworks to potentially add to the pro
 
 | Language   | Framework                                                |
 | ---------- | -------------------------------------------------------- |
-| Typescript | express, fastify, koa, hono, nestjs                      |
+| Typescript | express, fastify, koa, hono, nestjs, elyisa              |
 | Go         | gin, chi, echo, fiber, std/net                           |
 | Zig        | zap, http.zig                                            |
 | C++        | drogon, crow, boost-beast, pistache, Restinio, CppCMS    |

@@ -1,4 +1,8 @@
-use crate::{config::ProviderName, payload::Payload, provider::Provider};
+use crate::{
+    config::{ProviderName, ProviderOptions},
+    payload::Payload,
+    provider::Provider,
+};
 use rand::{rng, seq::IteratorRandom};
 use std::collections::HashMap;
 
@@ -7,14 +11,14 @@ pub struct ApiManager {
 }
 
 impl ApiManager {
-    pub fn new(apis: HashMap<ProviderName, String>) -> Self {
+    pub fn new(apis: Vec<ProviderOptions>) -> Self {
         let apis = apis
             .into_iter()
-            .map(|(provider, url)| {
+            .map(|options| {
                 (
-                    provider,
+                    options.provider.clone(),
                     ApiState {
-                        url,
+                        url: options.url.clone(),
                         tasks: HashMap::new(),
                     },
                 )

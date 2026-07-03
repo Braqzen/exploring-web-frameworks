@@ -29,9 +29,11 @@ pub struct Worker {
 
 impl Worker {
     pub fn new(config: Config) -> Self {
+        let api = config.api();
+
         Self {
-            api_manager: ApiManager::new(config.api()),
-            method_manager: MethodManager::new(),
+            api_manager: ApiManager::new(api.clone()),
+            method_manager: MethodManager::new(api),
             payload_manager: PayloadManager::new(),
             client: Client::new(),
             metrics: Metrics::new(),
@@ -67,7 +69,7 @@ impl Worker {
     #[instrument(name = "worker.send_request", skip_all, fields(provider = Empty, method = Empty))]
     async fn send_request(&mut self) -> Result<()> {
         let (provider, post) = self.api_manager.select();
-        let method = self.method_manager.select(post);
+        let method = self.method_manager.select(provider.name().clone(), post);
         tracing::Span::current().record("provider", provider.name().to_string());
         tracing::Span::current().record("method", method.to_string());
 

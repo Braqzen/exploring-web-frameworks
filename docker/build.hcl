@@ -14,3 +14,14 @@ target "rust-services" {
   tags       = ["servers-${service}:latest"]
   args       = { SERVICE = service }
 }
+
+target "typescript-services" {
+  matrix = {
+    service = ["express"]
+  }
+  name = service
+  context    = "."
+  dockerfile = "docker/Dockerfile.typescript-services"
+  tags       = ["servers-${service}:latest"]
+  args       = { SERVICE = service }
+}
