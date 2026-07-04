@@ -1,18 +1,13 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{errors::AppError, extractors::AppPath},
+    state::AppState,
 };
-use actix_web::{
-    HttpResponse,
-    web::{Data, ReqData},
-};
+use actix_web::{HttpResponse, ResponseError, web::Data};
 use std::sync::Mutex;
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[instrument(skip_all)]
-pub async fn get_handler(state: Data<Mutex<ServerState>>, id: ReqData<Uuid>) -> HttpResponse {
-    let id = id.into_inner();
+pub async fn get_handler(state: Data<Mutex<AppState>>, AppPath(id): AppPath) -> HttpResponse {
     if let Ok(state) = state.lock() {
         if let Some(task) = state.tasks.get(&id).cloned() {
             drop(state);
@@ -28,11 +23,11 @@ pub async fn get_handler(state: Data<Mutex<ServerState>>, id: ReqData<Uuid>) -> 
         } else {
             drop(state);
             warn!(%id, method = "GET", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.error_response();
         }
     }
 
     error!(%id, method = "GET", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.error_response()
 }

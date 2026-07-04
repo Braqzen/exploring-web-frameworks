@@ -1,29 +1,25 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+    },
+    state::AppState,
     task::PatchedTask,
 };
-use actix_web::{
-    HttpResponse,
-    web::{Data, ReqData},
-};
+use actix_web::{HttpResponse, ResponseError, web::Data};
 use std::sync::Mutex;
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[instrument(skip_all)]
 pub async fn patch_handler(
-    state: Data<Mutex<ServerState>>,
-    id: ReqData<Uuid>,
-    request: ReqData<PatchedTask>,
+    state: Data<Mutex<AppState>>,
+    AppPath(id): AppPath,
+    AppJson(new_task): AppJson<PatchedTask>,
 ) -> HttpResponse {
-    let id = id.into_inner();
-
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
-            let request = request.into_inner();
+            let request = new_task;
 
-            // Code assumes only operation is changed
             let previous_operation = task.operation.clone();
             task.operation = request.operation;
 
@@ -40,11 +36,11 @@ pub async fn patch_handler(
         } else {
             drop(state);
             warn!(%id, method = "PATCH", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.error_response();
         }
     }
 
     error!(%id, method = "PATCH", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.error_response()
 }

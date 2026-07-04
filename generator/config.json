@@ -16,7 +16,7 @@
     {
       "provider": "actix",
       "url": "http://rust-actix:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -68,7 +68,7 @@
     {
       "provider": "salvo",
       "url": "http://rust-salvo:8000",
-      "enabled": true,
+      "enabled": false,
       "methods": {
         "GET": true,
         "POST": true,

@@ -1,27 +1,24 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+    },
+    state::AppState,
     task::Task,
 };
-use actix_web::{
-    HttpResponse,
-    web::{Data, ReqData},
-};
+use actix_web::{HttpResponse, ResponseError, web::Data};
 use std::sync::Mutex;
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[instrument(skip_all)]
 pub async fn put_handler(
-    state: Data<Mutex<ServerState>>,
-    id: ReqData<Uuid>,
-    request: ReqData<Task>,
+    state: Data<Mutex<AppState>>,
+    AppPath(id): AppPath,
+    AppJson(new_task): AppJson<Task>,
 ) -> HttpResponse {
-    let id = id.into_inner();
-
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
-            let request = request.into_inner();
+            let request = new_task;
 
             let previous_task = task.clone();
             *task = request.clone();
@@ -40,11 +37,11 @@ pub async fn put_handler(
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.error_response();
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.error_response()
 }

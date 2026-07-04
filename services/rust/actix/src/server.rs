@@ -1,4 +1,10 @@
-use crate::{api::middleware::validate_request, router::router, state::State};
+use crate::{
+    routes::{
+        middleware::{chaos_middleware, log_middleware},
+        router,
+    },
+    state::AppState,
+};
 use actix_web::{App, HttpServer, middleware::from_fn, web::Data};
 use eyre::Result;
 use std::{
@@ -9,14 +15,14 @@ use tracing::info;
 
 pub struct Server {
     socket: SocketAddr,
-    state: Arc<Mutex<State>>,
+    state: Arc<Mutex<AppState>>,
 }
 
 impl Server {
     pub fn new(socket: SocketAddr) -> Self {
         Self {
             socket,
-            state: Arc::new(Mutex::new(State::new())),
+            state: Arc::new(Mutex::new(AppState::new())),
         }
     }
 
@@ -25,7 +31,8 @@ impl Server {
 
         HttpServer::new(move || {
             App::new()
-                .wrap(from_fn(validate_request))
+                .wrap(from_fn(chaos_middleware))
+                .wrap(from_fn(log_middleware))
                 .app_data(Data::from(self.state.clone()))
                 .configure(router)
         })
