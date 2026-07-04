@@ -1,4 +1,4 @@
-use crate::{router::router, state::State};
+use crate::{routes::router, state::AppState};
 use eyre::Result;
 use std::{
     net::SocketAddr,
@@ -9,20 +9,18 @@ use tracing::info;
 
 pub struct Server {
     socket: SocketAddr,
-    state: Arc<Mutex<State>>,
+    state: Arc<Mutex<AppState>>,
 }
 
 impl Server {
     pub fn new(socket: SocketAddr) -> Self {
         Self {
             socket,
-            state: Arc::new(Mutex::new(State::new())),
+            state: Arc::new(Mutex::new(AppState::new())),
         }
     }
 
     pub async fn run(self) -> Result<()> {
-        let app = router(self.state);
-
         // Handle running locally and interrupting the process with ctrl+c.º
         let mut sigint = signal(SignalKind::interrupt())?;
 
@@ -31,7 +29,7 @@ impl Server {
 
         info!(socket = self.socket.to_string(), "Starting router");
 
-        warp::serve(app)
+        warp::serve(router(self.state))
             .bind(self.socket)
             .await
             .graceful(async move {

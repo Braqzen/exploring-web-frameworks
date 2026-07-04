@@ -1,7 +1,4 @@
-use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
-};
+use crate::{routes::errors::AppError, state::AppState};
 use std::{
     convert::Infallible,
     sync::{Arc, Mutex},
@@ -14,10 +11,7 @@ use warp::{
 };
 
 #[instrument(skip_all)]
-pub async fn delete_handler(
-    id: Uuid,
-    state: Arc<Mutex<ServerState>>,
-) -> Result<Response, Infallible> {
+pub async fn delete_handler(id: Uuid, state: Arc<Mutex<AppState>>) -> Result<Response, Infallible> {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
             drop(state);
@@ -32,11 +26,11 @@ pub async fn delete_handler(
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return Ok(task_not_found());
+            return Ok(AppError::TaskNotFound.into_response());
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    Ok(internal_server_error())
+    Ok(AppError::Internal.into_response())
 }

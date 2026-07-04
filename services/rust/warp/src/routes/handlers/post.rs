@@ -1,4 +1,4 @@
-use crate::{api::errors::internal_server_error, state::State as ServerState, task::Task};
+use crate::{routes::errors::AppError, state::AppState, task::Task};
 use serde_json::json;
 use std::{
     convert::Infallible,
@@ -13,7 +13,7 @@ use warp::{
 
 #[instrument(skip_all)]
 pub async fn post_handler(
-    state: Arc<Mutex<ServerState>>,
+    state: Arc<Mutex<AppState>>,
     request: Task,
 ) -> Result<Response, Infallible> {
     let id = Uuid::new_v4();
@@ -44,5 +44,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    Ok(internal_server_error())
+    Ok(AppError::Internal.into_response())
 }

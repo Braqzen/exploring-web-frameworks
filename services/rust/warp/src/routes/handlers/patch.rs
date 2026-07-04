@@ -1,8 +1,4 @@
-use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
-    task::PatchedTask,
-};
+use crate::{routes::errors::AppError, state::AppState, task::PatchedTask};
 use std::{
     convert::Infallible,
     sync::{Arc, Mutex},
@@ -14,14 +10,13 @@ use warp::reply::{Reply, Response, json};
 #[instrument(skip_all)]
 pub async fn patch_handler(
     id: Uuid,
-    state: Arc<Mutex<ServerState>>,
-    request: PatchedTask,
+    state: Arc<Mutex<AppState>>,
+    new_task: PatchedTask,
 ) -> Result<Response, Infallible> {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
-            // Code assumes only operation is changed
             let previous_operation = task.operation.clone();
-            task.operation = request.operation;
+            task.operation = new_task.operation;
 
             info!(
                 %id,
@@ -36,11 +31,11 @@ pub async fn patch_handler(
         } else {
             drop(state);
             warn!(%id, method = "PATCH", "Task not found");
-            return Ok(task_not_found());
+            return Ok(AppError::TaskNotFound.into_response());
         }
     }
 
     error!(%id, method = "PATCH", "Poisoned lock");
 
-    Ok(internal_server_error())
+    Ok(AppError::Internal.into_response())
 }
