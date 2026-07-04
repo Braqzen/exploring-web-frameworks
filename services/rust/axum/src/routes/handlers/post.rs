@@ -1,7 +1,10 @@
-use crate::{api::errors::internal_server_error, state::State as ServerState, task::Task};
+use crate::{
+    routes::{errors::AppError, extractors::AppJson},
+    state::AppState,
+    task::Task,
+};
 use axum::{
-    Json,
-    extract::{Extension, State},
+    extract::{Json, State},
     http::StatusCode,
     response::{IntoResponse, Response},
 };
@@ -13,8 +16,8 @@ use uuid::Uuid;
 #[axum::debug_handler]
 #[instrument(skip_all)]
 pub async fn post_handler(
-    State(state): State<Arc<Mutex<ServerState>>>,
-    Extension(task): Extension<Task>,
+    State(state): State<Arc<Mutex<AppState>>>,
+    AppJson(task): AppJson<Task>,
 ) -> Response {
     let id = Uuid::new_v4();
 
@@ -41,5 +44,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    internal_server_error()
+    AppError::Internal.into_response()
 }

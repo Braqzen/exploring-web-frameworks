@@ -1,21 +1,20 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{errors::AppError, extractors::AppPath},
+    state::AppState,
 };
 use axum::{
-    extract::{Extension, State},
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[axum::debug_handler]
 #[instrument(skip_all)]
 pub async fn delete_handler(
-    State(state): State<Arc<Mutex<ServerState>>>,
-    Extension(id): Extension<Uuid>,
+    State(state): State<Arc<Mutex<AppState>>>,
+    AppPath(id): AppPath,
 ) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
@@ -31,11 +30,11 @@ pub async fn delete_handler(
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.into_response();
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.into_response()
 }

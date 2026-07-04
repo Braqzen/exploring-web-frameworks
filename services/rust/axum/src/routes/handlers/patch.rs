@@ -1,27 +1,27 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+    },
+    state::AppState,
     task::PatchedTask,
 };
 use axum::{
-    Json,
-    extract::{Extension, State},
+    extract::{Json, State},
     response::{IntoResponse, Response},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[axum::debug_handler]
 #[instrument(skip_all)]
 pub async fn patch_handler(
-    State(state): State<Arc<Mutex<ServerState>>>,
-    Extension(id): Extension<Uuid>,
-    Extension(patched_task): Extension<PatchedTask>,
+    State(state): State<Arc<Mutex<AppState>>>,
+    AppPath(id): AppPath,
+    AppJson(patched_task): AppJson<PatchedTask>,
 ) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
-            // Code assumes only operation is changed
             let previous_operation = task.operation.clone();
             task.operation = patched_task.operation.clone();
 
@@ -38,11 +38,11 @@ pub async fn patch_handler(
         } else {
             drop(state);
             warn!(%id, method = "PATCH", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.into_response();
         }
     }
 
     error!(%id, method = "PATCH", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.into_response()
 }
