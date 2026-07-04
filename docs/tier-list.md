@@ -7,11 +7,11 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 
 ## Tier List
 
-| Tier | Frameworks             |
-| ---- | ---------------------- |
-| S    | **Rust:** Axum, Poem   |
-| A    |                        |
-| B    | **Rust:** Actix, Salvo |
-| C    |                        |
-| D    | **Rust:** Warp         |
-| F    | **Rust:** Rocket       |
+| Tier | Frameworks       |
+| ---- | ---------------- |
+| S    | **Rust:** Axum   |
+| A    | **Rust:** Poem   |
+| B    | **Rust:** Actix  |
+| C    | **Rust:** Salvo  |
+| D    | **Rust:** Warp   |
+| F    | **Rust:** Rocket |

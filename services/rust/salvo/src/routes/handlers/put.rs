@@ -1,21 +1,30 @@
-use crate::api::{
-    errors::{internal_server_error, task_not_found},
-    handlers::{state, task, task_id},
+use crate::{
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+        handlers::state,
+    },
+    task::Task,
 };
-use salvo::{Depot, Response, http::StatusCode, writing::Json};
+use salvo::{Depot, Response, Writer, http::StatusCode, writing::Json};
 use tracing::{error, info, instrument, warn};
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn put_handler(depot: &mut Depot, res: &mut Response) {
+pub async fn put_handler(
+    depot: &mut Depot,
+    res: &mut Response,
+    id: AppPath,
+    new_task: AppJson<Task>,
+) {
     let state = state(depot, "PUT");
-    let id = task_id(depot, "PUT");
-    let request = task(depot, "PUT");
+    let id = id.task_id;
+    let new_task = new_task.value;
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();
-            *task = request.to_owned();
+            *task = new_task.to_owned();
 
             info!(
                 %id,
@@ -32,12 +41,12 @@ pub async fn put_handler(depot: &mut Depot, res: &mut Response) {
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            task_not_found(res);
+            AppError::TaskNotFound.render(res);
             return;
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    internal_server_error(res)
+    AppError::Internal.render(res);
 }

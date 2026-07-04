@@ -1,15 +1,12 @@
-use crate::api::{
-    errors::{internal_server_error, task_not_found},
-    handlers::{state, task_id},
-};
-use salvo::{Depot, Response, http::StatusCode};
+use crate::routes::{errors::AppError, extractors::AppPath, handlers::state};
+use salvo::{Depot, Response, Writer, http::StatusCode};
 use tracing::{error, info, instrument, warn};
 
 #[salvo::handler]
 #[instrument(skip_all)]
-pub async fn delete_handler(depot: &mut Depot, res: &mut Response) {
+pub async fn delete_handler(res: &mut Response, depot: &mut Depot, id: AppPath) {
     let state = state(depot, "DELETE");
-    let id = task_id(depot, "DELETE");
+    let id = id.task_id;
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
@@ -26,12 +23,12 @@ pub async fn delete_handler(depot: &mut Depot, res: &mut Response) {
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            task_not_found(res);
+            AppError::TaskNotFound.render(res);
             return;
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    internal_server_error(res);
+    AppError::Internal.render(res);
 }
