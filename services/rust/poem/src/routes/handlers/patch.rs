@@ -1,26 +1,28 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+    },
+    state::AppState,
     task::PatchedTask,
 };
 use poem::{
     Response,
+    error::ResponseError,
     web::{Data, IntoResponse, Json},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[poem::handler]
 #[instrument(skip_all)]
 pub async fn patch_handler(
-    Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Data(id): Data<&Uuid>,
-    Data(new_task): Data<&PatchedTask>,
+    Data(state): Data<&Arc<Mutex<AppState>>>,
+    AppPath(id): AppPath,
+    AppJson(new_task): AppJson<PatchedTask>,
 ) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
-            // Code assumes only operation is changed
             let previous_operation = task.operation.clone();
             task.operation = new_task.operation.clone();
 
@@ -37,11 +39,11 @@ pub async fn patch_handler(
         } else {
             drop(state);
             warn!(%id, method = "PATCH", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.as_response();
         }
     }
 
     error!(%id, method = "PATCH", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.as_response()
 }

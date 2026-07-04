@@ -1,17 +1,16 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{errors::AppError, extractors::AppPath},
+    state::AppState,
 };
-use poem::{IntoResponse, Response, http::StatusCode, web::Data};
+use poem::{IntoResponse, Response, error::ResponseError, http::StatusCode, web::Data};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[poem::handler]
 #[instrument(skip_all)]
 pub async fn delete_handler(
-    Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Data(id): Data<&Uuid>,
+    Data(state): Data<&Arc<Mutex<AppState>>>,
+    AppPath(id): AppPath,
 ) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
@@ -27,11 +26,11 @@ pub async fn delete_handler(
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.as_response();
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.as_response()
 }

@@ -1,22 +1,25 @@
 use crate::{
-    api::errors::{internal_server_error, task_not_found},
-    state::State as ServerState,
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+    },
+    state::AppState,
     task::Task,
 };
 use poem::{
     Response,
+    error::ResponseError,
     web::{Data, IntoResponse, Json},
 };
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[poem::handler]
 #[instrument(skip_all)]
 pub async fn put_handler(
-    Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Data(id): Data<&Uuid>,
-    Data(new_task): Data<&Task>,
+    Data(state): Data<&Arc<Mutex<AppState>>>,
+    AppPath(id): AppPath,
+    AppJson(new_task): AppJson<Task>,
 ) -> Response {
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
@@ -37,11 +40,11 @@ pub async fn put_handler(
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.as_response();
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.as_response()
 }

@@ -1,6 +1,11 @@
-use crate::{api::errors::internal_server_error, state::State as ServerState, task::Task};
+use crate::{
+    routes::{errors::AppError, extractors::AppJson},
+    state::AppState,
+    task::Task,
+};
 use poem::{
     Response,
+    error::ResponseError,
     http::StatusCode,
     web::{Data, IntoResponse, Json},
 };
@@ -12,8 +17,8 @@ use uuid::Uuid;
 #[poem::handler]
 #[instrument(skip_all)]
 pub async fn post_handler(
-    Data(state): Data<&Arc<Mutex<ServerState>>>,
-    Data(task): Data<&Task>,
+    Data(state): Data<&Arc<Mutex<AppState>>>,
+    AppJson(task): AppJson<Task>,
 ) -> Response {
     let id = Uuid::new_v4();
 
@@ -40,5 +45,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    internal_server_error()
+    AppError::Internal.as_response()
 }
