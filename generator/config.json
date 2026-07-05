@@ -29,7 +29,7 @@
     {
       "provider": "warp",
       "url": "http://rust-warp:8000",
-      "enabled": true,
+      "enabled": false,
       "methods": {
         "GET": true,
         "POST": true,
@@ -42,7 +42,7 @@
     {
       "provider": "rocket",
       "url": "http://rust-rocket:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,

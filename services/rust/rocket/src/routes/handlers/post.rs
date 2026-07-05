@@ -1,9 +1,6 @@
 use crate::{
-    api::{
-        errors::internal_server_error,
-        guard::{Chaos, Extract},
-    },
-    state::State as ServerState,
+    routes::{errors::AppError, extractors::AppJson, guards::ChaosGuard},
+    state::AppState,
     task::Task,
 };
 use rocket::{State, http::Status, post, serde::json::Json};
@@ -12,15 +9,15 @@ use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument};
 use uuid::Uuid;
 
-#[post("/", data = "<request>")]
+#[post("/", data = "<body>")]
 #[instrument(skip_all)]
 pub async fn post_handler(
-    _chaos: Chaos,
-    state: &State<Arc<Mutex<ServerState>>>,
-    request: Extract<Task>,
+    _guard: ChaosGuard,
+    state: &State<Arc<Mutex<AppState>>>,
+    body: AppJson<Task>,
 ) -> (Status, Json<Value>) {
     let id = Uuid::new_v4();
-    let request = request.into_inner();
+    let request = body.into_inner();
 
     if let Ok(mut state) = state.lock() {
         state.tasks.insert(id, request.clone());
@@ -45,5 +42,5 @@ pub async fn post_handler(
         "Poisoned lock"
     );
 
-    internal_server_error()
+    AppError::Internal.into_response()
 }

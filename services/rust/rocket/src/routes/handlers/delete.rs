@@ -1,30 +1,20 @@
 use crate::{
-    api::{
-        errors::{internal_server_error, invalid_path, task_not_found},
-        guard::Chaos,
-    },
-    state::State as ServerState,
+    routes::{errors::AppError, extractors::AppPath, guards::ChaosGuard},
+    state::AppState,
 };
 use rocket::{State, delete, http::Status, response::status::NoContent, serde::json::Json};
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
 #[delete("/<id>")]
 #[instrument(skip_all)]
 pub async fn delete_handler(
-    _chaos: Chaos,
-    id: &str,
-    state: &State<Arc<Mutex<ServerState>>>,
+    _guard: ChaosGuard,
+    state: &State<Arc<Mutex<AppState>>>,
+    id: AppPath,
 ) -> Result<NoContent, (Status, Json<Value>)> {
-    let id = match Uuid::parse_str(id) {
-        Ok(id) => id,
-        Err(_) => {
-            warn!(path = format!("/{id}"), method = "DELETE", "Invalid path");
-            return Err(invalid_path());
-        }
-    };
+    let id = id.into_inner();
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.remove(&id) {
@@ -40,11 +30,11 @@ pub async fn delete_handler(
         } else {
             drop(state);
             warn!(%id, method = "DELETE", "Task not found");
-            return Err(task_not_found());
+            return Err(AppError::TaskNotFound.into_response());
         }
     }
 
     error!(%id, method = "DELETE", "Poisoned lock");
 
-    Err(internal_server_error())
+    Err(AppError::Internal.into_response())
 }

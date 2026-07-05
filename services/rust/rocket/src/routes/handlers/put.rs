@@ -1,37 +1,31 @@
 use crate::{
-    api::{
-        errors::{internal_server_error, invalid_path, task_not_found},
-        guard::{Chaos, Extract},
+    routes::{
+        errors::AppError,
+        extractors::{AppJson, AppPath},
+        guards::ChaosGuard,
     },
-    state::State as ServerState,
+    state::AppState,
     task::Task,
 };
 use rocket::{State, http::Status, put, serde::json::Json};
 use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};
-use uuid::Uuid;
 
-#[put("/<id>", data = "<request>")]
+#[put("/<id>", data = "<body>")]
 #[instrument(skip_all)]
 pub async fn put_handler(
-    _chaos: Chaos,
-    id: &str,
-    state: &State<Arc<Mutex<ServerState>>>,
-    request: Extract<Task>,
+    _guard: ChaosGuard,
+    id: AppPath,
+    state: &State<Arc<Mutex<AppState>>>,
+    body: AppJson<Task>,
 ) -> (Status, Json<Value>) {
-    let id = match Uuid::parse_str(id) {
-        Ok(id) => id,
-        Err(_) => {
-            warn!(path = format!("/{id}"), method = "PUT", "Invalid path");
-            return invalid_path();
-        }
-    };
+    let id = id.into_inner();
 
     if let Ok(mut state) = state.lock() {
         if let Some(task) = state.tasks.get_mut(&id) {
             let previous_task = task.clone();
-            *task = request.into_inner();
+            *task = body.into_inner();
 
             info!(
                 %id,
@@ -47,11 +41,11 @@ pub async fn put_handler(
         } else {
             drop(state);
             warn!(%id, method = "PUT", "Task not found");
-            return task_not_found();
+            return AppError::TaskNotFound.into_response();
         }
     }
 
     error!(%id, method = "PUT", "Poisoned lock");
 
-    internal_server_error()
+    AppError::Internal.into_response()
 }

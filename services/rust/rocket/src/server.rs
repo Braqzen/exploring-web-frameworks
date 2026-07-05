@@ -1,4 +1,4 @@
-use crate::{router::router, state::State};
+use crate::{routes::router, state::AppState};
 use eyre::Result;
 use rocket::Config;
 use std::{
@@ -9,14 +9,14 @@ use tracing::info;
 
 pub struct Server {
     socket: SocketAddr,
-    state: Arc<Mutex<State>>,
+    state: Arc<Mutex<AppState>>,
 }
 
 impl Server {
     pub fn new(socket: SocketAddr) -> Self {
         Self {
             socket,
-            state: Arc::new(Mutex::new(State::new())),
+            state: Arc::new(Mutex::new(AppState::new())),
         }
     }
 
