@@ -5,15 +5,19 @@ import {
   getHandler,
   putHandler,
   patchHandler,
-  deleteHandler
+  deleteHandler,
+  invalidMethodHandler
 } from "./handlers/index.js";
 
 export function registerRoutes(app: Express, state: State) {
   app.post("/", postHandler(state));
+  app.all("/", invalidMethodHandler);
+
   app
     .route("/:id")
     .get(getHandler(state))
     .put(putHandler(state))
     .patch(patchHandler(state))
-    .delete(deleteHandler(state));
+    .delete(deleteHandler(state))
+    .all(invalidMethodHandler);
 }

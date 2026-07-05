@@ -1,18 +1,30 @@
 import { type Request, type RequestHandler, type Response } from "express";
+import { randomUUID } from "node:crypto";
 import { type State } from "../../state.js";
 import { Task } from "../../task.js";
-import { randomUUID } from "node:crypto";
+import { logger } from "../../logger.js";
+import { AppErrors, sendError } from "../errors.js";
 
 export function postHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
     let task = Task.safeParse(req.body);
     if (!task.success) {
-      return res.status(400).json({ error: "Invalid body JSON" });
+      return sendError(res, AppErrors.InvalidJsonBody);
     }
 
     let id = randomUUID();
 
     state.tasks.set(id, task.data);
+
+    logger.info(
+      {
+        id,
+        secret: task.data.secret.length,
+        operation: task.data.operation.toString().toLowerCase(),
+        method: "POST"
+      },
+      "Inserted new task"
+    );
 
     return res.status(201).json({
       id: id

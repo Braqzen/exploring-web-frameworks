@@ -1,18 +1,31 @@
 import type { Request, RequestHandler, Response } from "express";
-import type { State } from "../../state.js";
 import { z } from "zod";
+import type { State } from "../../state.js";
+import { logger } from "../../logger.js";
+import { AppErrors, sendError } from "../errors.js";
 
 export function getHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
     const id = z.uuidv4().safeParse(req.params.id);
     if (!id.success) {
-      return res.status(404).json({ error: "Invalid path" });
+      return sendError(res, AppErrors.InvalidPath);
     }
 
     const task = state.tasks.get(id.data);
     if (!task) {
-      return res.status(404).json({ error: "Task not found" });
+      logger.warn({ id: id.data, method: "GET" }, "Task not found");
+      return sendError(res, AppErrors.TaskNotFound);
     }
+
+    logger.info(
+      {
+        id: id.data,
+        secret: task.secret.length,
+        operation: task.operation.toString().toLowerCase(),
+        method: "GET"
+      },
+      "Retrieved task"
+    );
 
     return res.status(200).json(task);
   };

@@ -1,7 +1,9 @@
 import type { Request, RequestHandler, Response } from "express";
+import { z } from "zod";
 import type { State } from "../../state.js";
 import { Task } from "../../task.js";
-import { z } from "zod";
+import { logger } from "../../logger.js";
+import { AppErrors, sendError } from "../errors.js";
 
 export function putHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
@@ -12,14 +14,29 @@ export function putHandler(state: State): RequestHandler {
 
     const task = Task.safeParse(req.body);
     if (!task.success) {
-      return res.status(400).json({ error: "Invalid body JSON" });
+      return sendError(res, AppErrors.InvalidJsonBody);
     }
 
-    if (!state.tasks.has(id.data)) {
-      return res.status(404).json({ error: "Task not found" });
+    const previous_task = state.tasks.get(id.data);
+
+    if (previous_task === undefined) {
+      logger.warn({ id: id.data, method: "PUT" }, "Task not found");
+      return sendError(res, AppErrors.TaskNotFound);
     }
 
     state.tasks.set(id.data, task.data);
+
+    logger.info(
+      {
+        id: id.data,
+        from_secret: previous_task.secret.length,
+        to_secret: task.data.secret.length,
+        from_operation: previous_task.operation.toString().toLowerCase(),
+        to_operation: task.data.operation.toString().toLowerCase(),
+        method: "PUT"
+      },
+      "Overwrote task"
+    );
 
     return res.status(200).json(task.data);
   };
