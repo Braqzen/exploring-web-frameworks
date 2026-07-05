@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler } from "express";
+import { AppErrors, sendError } from "../errors.js";
 
 export const errorMiddleware: ErrorRequestHandler = (err, _req, res, next) => {
   if (res.headersSent) {
@@ -6,12 +7,12 @@ export const errorMiddleware: ErrorRequestHandler = (err, _req, res, next) => {
   }
 
   if (err.type === "entity.too.large" || err.name === "PayloadTooLargeError") {
-    return res.status(422).json({ error: "Invalid body JSON" });
+    return sendError(res, AppErrors.InvalidJsonBody);
   }
 
   if (err instanceof SyntaxError && "body" in err) {
-    return res.status(422).json({ error: "Invalid body JSON" });
+    return sendError(res, AppErrors.InvalidJsonBody);
   }
 
-  return res.status(500).json({ error: "Internal server error" });
+  return sendError(res, AppErrors.Internal);
 };
