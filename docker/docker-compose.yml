@@ -19,7 +19,7 @@ services:
     environment:
       RUST_LOG: info
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
     depends_on:
       - telemetry-alloy
@@ -36,7 +36,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-actix:
@@ -51,7 +51,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-warp:
@@ -66,7 +66,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-rocket:
@@ -81,7 +81,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
       ROCKET_CLI_COLORS: "false"
 
@@ -97,7 +97,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-salvo:
@@ -112,7 +112,7 @@ services:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   typescript-express:
@@ -127,8 +127,8 @@ services:
       LOG_LEVEL: info
       PORT: 3000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
-      PYROSCOPE_SERVER_ADDRESS: http://telemetry-alloy:9999
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
+      PYROSCOPE_URL: http://telemetry-alloy:9999
 
   telemetry-grafana:
     image: grafana/grafana:12.2

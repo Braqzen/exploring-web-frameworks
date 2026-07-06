@@ -98,6 +98,7 @@ impl Telemetry {
             env!("CARGO_PKG_VERSION"),
             pprof_backend(PprofConfig::default(), BackendConfig::default()),
         )
+        .tags([("lang", "rust")].into_iter().collect())
         .build()?;
         Ok(agent)
     }

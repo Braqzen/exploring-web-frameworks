@@ -13,14 +13,14 @@ function main(): void {
 
   const service = "express";
   // Create before init logger
-  const sdk = initTelemetry(service);
+  const telemetry = initTelemetry(service);
   initLogger(service);
 
   const state: State = {
     tasks: new Map()
   };
 
-  startServer(sdk, createApp(state), parseInt(port));
+  startServer(telemetry, createApp(state), parseInt(port));
 }
 
 main();

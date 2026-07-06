@@ -1,9 +1,13 @@
 import type { Express } from "express";
 import type { Server } from "node:http";
-import type { NodeSDK } from "typescript-telemetry";
+import type { Telemetry } from "typescript-telemetry";
 import { getLogger } from "./logger.js";
 
-export function startServer(sdk: NodeSDK, app: Express, port: number): Server {
+export function startServer(
+  telemetry: Telemetry,
+  app: Express,
+  port: number
+): Server {
   const logger = getLogger();
 
   logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
@@ -21,7 +25,18 @@ export function startServer(sdk: NodeSDK, app: Express, port: number): Server {
     logger.info(message);
 
     await server[Symbol.asyncDispose]();
-    await sdk.shutdown();
+
+    try {
+      await telemetry.profiler.shutdown();
+    } catch (error) {
+      logger.error({ error }, "Profiler shutdown failed");
+    }
+
+    try {
+      await telemetry.sdk.shutdown();
+    } catch (error) {
+      logger.error({ error }, "OpenTelemetry shutdown failed");
+    }
 
     process.exit(0);
   };
