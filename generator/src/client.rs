@@ -228,6 +228,7 @@ impl Metrics {
         self.requests.add(
             1,
             &[
+                KeyValue::new("language", provider.language().to_string()),
                 KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
                 KeyValue::new("method", method.to_string()),
@@ -244,6 +245,7 @@ impl Metrics {
     ) {
         let ms = elapsed.as_secs_f64() * MILLISECONDS;
         let attrs = &[
+            KeyValue::new("language", provider.language().to_string()),
             KeyValue::new("provider", provider.name().to_string()),
             KeyValue::new("operation", operation.to_string()),
             KeyValue::new("method", method.to_string()),

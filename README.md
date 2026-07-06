@@ -31,19 +31,17 @@ The project is run through `docker/docker-compose` and optionally you may instal
 
 ### Quickstart
 
+Building for the first time takes a while because there are a lot of services.
+
 #### Build Docker Images
 
-Build the load-generator
+Build everything in 1 command
 
 ```shell
-just build-generator
+just
 ```
 
-Build the APIs/web-frameworks
-
-```shell
-just build-apis
-```
+To build a specific service read the commands in the [justfile](./justfile).
 
 #### Start the services
 
@@ -67,4 +65,14 @@ Stop everything and delete all previous telemetry
 
 ```shell
 just clean
+```
+
+#### Configuration
+
+You may alter the behaviour of the generator through its [config](./generator/config.json).
+
+After making a change to the config you must rebuild the generator before running it.
+
+```shell
+just build-generator
 ```

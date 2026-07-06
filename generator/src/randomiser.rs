@@ -1,4 +1,4 @@
-use crate::{method::Method, operation::Operation};
+use crate::{config::ProviderName, method::Method, operation::Operation};
 use rand::{
     RngExt,
     distr::{Alphanumeric, SampleString},
@@ -13,12 +13,13 @@ use uuid::Uuid;
 pub struct Randomiser;
 
 impl Randomiser {
-    pub fn requests() -> [(Method, u16); 6] {
-        let mut requests = Self::try_randomise_methods();
+    pub fn requests(provider: &ProviderName, methods: &[Method]) -> Vec<(Method, u16)> {
+        // SAFETY: Method assumes config forces at least 1 method to be enabled
+        let mut requests = Self::try_randomise_methods(provider, methods);
 
-        // Realistically this will never trigger and if it does it likely won't loop a 2nd time
+        // Unlikely to loop much if at all
         while requests.is_none() {
-            requests = Self::try_randomise_methods();
+            requests = Self::try_randomise_methods(provider, methods);
         }
 
         requests.unwrap()
@@ -67,21 +68,20 @@ impl Randomiser {
     /// I.e. call this method X% of the time.
     ///
     /// The call selection assumes that at least 1 method is non-zero so return None if all were set to 0.
-    fn try_randomise_methods() -> Option<[(Method, u16); 6]> {
+    fn try_randomise_methods(
+        provider: &ProviderName,
+        methods: &[Method],
+    ) -> Option<Vec<(Method, u16)>> {
         // Select a random number to use to spread out the method weights
         let mut tokens: u16 = 1000;
 
         // Track if at least 1 method is non-zero
         let mut non_zero = false;
 
-        let mut requests = [
-            (Method::Post, 0),
-            (Method::Get, 0),
-            (Method::Patch, 0),
-            (Method::Put, 0),
-            (Method::Delete, 0),
-            (Method::Head, 0),
-        ];
+        let mut requests = methods
+            .iter()
+            .map(|method| (method.clone(), 0))
+            .collect::<Vec<_>>();
 
         requests.shuffle(&mut rng());
 
@@ -124,6 +124,7 @@ impl Randomiser {
                 delete = ((delete as f64 / total as f64) * 1000.0).round() / 10.0,
                 head = ((head as f64 / total as f64) * 1000.0).round() / 10.0,
                 total,
+                provider = provider.to_string(),
                 "Randomised requests"
             );
             Some(requests)

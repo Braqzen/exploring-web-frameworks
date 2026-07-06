@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 12,
+  "id": 11,
   "links": [],
   "panels": [
     {
@@ -54,7 +54,7 @@
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised requests)\"\n| line_format \"{{ __line__ }} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
+          "expr": "{service_name=\"generator\"}\n|~ \"(?P<x>Randomised requests)\"\n| line_format \"{{ __line__ }} | {{.provider}} | POST={{.post}}% | GET={{.get}}% | PUT={{.put}}% | PATCH={{.patch}}% | DELETE={{.delete}}% | HEAD={{.head}}% | TOTAL={{.total}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -215,15 +215,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "names": [
-                "Time",
-                "delete",
-                "get",
-                "head",
-                "patch",
-                "post",
-                "put"
-              ]
+              "names": ["Time", "delete", "get", "head", "patch", "post", "put"]
             }
           }
         },
@@ -527,10 +519,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "names": [
-                "Time",
-                "total"
-              ]
+              "names": ["Time", "total"]
             }
           }
         },
@@ -660,10 +649,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "names": [
-                "Time",
-                "total"
-              ]
+              "names": ["Time", "total"]
             }
           }
         },

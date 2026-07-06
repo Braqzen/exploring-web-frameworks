@@ -1,13 +1,18 @@
-use crate::config::ProviderName;
+use crate::config::{Language, ProviderName};
 
 pub struct Provider {
     name: ProviderName,
     url: String,
+    language: Language,
 }
 
 impl Provider {
-    pub fn new(name: ProviderName, url: String) -> Self {
-        Self { name, url }
+    pub fn new(name: ProviderName, url: String, language: Language) -> Self {
+        Self {
+            name,
+            url,
+            language,
+        }
     }
 
     pub fn name(&self) -> ProviderName {
@@ -16,5 +21,9 @@ impl Provider {
 
     pub fn url(&self) -> String {
         self.url.clone()
+    }
+
+    pub fn language(&self) -> Language {
+        self.language.clone()
     }
 }

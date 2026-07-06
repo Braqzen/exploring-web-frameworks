@@ -1,5 +1,7 @@
 ## Repository Structure
 
+> Note: Dumping ground for now, will refactor into proper files/sections later
+
 If you'd like to poke around the repository then there are 4 primary directories to look at:
 
 - **docker**: configure, build and run services
@@ -107,7 +109,7 @@ The following does not outline the happy path it only outlines the chaos.
 
 ## Configuration
 
-Currently only the generator has minimal configuration which filters out frameworks so it won't send requests to them.
+Currently only the generator has configuration which specifies which frameworks it will send requests to and which HTTP methods it will send.
 
 You may edit the [config](../generator/config.json) but need to rebuild the generator image every time a change is made.
 
@@ -118,3 +120,12 @@ There are a lot of dashboards from a minimal amount of metrics and misc telemetr
 Since the payload is meaningless a lot of the panels are meaningless but you may imagine sending real data and creating dashboards to understand a variety of business and engineering needs.
 
 Moreover, the panels may be grouped differently, some may be useless and removed and perhaps other visualisations may be more useful but again the payload is meaningless in this project.
+
+## Known Issues / Future Work
+
+1. HTTP status codes aren't identical across all frameworks
+2. Logs may be missing some parameters or may need to be added
+3. Typescript: artificial latency uses setTimeout() which doesn't work sub-ms so its latency is usually higher
+4. Frameworks use fewer telemetry than the base Rust/Generator. May split generator telemetry into Generator and Framework instead of current mostly Generator focused view and thus implement more telemetry in frameworks
+5. Grafana framework directory has Rust and Typescript profiling as seperate dashboards because profiling is inherently different\
+   5.1 Thus provider dropdown is limited and allows all providers instead of limiting to only rust web frameworks in the Rust Profiling and Typescript services in Typescript Profiling

@@ -1,5 +1,4 @@
-mod api;
-mod router;
+mod routes;
 mod server;
 mod state;
 mod task;

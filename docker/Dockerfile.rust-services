@@ -5,19 +5,19 @@ FROM chef AS planner
 ARG SERVICE
 WORKDIR /app
 COPY services/rust/${SERVICE} .
-COPY shared-code /shared-code
+COPY shared-code/rust-telemetry /shared-code/rust-telemetry
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 ARG SERVICE
 WORKDIR /app
-COPY shared-code /shared-code
+COPY shared-code/rust-telemetry /shared-code/rust-telemetry
 COPY --from=planner /app/recipe.json recipe.json
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     cargo chef cook --release --recipe-path recipe.json
 COPY services/rust/${SERVICE} .
-COPY shared-code /shared-code
+COPY shared-code/rust-telemetry /shared-code/rust-telemetry
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     cargo build --release --bin ${SERVICE}

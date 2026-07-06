@@ -5,7 +5,7 @@ The following table shows the frameworks that are implemented in the project
 | Language   | Framework                              |
 | ---------- | -------------------------------------- |
 | Rust       | Axum, Poem, Actix, Salvo, Warp, Rocket |
-| Typescript |                                        |
+| Typescript | Express                                |
 | Go         |                                        |
 | Zig        |                                        |
 | C++        |                                        |
@@ -20,7 +20,7 @@ The following table lists languages and frameworks to potentially add to the pro
 
 | Language   | Framework                                                |
 | ---------- | -------------------------------------------------------- |
-| Typescript | express, fastify, koa, hono, nestjs                      |
+| Typescript | fastify, koa, hono, nestjs, elyisa                       |
 | Go         | gin, chi, echo, fiber, std/net                           |
 | Zig        | zap, http.zig                                            |
 | C++        | drogon, crow, boost-beast, pistache, Restinio, CppCMS    |

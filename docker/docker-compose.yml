@@ -16,11 +16,10 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-generator:latest
-    command: ["/app/generator"]
     environment:
       RUST_LOG: info
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
     depends_on:
       - telemetry-alloy
@@ -33,12 +32,11 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-axum:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-actix:
@@ -49,12 +47,11 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-actix:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-warp:
@@ -65,12 +62,11 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-warp:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-rocket:
@@ -81,12 +77,11 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-rocket:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
       ROCKET_CLI_COLORS: "false"
 
@@ -98,12 +93,11 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-poem:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   rust-salvo:
@@ -114,12 +108,26 @@ services:
           memory: 128M
     memswap_limit: 128M
     image: servers-salvo:latest
-    command: ["/app/server"]
     environment:
       RUST_LOG: info
       SOCKET: 0.0.0.0:8000
       OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
+      PYROSCOPE_URL: http://telemetry-alloy:9999
+
+  typescript-express:
+    <<: *common-setup
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    memswap_limit: 128M
+    image: servers-express:latest
+    environment:
+      LOG_LEVEL: info
+      PORT: 3000
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
   telemetry-grafana:

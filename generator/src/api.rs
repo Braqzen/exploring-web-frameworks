@@ -1,4 +1,8 @@
-use crate::{config::ProviderName, payload::Payload, provider::Provider};
+use crate::{
+    config::{Language, ProviderName, ProviderOptions},
+    payload::Payload,
+    provider::Provider,
+};
 use rand::{rng, seq::IteratorRandom};
 use std::collections::HashMap;
 
@@ -7,15 +11,16 @@ pub struct ApiManager {
 }
 
 impl ApiManager {
-    pub fn new(apis: HashMap<ProviderName, String>) -> Self {
+    pub fn new(apis: Vec<ProviderOptions>) -> Self {
         let apis = apis
             .into_iter()
-            .map(|(provider, url)| {
+            .map(|options| {
                 (
-                    provider,
+                    options.provider.clone(),
                     ApiState {
-                        url,
+                        url: options.url.clone(),
                         tasks: HashMap::new(),
+                        language: options.language,
                     },
                 )
             })
@@ -34,7 +39,10 @@ impl ApiManager {
         // If no tasks, default to POST to get first ID
         let post = if state.tasks.is_empty() { true } else { false };
 
-        (Provider::new(provider.clone(), state.url.clone()), post)
+        (
+            Provider::new(provider.clone(), state.url.clone(), state.language.clone()),
+            post,
+        )
     }
 
     pub fn insert(
@@ -66,4 +74,7 @@ struct ApiState {
     url: String,
     /// Task ID -> Payload
     tasks: HashMap<String, Payload>,
+    // TODO: Hack this should not be on here
+    /// Programming Language
+    language: Language,
 }

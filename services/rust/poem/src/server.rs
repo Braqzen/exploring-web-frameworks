@@ -1,4 +1,4 @@
-use crate::{router::router, state::State};
+use crate::{routes::router, state::AppState};
 use eyre::Result;
 use poem::{Server as PoemServer, listener::TcpListener};
 use std::{
@@ -11,21 +11,19 @@ use tracing::info;
 
 pub struct Server {
     socket: SocketAddr,
-    state: Arc<Mutex<State>>,
+    state: Arc<Mutex<AppState>>,
 }
 
 impl Server {
     pub fn new(socket: SocketAddr) -> Self {
         Self {
             socket,
-            state: Arc::new(Mutex::new(State::new())),
+            state: Arc::new(Mutex::new(AppState::new())),
         }
     }
 
     pub async fn run(self) -> Result<()> {
         let listener = TcpListener::bind(self.socket);
-
-        let app = router(self.state);
 
         // Handle running locally and interrupting the process with ctrl+c.º
         let mut sigint = signal(SignalKind::interrupt())?;
@@ -37,7 +35,7 @@ impl Server {
 
         PoemServer::new(listener)
             .run_with_graceful_shutdown(
-                app,
+                router(self.state),
                 async move {
                     tokio::select! {
                         _ = sigint.recv() => {

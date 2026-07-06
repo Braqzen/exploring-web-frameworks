@@ -1,0 +1,18 @@
+FROM node:26-slim AS builder
+ARG SERVICE
+WORKDIR /app
+COPY services/typescript/${SERVICE} .
+COPY shared-code/typescript-telemetry ./shared-code/typescript-telemetry
+RUN npm install -g pnpm@11.5.1
+RUN cd ./shared-code/typescript-telemetry && pnpm install && pnpm build
+RUN pnpm add typescript-telemetry@file:./shared-code/typescript-telemetry
+RUN pnpm build
+RUN pnpm prune --production
+
+FROM node:26-slim
+WORKDIR /app
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+
+CMD ["node", "dist/index.js"]
