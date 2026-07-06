@@ -66,12 +66,13 @@ impl Worker {
         }
     }
 
-    #[instrument(name = "worker.send_request", skip_all, fields(provider = Empty, method = Empty))]
+    #[instrument(name = "worker.send_request", skip_all, fields(provider = Empty, method = Empty, language = Empty))]
     async fn send_request(&mut self) -> Result<()> {
         let (provider, post) = self.api_manager.select();
         let method = self.method_manager.select(provider.name().clone(), post);
         tracing::Span::current().record("provider", provider.name().to_string());
         tracing::Span::current().record("method", method.to_string());
+        tracing::Span::current().record("language", provider.language().to_string());
 
         match method {
             Method::Post => self.post(provider).await?,
@@ -406,6 +407,7 @@ impl Metrics {
         self.operations.add(
             1,
             &[
+                KeyValue::new("language", provider.language().to_string()),
                 KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
             ],
@@ -416,6 +418,7 @@ impl Metrics {
         self.operations.add(
             -1,
             &[
+                KeyValue::new("language", provider.language().to_string()),
                 KeyValue::new("provider", provider.name().to_string()),
                 KeyValue::new("operation", operation.to_string()),
             ],

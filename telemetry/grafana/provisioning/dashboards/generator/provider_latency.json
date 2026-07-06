@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 17,
   "links": [],
   "panels": [
     {
@@ -37,6 +37,9 @@
             "cellOptions": {
               "type": "auto"
             },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
@@ -44,7 +47,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -62,7 +66,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 95
+                "value": 87
               }
             ]
           },
@@ -125,6 +129,18 @@
                 "value": 100
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "language"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
           }
         ]
       },
@@ -137,18 +153,10 @@
       "id": 33,
       "options": {
         "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -157,7 +165,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{method}}",
@@ -171,7 +179,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -186,7 +194,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -201,7 +209,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -216,7 +224,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.50, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -240,6 +248,7 @@
             "include": {
               "names": [
                 "provider",
+                "language 1",
                 "Value #POST",
                 "Value #PUT",
                 "Value #PATCH",
@@ -304,6 +313,9 @@
             "cellOptions": {
               "type": "auto"
             },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
@@ -311,7 +323,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -329,7 +342,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 95
+                "value": 83
               }
             ]
           },
@@ -392,6 +405,18 @@
                 "value": 100
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "language"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
           }
         ]
       },
@@ -404,18 +429,10 @@
       "id": 34,
       "options": {
         "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -424,7 +441,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{method}}",
@@ -438,7 +455,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -453,7 +470,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -468,7 +485,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -483,7 +500,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.90, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.90, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -511,7 +528,8 @@
                 "Value #PUT",
                 "Value #PATCH",
                 "Value #GET",
-                "Value #DELETE"
+                "Value #DELETE",
+                "language 1"
               ]
             }
           }
@@ -571,6 +589,9 @@
             "cellOptions": {
               "type": "auto"
             },
+            "footer": {
+              "reducers": []
+            },
             "inspect": false
           },
           "mappings": [],
@@ -578,7 +599,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -596,7 +618,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 95
+                "value": 81
               }
             ]
           },
@@ -659,6 +681,18 @@
                 "value": 100
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "language"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 87
+              }
+            ]
           }
         ]
       },
@@ -671,18 +705,10 @@
       "id": 35,
       "options": {
         "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -691,7 +717,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"POST\"}[$__rate_interval])))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{method}}",
@@ -705,7 +731,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PUT\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -720,7 +746,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"PATCH\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -735,7 +761,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"GET\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -750,7 +776,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.99, sum by (provider, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (provider, language, le) (rate(latency_percentile_bucket{job=\"generator\", method=\"DELETE\"}[$__rate_interval])))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -778,7 +804,8 @@
                 "Value #PUT",
                 "Value #PATCH",
                 "Value #GET",
-                "Value #DELETE"
+                "Value #DELETE",
+                "language 1"
               ]
             }
           }
@@ -859,6 +886,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -873,7 +901,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -905,7 +934,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -958,6 +987,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -972,7 +1002,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -1004,7 +1035,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -1057,6 +1088,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1071,7 +1103,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -1103,7 +1136,7 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "11.6.15",
+      "pluginVersion": "12.2.10",
       "targets": [
         {
           "datasource": {
@@ -1123,7 +1156,7 @@
   ],
   "preload": false,
   "refresh": "5s",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": []
@@ -1136,5 +1169,5 @@
   "timezone": "browser",
   "title": "Provider Latency",
   "uid": "bfqbxhgo2duyod",
-  "version": 2
+  "version": 1
 }

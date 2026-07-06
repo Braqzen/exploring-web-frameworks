@@ -1,5 +1,5 @@
 use crate::{
-    config::{ProviderName, ProviderOptions},
+    config::{Language, ProviderName, ProviderOptions},
     payload::Payload,
     provider::Provider,
 };
@@ -20,6 +20,7 @@ impl ApiManager {
                     ApiState {
                         url: options.url.clone(),
                         tasks: HashMap::new(),
+                        language: options.language,
                     },
                 )
             })
@@ -38,7 +39,10 @@ impl ApiManager {
         // If no tasks, default to POST to get first ID
         let post = if state.tasks.is_empty() { true } else { false };
 
-        (Provider::new(provider.clone(), state.url.clone()), post)
+        (
+            Provider::new(provider.clone(), state.url.clone(), state.language.clone()),
+            post,
+        )
     }
 
     pub fn insert(
@@ -70,4 +74,7 @@ struct ApiState {
     url: String,
     /// Task ID -> Payload
     tasks: HashMap<String, Payload>,
+    // TODO: Hack this should not be on here
+    /// Programming Language
+    language: Language,
 }

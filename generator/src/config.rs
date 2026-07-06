@@ -31,6 +31,7 @@ impl Config {
 
             api.push(ProviderOptions {
                 provider: provider.provider,
+                language: provider.language,
                 url: provider.url,
                 methods,
             });
@@ -61,6 +62,7 @@ impl Config {
 #[derive(Debug, Clone)]
 pub struct ProviderOptions {
     pub provider: ProviderName,
+    pub language: Language,
     pub url: String,
     pub methods: Vec<Method>,
 }
@@ -91,6 +93,22 @@ impl ToString for ProviderName {
     }
 }
 
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum Language {
+    Rust,
+    Typescript,
+}
+
+impl ToString for Language {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Rust => "rust".to_string(),
+            Self::Typescript => "typescript".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct ConfigJson {
     /// Which Providers to send load to
@@ -103,6 +121,8 @@ struct ConfigJson {
 struct ApiJson {
     /// Name to identify the provider
     provider: ProviderName,
+    /// Programming language
+    language: Language,
     /// URL to send requests to
     url: String,
     /// Whether the provider is loaded into the worker
