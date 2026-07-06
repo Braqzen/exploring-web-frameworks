@@ -1,0 +1,30 @@
+{
+  "name": "fastify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.5.1",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "26.0.1",
+    "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "fastify": "5.9.0",
+    "typescript-telemetry": "file:../../../shared-code/typescript-telemetry",
+    "zod": "4.4.3"
+  }
+}

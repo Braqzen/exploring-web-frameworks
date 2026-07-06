@@ -7,12 +7,12 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 
 ## Tier List
 
-| Tier | Frameworks              |
-| ---- | ----------------------- |
-| S    | **Rust:** Axum          |
-| A    | **Rust:** Poem          |
-| B    | **Rust:** Actix         |
-| C    | **Rust:** Salvo         |
-| D    | **Rust:** Rocket        |
-| E    | **Typescript:** Express |
-| F    | **Rust:** Warp          |
+| Tier | Frameworks                                  |
+| ---- | ------------------------------------------- |
+| S    | **Rust:** Axum                              |
+| A    | **Rust:** Poem                              |
+| B    | **Rust:** Actix                             |
+| C    | **Rust:** Rocket<br>**Typescript:** Fastify |
+| D    | **Rust:** Salvo                             |
+| E    | **Typescript:** Express                     |
+| F    | **Rust:** Warp                              |

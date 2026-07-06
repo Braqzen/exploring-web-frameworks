@@ -97,6 +97,20 @@
         "PATCH": true,
         "HEAD": true
       }
+    },
+    {
+      "provider": "fastify",
+      "language": "typescript",
+      "url": "http://typescript-fastify:3000",
+      "enabled": true,
+      "methods": {
+        "GET": true,
+        "POST": true,
+        "PUT": true,
+        "DELETE": true,
+        "PATCH": true,
+        "HEAD": true
+      }
     }
   ],
   "sleep": 100

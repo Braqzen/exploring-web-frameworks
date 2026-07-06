@@ -17,7 +17,7 @@ target "rust-services" {
 
 target "typescript-services" {
   matrix = {
-    service = ["express"]
+    service = ["express", "fastify"]
   }
   name = service
   context    = "."

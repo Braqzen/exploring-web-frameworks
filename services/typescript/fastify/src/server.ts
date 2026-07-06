@@ -1,11 +1,11 @@
-import type { Express } from "express";
+import type { FastifyInstance } from "fastify";
 import type { Server } from "node:http";
 import type { Telemetry } from "typescript-telemetry";
 import { getLogger } from "./logger.js";
 
 export function startServer(
   telemetry: Telemetry,
-  app: Express,
+  app: FastifyInstance,
   port: number
 ): Server {
   const logger = getLogger();
@@ -22,7 +22,7 @@ export function startServer(
 
     logger.info(message);
 
-    await server[Symbol.asyncDispose]();
+    await app.close();
 
     try {
       await telemetry.profiler.shutdown();
@@ -39,13 +39,13 @@ export function startServer(
     process.exit(0);
   };
 
-  const server = app.listen(port, () => {
-    logger.info(`Server is running on port ${port}`);
-  });
-
-  server.on("error", (err) => {
-    logger.error({ err }, "Failed to start server");
-    void shutdown("STARTUP");
+  app.listen({ port, host: "0.0.0.0" }, (err, address) => {
+    if (err) {
+      logger.error({ err }, "Failed to start server");
+      void shutdown("STARTUP");
+      return;
+    }
+    logger.info(`Server is running on ${address}`);
   });
 
   process.once("SIGTERM", () => {
@@ -56,5 +56,5 @@ export function startServer(
     void shutdown("SIGINT");
   });
 
-  return server;
+  return app.server;
 }
