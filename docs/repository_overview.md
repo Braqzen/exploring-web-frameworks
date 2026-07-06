@@ -9,6 +9,8 @@ If you'd like to poke around the repository then there are 4 primary directories
 - **services**: contains the APIs/frameworks to send requests to
 - **telemetry**: components to capture telemetry from the generator, frameworks and dashboards for visualisations
 
+For information about the API [click here](api.md).
+
 ## Project Scope
 
 The repo consists of the following components:
@@ -44,42 +46,6 @@ The frameworks do not strictly follow any RFCs, they tend to but do not always i
 #### Framework Implementation
 
 There may be more than 1 approach to how a web-framework may be used. Instead of multiple implementations per framework 1 approach has been chosen and it may not be the idiomatic / "best" way of using that framework.
-
-## API
-
-This section describes the data sent to the web-frameworks.
-
-### Payload
-
-The generator creates the following json
-
-```json
-{
-    secret: String,
-    operation: String
-}
-```
-
-The secret is a randomly generated string and the operation is an enum of 4 valid variants and 1 variant which the servers reject.
-
-```rust
-enum Operation {
-    Transform,
-    Merge,
-    Sort,
-    Compute,
-    Filter // Frameworks reject
-}
-```
-
-Note that frameworks do no work and the payload is meaningless. The frameworks only store, update and delete payloads from their memory.
-
-### HTTP Methods
-
-The generator sends 5 valid HTTP methods and 1 invalid method (although the frameworks reject everything that isn't the 5 valid methods).
-
-The valid methods are: POST, GET, PUT, PATCH, DELETE\
-The invalid method is HEAD
 
 ## Data Flow
 
