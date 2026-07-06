@@ -77,6 +77,7 @@ pub enum ProviderName {
     Poem,
     Salvo,
     Express,
+    Fastify,
 }
 
 impl ToString for ProviderName {
@@ -89,6 +90,7 @@ impl ToString for ProviderName {
             Self::Poem => "poem".to_string(),
             Self::Salvo => "salvo".to_string(),
             Self::Express => "express".to_string(),
+            Self::Fastify => "fastify".to_string(),
         }
     }
 }
