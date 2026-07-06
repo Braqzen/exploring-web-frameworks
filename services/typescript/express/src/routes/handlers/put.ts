@@ -2,25 +2,32 @@ import type { Request, RequestHandler, Response } from "express";
 import { z } from "zod";
 import type { State } from "../../state.js";
 import { Task } from "../../task.js";
-import { logger } from "../../logger.js";
+import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
 
 export function putHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
+    const logger = getLogger();
+
     const id = z.uuidv4().safeParse(req.params.id);
     if (!id.success) {
-      return res.status(404).json({ error: "Invalid path" });
+      logger.warn({ method: req.method, path: req.path }, "Invalid path");
+      return sendError(res, AppErrors.InvalidPath);
     }
 
     const task = Task.safeParse(req.body);
     if (!task.success) {
+      logger.warn({ method: req.method, path: req.path }, "Invalid body JSON");
       return sendError(res, AppErrors.InvalidJsonBody);
     }
 
     const previous_task = state.tasks.get(id.data);
 
     if (previous_task === undefined) {
-      logger.warn({ id: id.data, method: "PUT" }, "Task not found");
+      logger.warn(
+        { id: id.data, method: "PUT", path: req.path },
+        "Task not found"
+      );
       return sendError(res, AppErrors.TaskNotFound);
     }
 

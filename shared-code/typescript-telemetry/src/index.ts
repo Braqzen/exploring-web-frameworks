@@ -1,10 +1,2 @@
-import pino from "pino";
-
-export function createLogger(serviceName: string): pino.Logger {
-  return pino({
-    name: serviceName,
-    level: process.env.LOG_LEVEL ?? "info"
-  });
-}
-
-export type Logger = ReturnType<typeof createLogger>;
+export { initTelemetry, type NodeSDK } from "./telemetry.js";
+export { createLogger, type Logger } from "./logger.js";

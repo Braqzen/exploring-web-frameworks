@@ -1,3 +1,9 @@
-**/target
 **/.git
+
+# RUST
+**/target
+
+# TYPESCRIPT
 **/node_modules
+**/dist
+**/pnpm-lock.yaml
