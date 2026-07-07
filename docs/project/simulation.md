@@ -11,6 +11,10 @@ Similarly, the `Operation`s are randomised however this applies to all enabled p
 
 Provider selection is also random for each request.
 
+Task IDs may be random at times defaulting to either a random string or a random `uuid`.
+
+Payloads may be created with long `secret` strings to simulate large requests beyond what the frameworks are willing to accept.
+
 **Frameworks**
 
 For each received request a framework has a chance to sleep to simulate increased workload/latency.\
