@@ -1,7 +1,21 @@
 # Generator
 
-- The generator periodically randomises its probability of which HTTP methods and operations to send
-- It may send a HEAD HTTP method (all frameworks reject it)
-- It may send an invalid Operation (filter, frameworks do not support it)
-- It may send an invalid payload identifier (random string or valid but random UUID) instead of the ID associated with the payload
-- It may generate a very long secret which causes the servers to reject it because of maximum allowed payload size
+Broadly speaking the generator consists of 3 components
+
+1. An infinite loop putting together all the pieces to send requests
+2. Selection mechanisms for providers and HTTP methods
+3. The randomiser changing internal state to make the simulation interesting
+
+In the background the randomiser changes distributions affecting selection mechanisms however to prevent a pointless state we fall back to `POST`ing if a selected provider has no current tasks.
+
+The general workflow is:
+
+1. Load config and initialise systems
+2. Start the loop
+   1. Select a provider
+   2. Select a HTTP method to send to them
+   3. Call the function that handles that logic
+   4. Handle telemetry, send request and deal with response
+   5. Restart loop
+
+The generator maintains an in-memory state of its tasks.
