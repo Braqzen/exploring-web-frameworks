@@ -6,7 +6,7 @@ This repository attempts to create the same API in different web-frameworks acro
 
 The goal is to explore what a "web-framework" is, how different frameworks implement and expose common design concepts/functionality, inherent benefits provided to the framework by its programming language, and to explore each language's ecosystem to develop a minimal prod-adjacent server.
 
-For information about the technical aspects of the repo [click here](./docs/repository_overview.md).\
+For information about the technical aspects of the project [click here](./docs/project/overview.md).\
 For information about which language/frameworks are/may be implemented [click here](./docs/framework_list.md).\
 For a breakdown of what a framework is [click here](./docs/framework.md).\
 For a web-framework tier-list [click here](./docs/tier-list.md).
