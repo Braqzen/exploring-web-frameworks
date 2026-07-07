@@ -13,6 +13,6 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 | A    | **Rust:** Poem                              |
 | B    | **Rust:** Actix                             |
 | C    | **Rust:** Rocket<br>**Typescript:** Fastify |
-| D    | **Rust:** Salvo                             |
+| D    | **Rust:** Salvo<br>**Typescript:** Hono     |
 | E    | **Typescript:** Express                     |
 | F    | **Rust:** Warp                              |
