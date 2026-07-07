@@ -1,35 +1,54 @@
-## Project Scope
+# Project Scope
 
-The repo consists of the following components:
+The scope is limited to the following:
 
-- 1 Load Generator
-- 1 Instance of each framework
-- 6 Telemetry components
-  - Grafana: UI to visualise telemetry
-  - Alloy: collects and forwards telemetry to backends
-  - Prometheus: stores metrics
-  - Loki: stores logs
-  - Tempo: stores traces
-  - Pyroscope: stores profiles
+- **Load Generator**: Something must send requests to various web-frameworks
+- **Web-Frameworks**: Many frameworks in many languages but only 1 implementation of each framework
+- **Telemetry**: We must be able to observe what each service is doing
 
-The idea is to have something generate requests and try various programming languages and web-frameworks to see what they're like. This means telemetry is required to see what is happening internally and the API is simple and limited.
+### Frameworks
 
-### Out of Scope
+The frameworks should attempt to follow the same behaviour as closely as the framework, ecosystem tooling and language enables them.
 
-#### Database
+Frameworks have different designs and features so ideally they showcase their uniqueness while being as simple/minimal as possible.
 
-There is no database because the concept of shared state can be represented through a HashMap or a database handle.\
-Meaning, shutting down services loses state except telemetry which needs a command to specifically delete telemetry.
+### Telemetry
 
-#### Framework Visualisations
+Telemetry in different languages may not be equally mature (or exist) or may differ. We ought to keep it uniform to display the same information when possible.
 
-There is data overlap in the generator and the frameworks because of the request that is sent between them.\
-Reimplementing the same telemetry per framework is a lot of work therefore most of the telemetry is in the generator instead of being moved into or solely implemented in each framework.
+Most telemetry should be in the generator and later may be moved into frameworks depending on available tooling.
 
-#### Common Web-Server Functionality
+Use OTeL as much as possible however if there is a popular library then attempt to bridge the library into OTeL format.
 
-The frameworks do not strictly follow any RFCs, they tend to but do not always implement the same functionality across all frameworks and they do not implement Auth or a variety of functionality that may be expected from a safe production-worthy setup.
+Keep the telemetry to a minimum because even a few points can be interpreted and visualised in many ways (as the repo already has).
 
-#### Framework Implementation
+Use the Grafana stack:
 
-There may be more than 1 approach to how a web-framework may be used. Instead of multiple implementations per framework 1 approach has been chosen and it may not be the idiomatic / "best" way of using that framework.
+- **UI**: Grafana
+- **Collector**: Grafana Alloy
+- **Log Storage**: Loki
+- **Metric Storage**: Prometheus
+- **Trace Storage**: Tempo
+- **Profile Storage**: Pyroscope
+
+## Out of Scope
+
+### Database
+
+There will not be a database because the concept of shared state can be represented through a HashMap or a database handle in a framework.
+
+### Testing
+
+There will be no tests. There is consideration for OpenAPI validation which acts as a constraint.
+
+### Web RFCs
+
+The frameworks do not subscribe to any particular RFC but attempt to use the same status codes, http methods, bodies.
+
+### Production Functionality
+
+The frameworks are not meant to be "off-the-shelf" backends therefore common functionality like authentication, authorization, caching, etc. will not be implemented.
+
+### Benchmarking
+
+The code is not meant to be performant and there are other projects that specialise in isolating and comparing the performance of web-frameworks.
