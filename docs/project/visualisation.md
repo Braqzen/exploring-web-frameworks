@@ -1,7 +1,11 @@
-## Visualisations
+# Visualisations
 
-There are a lot of dashboards from a minimal amount of metrics and misc telemetry. Most of the dashboards are attributed to the generator.
+The generator only tracks a few values such as request counts/http methods/operations/programming languages, latencies, logs, traces, and profiles.
 
-Since the payload is meaningless a lot of the panels are meaningless but you may imagine sending real data and creating dashboards to understand a variety of business and engineering needs.
+Each unit of telemetry may be visualised in many ways and thus there are many dashboards with many panels. That being said we can add a lot more from the current units and group panels differently.
 
-Moreover, the panels may be grouped differently, some may be useless and removed and perhaps other visualisations may be more useful but again the payload is meaningless in this project.
+Ultimately, the payload is meaningless and thus there's little point in explaining what the visualisations represent especially since there's so many.
+
+The takeaway is regardless of the content of the payload, with very little telemetry we can create various insights into the performance of providers.
+
+Currently, most of the telemetry is in the generator for a few reasons so it's recommended to spend most of the time in those dashboards.
