@@ -1,5 +1,10 @@
 ## Configuration
 
-Currently only the generator has configuration which specifies which frameworks it will send requests to and which HTTP methods it will send.
+You may edit the generator's [config](../generator/config.json) to specify which framework to send requests to and which HTTP methods to use.
 
-You may edit the [config](../generator/config.json) but need to rebuild the generator image every time a change is made.
+The generator is made to crash when
+
+- All frameworks are disabled
+- A framework is enabled but all of its methods are disabled
+
+After changing the config you must rebuild the generator image.
