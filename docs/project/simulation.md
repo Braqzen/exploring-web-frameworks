@@ -1,4 +1,4 @@
-## Randomisation
+# Randomisation
 
 To make the simulation interesting the generator and frameworks have built-in randomness.
 

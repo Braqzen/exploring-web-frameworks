@@ -1,4 +1,4 @@
-### Generator
+# Generator
 
 - The generator periodically randomises its probability of which HTTP methods and operations to send
 - It may send a HEAD HTTP method (all frameworks reject it)

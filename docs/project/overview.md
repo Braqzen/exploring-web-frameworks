@@ -1,4 +1,4 @@
-## Project Overview
+# Project Overview
 
 > Note: Documents are WIP
 

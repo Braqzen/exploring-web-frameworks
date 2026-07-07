@@ -1,4 +1,4 @@
-## Configuration
+# Configuration
 
 You may edit the generator's [config](../generator/config.json) to specify which framework to send requests to and which HTTP methods to use.
 
