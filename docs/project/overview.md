@@ -1,7 +1,5 @@
 # Project Overview
 
-> Note: Documents are WIP
-
 The project is split into smaller documents to make it easier to encapsulate and understand the information.
 
 > It's recommended to read the list in order from top to bottom
