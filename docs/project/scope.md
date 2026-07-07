@@ -52,3 +52,11 @@ The frameworks are not meant to be "off-the-shelf" backends therefore common fun
 ### Benchmarking
 
 The code is not meant to be performant and there are other projects that specialise in isolating and comparing the performance of web-frameworks.
+
+### Alerts
+
+Telemetry captures warnings and errors however no alerts will be integrated.
+
+### Cloud Infrastructure
+
+The project is intended to run locally and thus no cloud infra configuration/deployment/3rd party services will be added.
