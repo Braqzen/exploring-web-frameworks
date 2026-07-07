@@ -1,0 +1,33 @@
+import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
+import type { State } from "./state.js";
+import { registerRoutes } from "./routes/router.js";
+import { invalidPathHandler, errorHandler } from "./routes/handlers/index.js";
+import { chaosMiddleware, logMiddleware } from "./routes/middleware/index.js";
+import { getLogger } from "./logger.js";
+import { AppErrors, sendError } from "./routes/errors.js";
+
+export function createApp(state: State): Hono {
+  const app = new Hono();
+
+  app.use(
+    "*",
+    bodyLimit({
+      maxSize: 64 * 1024,
+      onError: (c) => {
+        getLogger().warn(
+          { method: c.req.method, path: c.req.path },
+          "Invalid body JSON"
+        );
+        return sendError(c, AppErrors.InvalidJsonBody);
+      }
+    })
+  );
+  app.use(logMiddleware);
+  app.use(chaosMiddleware);
+  registerRoutes(app, state);
+  app.notFound(invalidPathHandler);
+  app.onError(errorHandler);
+
+  return app;
+}

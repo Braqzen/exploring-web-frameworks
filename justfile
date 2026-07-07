@@ -6,7 +6,7 @@ build-apis: build-rust-apis build-typescript-apis
 
 # Shorthand to build the APIs per language
 build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
-build-typescript-apis: build-express build-fastify
+build-typescript-apis: build-express build-fastify build-hono
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
@@ -45,6 +45,10 @@ build-express:
 build-fastify:
 	docker rmi servers-fastify:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl fastify
+
+build-hono:
+	docker rmi servers-hono:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl hono
 
 # Docker Compose Commands
 run:

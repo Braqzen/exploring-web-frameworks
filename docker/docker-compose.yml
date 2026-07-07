@@ -145,6 +145,21 @@ services:
       OTEL_METRIC_EXPORT_INTERVAL: "1000"
       PYROSCOPE_URL: http://telemetry-alloy:9999
 
+  typescript-hono:
+    <<: *common-setup
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    memswap_limit: 128M
+    image: servers-hono:latest
+    environment:
+      LOG_LEVEL: info
+      PORT: 3000
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
+      PYROSCOPE_URL: http://telemetry-alloy:9999
+
   telemetry-grafana:
     image: grafana/grafana:12.2
     ports:

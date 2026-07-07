@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 13,
   "links": [],
   "panels": [
     {
@@ -78,7 +78,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 179
+                "value": 156
               }
             ]
           },
@@ -126,7 +126,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 171
+                "value": 127
               }
             ]
           },
@@ -150,7 +150,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 162
+                "value": 95
               }
             ]
           }
@@ -186,15 +186,13 @@
               "operator": "=",
               "scope": "resource",
               "tag": "service.name",
-              "value": [
-                "generator"
-              ],
+              "value": ["generator"],
               "valueType": "string"
             }
           ],
           "limit": 200,
           "metricsQueryType": "range",
-          "query": "{ resource.service.name=\"generator\" && name = trace:rootName && span.provider=~\"$provider\" && span.method=~\"$method\" } | select(span.provider, span.method, resource.telemetry.sdk.language)",
+          "query": "{ resource.service.name=\"generator\" && name = trace:rootName && span.provider=~\"$provider\" && span.method=~\"$method\" } | select(span.provider, span.method, span.language)",
           "queryType": "traceql",
           "refId": "A",
           "serviceMapUseNativeHistograms": false,
@@ -234,10 +232,10 @@
               "Start time": 7,
               "Trace Name": 5,
               "Trace Service": 4,
+              "language": 0,
               "method": 2,
               "provider": 1,
               "service.name": 9,
-              "telemetry.sdk.language": 0,
               "traceIdHidden": 10
             },
             "renameByName": {
@@ -259,9 +257,7 @@
         "allowCustomValue": false,
         "current": {
           "text": "All",
-          "value": [
-            "$__all"
-          ]
+          "value": ["$__all"]
         },
         "datasource": {
           "type": "prometheus",
@@ -286,12 +282,8 @@
       {
         "allowCustomValue": false,
         "current": {
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "text": ["All"],
+          "value": ["$__all"]
         },
         "datasource": {
           "type": "prometheus",
