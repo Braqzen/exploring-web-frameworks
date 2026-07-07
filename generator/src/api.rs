@@ -32,6 +32,7 @@ impl ApiManager {
     pub fn select(&self) -> (Provider, bool) {
         // TOD0: annoying post: bool return. This type should not have coupled functionality with the MethodManager
         //       it should only return (provider, url).
+        // TODO: randomise provider distribution similar to requests/operations
         // SAFETY: We hold exlusive access to apis and it's non-empty therefore cannot panic
         let (provider, state) = self.apis.iter().choose(&mut rng()).unwrap();
 
