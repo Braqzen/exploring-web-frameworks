@@ -1,11 +1,9 @@
-use crate::{
-    routes::{
-        errors::AppError,
-        filters::{chaos_filter, handle_rejection, log_filter, patched_body, task_body, task_id},
-        handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
-    },
-    state::AppState,
+use crate::routes::{
+    errors::AppError,
+    filters::{chaos_filter, handle_rejection, log_filter, patched_body, task_body, task_id},
+    handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
 };
+use app::state::AppState;
 use std::{
     convert::Infallible,
     sync::{Arc, Mutex},

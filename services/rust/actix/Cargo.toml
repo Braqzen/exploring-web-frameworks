@@ -5,9 +5,10 @@ edition = "2024"
 
 [dependencies]
 actix-web = { version = "4.14.0", default-features = false, features = ["macros"] }
+app.path = "../../../shared-code/rust/app"
 eyre = "0.6.12"
 rand = "0.10.1"
-rust-telemetry.path = "../../../shared-code/rust-telemetry"
+telemetry.path = "../../../shared-code/rust/telemetry"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 tracing = "0.1"

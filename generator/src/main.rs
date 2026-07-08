@@ -1,16 +1,16 @@
 mod api;
 mod client;
-mod config;
 mod method;
 mod operation;
-mod payload;
+mod payloads;
 mod provider;
 mod randomiser;
+mod settings;
 mod worker;
 
-use crate::{config::Config, worker::Worker};
+use crate::{settings::Config, worker::Worker};
 use eyre::Result;
-use rust_telemetry::{Telemetry, cleanup};
+use telemetry::{Telemetry, cleanup};
 
 #[tokio::main]
 async fn main() -> Result<()> {

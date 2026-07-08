@@ -1,8 +1,5 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppJson},
-    state::AppState,
-    task::Task,
-};
+use crate::routes::{errors::AppError, extractors::AppJson};
+use app::{state::AppState, task::Task};
 use poem::{
     Response,
     error::ResponseError,

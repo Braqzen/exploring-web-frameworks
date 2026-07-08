@@ -1,11 +1,9 @@
-use crate::{
-    routes::{
-        errors::AppError,
-        extractors::{AppJson, AppPath},
-        handlers::state,
-    },
-    task::PatchedTask,
+use crate::routes::{
+    errors::AppError,
+    extractors::{AppJson, AppPath},
+    handlers::state,
 };
+use app::task::PatchedTask;
 use salvo::{Depot, Response, Writer, http::StatusCode, writing::Json};
 use tracing::{error, info, instrument, warn};
 

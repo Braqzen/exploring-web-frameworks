@@ -1,14 +1,9 @@
-//! The payload sent to a provider.
-//!
-//! Operation is a pointless variable used to put/patch requests and use in dashboards.
-
-use crate::{operation::Operation, randomiser::Randomiser};
+use crate::{operation::Operation, payloads::payload::Payload, randomiser::Randomiser};
 use rand::{
     distr::{Alphanumeric, SampleString},
     rng,
     seq::IndexedRandom,
 };
-use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use tracing::error;
 
@@ -93,21 +88,5 @@ impl PayloadManager {
             .unwrap();
 
         operation.clone()
-    }
-}
-
-/// A payload sent to the server.
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Payload {
-    /// Arbitrary data to differentiate payloads.
-    pub secret: String,
-
-    /// The operation to perform on the payload.
-    pub operation: Operation,
-}
-
-impl Payload {
-    fn new(secret: String, operation: Operation) -> Self {
-        Self { secret, operation }
     }
 }

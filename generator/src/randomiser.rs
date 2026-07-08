@@ -1,4 +1,4 @@
-use crate::{config::ProviderName, method::Method, operation::Operation};
+use crate::{method::Method, operation::Operation, settings::ProviderName};
 use rand::{
     RngExt,
     distr::{Alphanumeric, SampleString},

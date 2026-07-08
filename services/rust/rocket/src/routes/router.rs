@@ -1,11 +1,9 @@
-use crate::{
-    routes::{
-        catchers::{internal_error, method_not_allowed, not_found, unprocessable},
-        fairings::LogFairing,
-        handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
-    },
-    state::AppState,
+use crate::routes::{
+    catchers::{internal_error, method_not_allowed, not_found, unprocessable},
+    fairings::LogFairing,
+    handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
 };
+use app::state::AppState;
 use rocket::{
     Build, Config, Rocket, catchers,
     data::{Limits, ToByteUnit},

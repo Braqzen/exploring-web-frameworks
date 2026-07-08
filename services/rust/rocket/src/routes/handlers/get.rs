@@ -1,7 +1,5 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppPath, guards::ChaosGuard},
-    state::AppState,
-};
+use crate::routes::{errors::AppError, extractors::AppPath, guards::ChaosGuard};
+use app::state::AppState;
 use rocket::{State, get, http::Status, serde::json::Json};
 use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};

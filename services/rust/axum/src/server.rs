@@ -1,4 +1,5 @@
-use crate::{routes::router, state::AppState};
+use crate::routes::router;
+use app::state::AppState;
 use axum::serve;
 use eyre::Result;
 use std::{

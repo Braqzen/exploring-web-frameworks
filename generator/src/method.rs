@@ -1,6 +1,6 @@
 use crate::{
-    config::{ProviderName, ProviderOptions},
     randomiser::Randomiser,
+    settings::{ProviderName, ProviderOptions},
 };
 use rand::{rng, seq::IndexedRandom};
 use std::{

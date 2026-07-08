@@ -1,12 +1,10 @@
 mod routes;
 mod server;
-mod state;
-mod task;
 
 use eyre::Result;
-use rust_telemetry::{Telemetry, cleanup};
 use server::Server;
 use std::{net::SocketAddr, str::FromStr};
+use telemetry::{Telemetry, cleanup};
 
 #[rocket::main]
 async fn main() -> Result<()> {

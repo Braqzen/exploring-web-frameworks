@@ -1,7 +1,5 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppPath},
-    state::AppState,
-};
+use crate::routes::{errors::AppError, extractors::AppPath};
+use app::state::AppState;
 use poem::{IntoResponse, Response, error::ResponseError, http::StatusCode, web::Data};
 use std::sync::{Arc, Mutex};
 use tracing::{error, info, instrument, warn};

@@ -1,4 +1,5 @@
-use crate::{routes::errors::AppError, state::AppState, task::PatchedTask};
+use crate::routes::errors::AppError;
+use app::{state::AppState, task::PatchedTask};
 use std::{
     convert::Infallible,
     sync::{Arc, Mutex},

@@ -1,11 +1,9 @@
-use crate::{
-    routes::{
-        middleware::{chaos_middleware, log_middleware},
-        router,
-    },
-    state::AppState,
+use crate::routes::{
+    middleware::{chaos_middleware, log_middleware},
+    router,
 };
 use actix_web::{App, HttpServer, middleware::from_fn, web::Data};
+use app::state::AppState;
 use eyre::Result;
 use std::{
     net::SocketAddr,
