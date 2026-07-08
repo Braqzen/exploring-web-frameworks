@@ -1,8 +1,6 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppPath},
-    state::AppState,
-};
+use crate::routes::{errors::AppError, extractors::AppPath};
 use actix_web::{HttpResponse, ResponseError, web::Data};
+use app::state::AppState;
 use std::sync::Mutex;
 use tracing::{error, info, instrument, warn};
 

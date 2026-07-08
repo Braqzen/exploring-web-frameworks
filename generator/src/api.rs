@@ -1,7 +1,7 @@
 use crate::{
-    config::{Language, ProviderName, ProviderOptions},
-    payload::Payload,
+    payloads::Payload,
     provider::Provider,
+    settings::{Language, ProviderName, ProviderOptions},
 };
 use rand::{rng, seq::IteratorRandom};
 use std::collections::HashMap;

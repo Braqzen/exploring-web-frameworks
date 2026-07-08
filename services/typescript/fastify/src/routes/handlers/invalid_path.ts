@@ -3,7 +3,9 @@ import { AppErrors, sendError } from "../errors.js";
 import { getLogger } from "../../logger.js";
 
 export const invalidPathHandler: RouteHandler = (request, reply) => {
-  const logger = getLogger();
-  logger.warn({ method: request.method, path: request.url }, "Invalid path");
+  getLogger().warn(
+    { method: request.method, path: request.url },
+    "Invalid path"
+  );
   sendError(reply, AppErrors.InvalidPath);
 };

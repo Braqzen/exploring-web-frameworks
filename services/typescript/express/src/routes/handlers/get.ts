@@ -1,14 +1,13 @@
 import type { Request, RequestHandler, Response } from "express";
-import { z } from "zod";
-import type { State } from "../../state.js";
 import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
+import { parseId, type State } from "app";
 
 export function getHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
     const logger = getLogger();
 
-    const id = z.uuidv4().safeParse(req.params.id);
+    const id = parseId(req.params.id);
     if (!id.success) {
       logger.warn({ method: req.method, path: req.path }, "Invalid path");
       return sendError(res, AppErrors.InvalidPath);

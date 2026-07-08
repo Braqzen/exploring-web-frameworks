@@ -2,10 +2,11 @@ FROM node:26-slim AS builder
 ARG SERVICE
 WORKDIR /app
 COPY services/typescript/${SERVICE} .
-COPY shared-code/typescript-telemetry ./shared-code/typescript-telemetry
+COPY shared-code/typescript /shared-code/typescript
 RUN npm install -g pnpm@11.5.1
-RUN cd ./shared-code/typescript-telemetry && pnpm install && pnpm build
-RUN pnpm add typescript-telemetry@file:./shared-code/typescript-telemetry
+RUN cd /shared-code/typescript/telemetry && pnpm install && pnpm build
+RUN cd /shared-code/typescript/app && pnpm install && pnpm build
+RUN pnpm install
 RUN pnpm build
 RUN pnpm prune --production
 

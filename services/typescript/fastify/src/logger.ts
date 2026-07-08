@@ -1,4 +1,4 @@
-import { createLogger, type Logger } from "typescript-telemetry";
+import { createLogger, type Logger } from "telemetry";
 
 let logger: Logger | undefined;
 

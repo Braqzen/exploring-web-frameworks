@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "fastify": "5.9.0",
-    "typescript-telemetry": "file:../../../shared-code/typescript-telemetry",
-    "zod": "4.4.3"
+    "app": "file:../../../shared-code/typescript/app",
+    "telemetry": "file:../../../shared-code/typescript/telemetry"
   }
 }

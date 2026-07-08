@@ -1,4 +1,9 @@
-use crate::method::Method;
+//! Public API for handling the config
+
+use crate::{
+    methods::Method,
+    settings::json::{ApiJson, ConfigJson},
+};
 use eyre::Result;
 use serde::Deserialize;
 
@@ -29,12 +34,7 @@ impl Config {
                 continue;
             }
 
-            api.push(ProviderOptions {
-                provider: provider.provider,
-                language: provider.language,
-                url: provider.url,
-                methods,
-            });
+            api.push(ProviderOptions::new(provider, methods));
         }
 
         if api.is_empty() {
@@ -65,6 +65,17 @@ pub struct ProviderOptions {
     pub language: Language,
     pub url: String,
     pub methods: Vec<Method>,
+}
+
+impl ProviderOptions {
+    fn new(provider: ApiJson, methods: Vec<Method>) -> Self {
+        Self {
+            provider: provider.provider,
+            language: provider.language,
+            url: provider.url,
+            methods,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, PartialEq, Eq, Hash, Clone)]
@@ -110,55 +121,5 @@ impl ToString for Language {
             Self::Rust => "rust".to_string(),
             Self::Typescript => "typescript".to_string(),
         }
-    }
-}
-
-#[derive(Debug, Deserialize)]
-struct ConfigJson {
-    /// Which Providers to send load to
-    api: Vec<ApiJson>,
-    /// How long to sleep between each request (miliseconds)
-    sleep: u64,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-struct ApiJson {
-    /// Name to identify the provider
-    provider: ProviderName,
-    /// Programming language
-    language: Language,
-    /// URL to send requests to
-    url: String,
-    /// Whether the provider is loaded into the worker
-    enabled: bool,
-    /// Methods to send requests to
-    methods: MethodsJson,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "UPPERCASE")]
-struct MethodsJson {
-    get: bool,
-    post: bool,
-    put: bool,
-    delete: bool,
-    patch: bool,
-    head: bool,
-}
-
-impl MethodsJson {
-    fn enabled(&self) -> Vec<Method> {
-        [
-            (self.get, Method::Get),
-            (self.post, Method::Post),
-            (self.put, Method::Put),
-            (self.delete, Method::Delete),
-            (self.patch, Method::Patch),
-            (self.head, Method::Head),
-        ]
-        .into_iter()
-        .filter(|(on, _)| *on)
-        .map(|(_, method)| method)
-        .collect()
     }
 }

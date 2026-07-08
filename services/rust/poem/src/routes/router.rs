@@ -1,13 +1,11 @@
-use crate::{
-    routes::{
-        handlers::{
-            delete_handler, get_handler, invalid_method_handler, invalid_path_handler,
-            patch_handler, post_handler, put_handler,
-        },
-        middleware::{chaos_middleware, log_middleware},
+use crate::routes::{
+    handlers::{
+        delete_handler, get_handler, invalid_method_handler, invalid_path_handler, patch_handler,
+        post_handler, put_handler,
     },
-    state::AppState,
+    middleware::{chaos_middleware, log_middleware},
 };
+use app::state::AppState;
 use poem::{EndpointExt, IntoEndpoint, Middleware, Route, get, middleware::SizeLimit, post};
 use std::sync::{Arc, Mutex};
 

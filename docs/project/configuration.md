@@ -5,6 +5,7 @@ You may edit the generator's [config](../generator/config.json) to specify which
 The generator is made to crash when
 
 - All frameworks are disabled
-- A framework is enabled but all of its methods are disabled
+
+> Note: Disabling all HTTP methods on a provider treats it as disabled
 
 After changing the config you must rebuild the generator image.

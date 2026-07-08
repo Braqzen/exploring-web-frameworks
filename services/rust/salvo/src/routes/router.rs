@@ -1,10 +1,8 @@
-use crate::{
-    routes::{
-        handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
-        middleware::{chaos_middleware, log_middleware},
-    },
-    state::AppState,
+use crate::routes::{
+    handlers::{delete_handler, get_handler, patch_handler, post_handler, put_handler},
+    middleware::{chaos_middleware, log_middleware},
 };
+use app::state::AppState;
 use salvo::{Router, affix_state::inject, size_limiter::max_size};
 use std::sync::{Arc, Mutex};
 

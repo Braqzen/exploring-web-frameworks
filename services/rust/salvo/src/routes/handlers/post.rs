@@ -1,7 +1,5 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppJson, handlers::state},
-    task::Task,
-};
+use crate::routes::{errors::AppError, extractors::AppJson, handlers::state};
+use app::task::Task;
 use salvo::{Depot, Response, Writer, http::StatusCode, writing::Json};
 use serde_json::json;
 use tracing::{error, info, instrument};

@@ -1,15 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-/// A payload sent to the server.
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Task {
-    /// Arbitrary data to differentiate payloads.
-    pub secret: String,
-
-    /// The operation to perform on the payload.
-    pub operation: Operation,
-}
-
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum Operation {
     Compute,
@@ -41,9 +31,4 @@ impl ToString for Operation {
             Operation::Transform => "transform".to_string(),
         }
     }
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct PatchedTask {
-    pub operation: Operation,
 }

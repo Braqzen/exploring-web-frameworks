@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
-import type { Telemetry } from "typescript-telemetry";
+import type { Telemetry } from "telemetry";
 import { getLogger } from "./logger.js";
 
 export function startServer(

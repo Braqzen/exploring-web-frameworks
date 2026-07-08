@@ -1,15 +1,14 @@
 import { type Request, type RequestHandler, type Response } from "express";
 import { randomUUID } from "node:crypto";
-import { type State } from "../../state.js";
-import { Task } from "../../task.js";
 import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
+import { parseTask, type State } from "app";
 
 export function postHandler(state: State): RequestHandler {
   return (req: Request, res: Response) => {
     const logger = getLogger();
 
-    let task = Task.safeParse(req.body);
+    let task = parseTask(req.body);
     if (!task.success) {
       logger.warn({ method: req.method, path: req.path }, "Invalid body JSON");
       return sendError(res, AppErrors.InvalidJsonBody);

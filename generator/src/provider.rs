@@ -1,4 +1,4 @@
-use crate::config::{Language, ProviderName};
+use crate::settings::{Language, ProviderName};
 
 pub struct Provider {
     name: ProviderName,

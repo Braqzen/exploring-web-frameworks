@@ -1,12 +1,12 @@
 use crate::{
     api::ApiManager,
     client::Client,
-    config::Config,
-    method::{Method, MethodManager},
+    methods::{Method, MethodManager},
     operation::Operation,
-    payload::{Payload, PayloadManager},
+    payloads::{Payload, PayloadManager},
     provider::Provider,
     randomiser::Randomiser,
+    settings::Config,
 };
 use eyre::Result;
 use opentelemetry::{KeyValue, global, metrics::UpDownCounter};

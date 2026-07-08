@@ -1,7 +1,7 @@
 import { createApp } from "./app.js";
 import { startServer } from "./server.js";
-import { type State } from "./state.js";
-import { initTelemetry } from "typescript-telemetry";
+import { createState, type State } from "app";
+import { initTelemetry } from "telemetry";
 import { initLogger } from "./logger.js";
 
 function main(): void {
@@ -16,9 +16,7 @@ function main(): void {
   const telemetry = initTelemetry(service);
   initLogger(service);
 
-  const state: State = {
-    tasks: new Map()
-  };
+  const state: State = createState();
 
   startServer(telemetry, createApp(state), parseInt(port));
 }

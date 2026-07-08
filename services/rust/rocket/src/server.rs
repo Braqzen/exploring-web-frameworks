@@ -1,4 +1,5 @@
-use crate::{routes::router, state::AppState};
+use crate::routes::router;
+use app::state::AppState;
 use eyre::Result;
 use rocket::Config;
 use std::{

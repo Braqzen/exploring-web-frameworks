@@ -1,4 +1,4 @@
-import type { PatchedTask, Task } from "../task.js";
+import type { PatchedTask, Task } from "app";
 
 export type IdParams = {
   Params: { id: string };

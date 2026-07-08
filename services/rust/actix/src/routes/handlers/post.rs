@@ -1,9 +1,6 @@
-use crate::{
-    routes::{errors::AppError, extractors::AppJson},
-    state::AppState,
-    task::Task,
-};
+use crate::routes::{errors::AppError, extractors::AppJson};
 use actix_web::{HttpResponse, ResponseError, web::Data};
+use app::{state::AppState, task::Task};
 use serde_json::json;
 use std::sync::Mutex;
 use tracing::{error, info, instrument};

@@ -1,7 +1,5 @@
 import type { RouteHandler } from "fastify";
-import { z } from "zod";
-import type { State } from "../../state.js";
-import { PatchedTask } from "../../task.js";
+import { type State, parseId, parsePatchedTask } from "app";
 import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
 import type { PatchRoute } from "../types.js";
@@ -10,7 +8,7 @@ export function patchHandler(state: State): RouteHandler<PatchRoute> {
   return async (request, reply) => {
     const logger = getLogger();
 
-    const id = z.uuidv4().safeParse(request.params.id);
+    const id = parseId(request.params.id);
     if (!id.success) {
       logger.warn(
         { method: request.method, path: request.url },
@@ -19,7 +17,7 @@ export function patchHandler(state: State): RouteHandler<PatchRoute> {
       return sendError(reply, AppErrors.InvalidPath);
     }
 
-    const patchedTask = PatchedTask.safeParse(request.body);
+    const patchedTask = parsePatchedTask(request.body);
     if (!patchedTask.success) {
       logger.warn(
         { method: request.method, path: request.url },

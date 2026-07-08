@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
-import type { State } from "./state.js";
+import type { State } from "app";
 import { registerRoutes } from "./routes/router.js";
 import { invalidPathHandler, errorHandler } from "./routes/handlers/index.js";
 import { chaosMiddleware, logMiddleware } from "./routes/middleware/index.js";

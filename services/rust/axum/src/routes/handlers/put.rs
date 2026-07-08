@@ -1,11 +1,8 @@
-use crate::{
-    routes::{
-        errors::AppError,
-        extractors::{AppJson, AppPath},
-    },
-    state::AppState,
-    task::Task,
+use crate::routes::{
+    errors::AppError,
+    extractors::{AppJson, AppPath},
 };
+use app::{state::AppState, task::Task};
 use axum::{
     extract::{Json, State},
     response::{IntoResponse, Response},

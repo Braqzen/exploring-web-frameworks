@@ -1,7 +1,5 @@
-use crate::{
-    routes::errors::AppError,
-    task::{PatchedTask, Task},
-};
+use crate::routes::errors::AppError;
+use app::task::{PatchedTask, Task};
 use serde::de::DeserializeOwned;
 use tracing::{instrument, warn};
 use uuid::Uuid;

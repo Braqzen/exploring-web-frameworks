@@ -1,6 +1,6 @@
 //! The client is used to send payload requests to the server.
 
-use crate::{operation::Operation, payload::Payload, provider::Provider};
+use crate::{operation::Operation, payloads::Payload, provider::Provider};
 use eyre::Result;
 use opentelemetry::{
     KeyValue, global,

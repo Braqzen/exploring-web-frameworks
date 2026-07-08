@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import type { State } from "../state.js";
+import type { State } from "app";
 import {
   getHandler,
   postHandler,

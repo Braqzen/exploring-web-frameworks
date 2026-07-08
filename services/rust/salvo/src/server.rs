@@ -1,7 +1,5 @@
-use crate::{
-    routes::{invalid_method_handler, invalid_path_handler, router},
-    state::AppState,
-};
+use crate::routes::{invalid_method_handler, invalid_path_handler, router};
+use app::state::AppState;
 use eyre::Result;
 use salvo::{Listener, Server as SalvoServer, Service, catcher::Catcher, prelude::TcpListener};
 use std::{
