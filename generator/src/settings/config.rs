@@ -90,6 +90,7 @@ pub enum ProviderName {
     Express,
     Fastify,
     Hono,
+    Koa,
 }
 
 impl ToString for ProviderName {
@@ -104,6 +105,7 @@ impl ToString for ProviderName {
             Self::Express => "express".to_string(),
             Self::Fastify => "fastify".to_string(),
             Self::Hono => "hono".to_string(),
+            Self::Koa => "koa".to_string(),
         }
     }
 }
