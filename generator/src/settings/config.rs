@@ -1,7 +1,7 @@
 //! Public API for handling the config
 
 use crate::{
-    method::Method,
+    methods::Method,
     settings::json::{ApiJson, ConfigJson},
 };
 use eyre::Result;

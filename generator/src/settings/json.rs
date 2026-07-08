@@ -1,7 +1,7 @@
 //! Private types for how the config handles file parsing
 
 use crate::{
-    method::Method,
+    methods::Method,
     settings::{Language, ProviderName},
 };
 use serde::Deserialize;

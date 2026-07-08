@@ -1,7 +1,7 @@
 use crate::{
     api::ApiManager,
     client::Client,
-    method::{Method, MethodManager},
+    methods::{Method, MethodManager},
     operation::Operation,
     payloads::{Payload, PayloadManager},
     provider::Provider,

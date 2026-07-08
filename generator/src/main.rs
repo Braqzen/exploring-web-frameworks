@@ -1,6 +1,6 @@
 mod api;
 mod client;
-mod method;
+mod methods;
 mod operation;
 mod payloads;
 mod provider;
