@@ -1,6 +1,6 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { registerRoutes } from "./routes/router.js";
-import type { State } from "./state.js";
+import type { State } from "app";
 import { errorHandler, invalidPathHandler } from "./routes/handlers/index.js";
 import { chaosHook, logHook } from "./routes/hooks/index.js";
 

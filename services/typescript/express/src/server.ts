@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import type { Server } from "node:http";
-import type { Telemetry } from "typescript-telemetry";
+import type { Telemetry } from "telemetry";
 import { getLogger } from "./logger.js";
 
 export function startServer(

@@ -1,6 +1,6 @@
 import express from "express";
 import type { Express } from "express";
-import type { State } from "./state.js";
+import type { State } from "app";
 import { registerRoutes } from "./routes/router.js";
 import { invalidPathHandler } from "./routes/handlers/index.js";
 import {

@@ -1,7 +1,6 @@
 import type { Context } from "hono";
+import { type State, parseTask } from "app";
 import { randomUUID } from "node:crypto";
-import { type State } from "../../state.js";
-import { Task } from "../../task.js";
 import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
 
@@ -10,7 +9,7 @@ export function postHandler(state: State) {
     const logger = getLogger();
 
     const body = await c.req.json();
-    let task = Task.safeParse(body);
+    let task = parseTask(body);
     if (!task.success) {
       logger.warn(
         { method: c.req.method, path: c.req.path },

@@ -24,8 +24,8 @@
   },
   "dependencies": {
     "@hono/node-server": "2.0.6",
+    "app": "file:../../../shared-code/typescript/app",
     "hono": "4.12.27",
-    "typescript-telemetry": "file:../../../shared-code/typescript-telemetry",
-    "zod": "4.4.3"
+    "telemetry": "file:../../../shared-code/typescript/telemetry"
   }
 }

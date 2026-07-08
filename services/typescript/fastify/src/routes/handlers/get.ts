@@ -1,6 +1,5 @@
 import type { RouteHandler } from "fastify";
-import { z } from "zod";
-import type { State } from "../../state.js";
+import { type State, parseId } from "app";
 import { getLogger } from "../../logger.js";
 import { AppErrors, sendError } from "../errors.js";
 import type { GetRoute } from "../types.js";
@@ -9,7 +8,7 @@ export function getHandler(state: State): RouteHandler<GetRoute> {
   return async (request, reply) => {
     const logger = getLogger();
 
-    const id = z.uuidv4().safeParse(request.params.id);
+    const id = parseId(request.params.id);
     if (!id.success) {
       logger.warn(
         { method: request.method, path: request.url },

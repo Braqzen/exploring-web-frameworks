@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import type { State } from "../state.js";
+import type { State } from "app";
 import {
   postHandler,
   getHandler,

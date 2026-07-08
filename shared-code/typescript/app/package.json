@@ -1,11 +1,11 @@
 {
-  "name": "fastify",
+  "name": "app",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -18,13 +18,16 @@
     }
   },
   "type": "module",
+  "dependencies": {
+    "zod": "4.4.3"
+  },
   "devDependencies": {
-    "@types/node": "26.0.1",
     "typescript": "6.0.3"
   },
-  "dependencies": {
-    "fastify": "5.9.0",
-    "app": "file:../../../shared-code/typescript/app",
-    "telemetry": "file:../../../shared-code/typescript/telemetry"
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js"
+    }
   }
 }
