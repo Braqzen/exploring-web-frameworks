@@ -1,7 +1,7 @@
 import type { RouteHandler } from "fastify";
 import { randomUUID } from "node:crypto";
 import { type State, parseTask } from "app";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "../errors.js";
 import type { PostRoute } from "../types.js";
 

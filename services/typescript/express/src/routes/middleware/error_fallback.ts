@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler } from "express";
 import { AppErrors, sendError } from "../errors.js";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   if (res.headersSent) {

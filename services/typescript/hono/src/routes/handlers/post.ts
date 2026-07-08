@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { type State, parseTask } from "app";
 import { randomUUID } from "node:crypto";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "../errors.js";
 
 export function postHandler(state: State) {

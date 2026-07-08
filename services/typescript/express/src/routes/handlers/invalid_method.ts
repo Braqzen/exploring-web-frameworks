@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { AppErrors, sendError } from "../errors.js";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const invalidMethodHandler: RequestHandler = (req, res) => {
   const logger = getLogger();

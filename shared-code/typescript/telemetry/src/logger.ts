@@ -3,13 +3,21 @@ import type pino from "pino";
 
 const require = createRequire(import.meta.url);
 
-export function createLogger(serviceName: string): pino.Logger {
+let logger: pino.Logger | undefined;
+
+export function initLogger(serviceName: string): void {
   const pino = require("pino") as typeof import("pino");
 
-  return pino({
+  logger = pino({
     name: serviceName,
     level: process.env.LOG_LEVEL ?? "info"
   });
 }
 
-export type Logger = ReturnType<typeof createLogger>;
+export function getLogger(): pino.Logger {
+  if (!logger) {
+    throw new Error("Logger is not initialized");
+  }
+
+  return logger;
+}
