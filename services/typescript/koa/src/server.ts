@@ -1,12 +1,12 @@
-import type { Hono } from "hono";
-import { serve, type ServerType } from "@hono/node-server";
+import Koa from "koa";
+import type { Server } from "http";
 import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,
-  app: Hono,
+  app: Koa,
   port: number
-): ServerType {
+): Server {
   const logger = getLogger();
 
   logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
@@ -38,12 +38,9 @@ export function startServer(
     process.exit(0);
   };
 
-  const server = serve(
-    { fetch: app.fetch, port, hostname: "0.0.0.0" },
-    (info) => {
-      logger.info(`Server is running on port ${info.port}`);
-    }
-  );
+  const server = app.listen({ port, hostname: "0.0.0.0" }, () => {
+    logger.info(`Server is running on port ${port}`);
+  });
 
   server.on("error", (err) => {
     logger.error({ err }, "Failed to start server");

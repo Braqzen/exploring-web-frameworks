@@ -60,3 +60,7 @@ Telemetry captures warnings and errors however no alerts will be integrated.
 ### Cloud Infrastructure
 
 The project is intended to run locally and thus no cloud infra configuration/deployment/3rd party services will be added.
+
+### Misc Services
+
+There will be no queues/brokers/background workers or anything beyond the web-frameworks.
