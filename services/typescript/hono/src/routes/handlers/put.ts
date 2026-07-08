@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { type State, parseTask, parseId } from "app";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "../errors.js";
 
 export function putHandler(state: State) {

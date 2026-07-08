@@ -1,6 +1,6 @@
 import type { RouteHandler } from "fastify";
 import { AppErrors, sendError } from "../errors.js";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const invalidPathHandler: RouteHandler = (request, reply) => {
   getLogger().warn(

@@ -1,6 +1,6 @@
 import { type Request, type RequestHandler, type Response } from "express";
 import { randomUUID } from "node:crypto";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "../errors.js";
 import { parseTask, type State } from "app";
 

@@ -1,6 +1,6 @@
 import type { ErrorHandler } from "hono";
 import { AppErrors, sendError } from "../errors.js";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const errorHandler: ErrorHandler = (err, c) => {
   const logger = getLogger();

@@ -1,5 +1,5 @@
 import type { Context, MiddlewareHandler, Next } from "hono";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const logMiddleware: MiddlewareHandler = (c: Context, next: Next) => {
   let method = c.req.method;

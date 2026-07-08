@@ -1,7 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { Server } from "node:http";
-import type { Telemetry } from "telemetry";
-import { getLogger } from "./logger.js";
+import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,

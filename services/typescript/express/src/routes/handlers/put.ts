@@ -1,5 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "../errors.js";
 import { parseId, parseTask, type State } from "app";
 

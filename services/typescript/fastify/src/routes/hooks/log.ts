@@ -1,5 +1,5 @@
 import type { onRequestAsyncHookHandler } from "fastify";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const logHook: onRequestAsyncHookHandler = async (request, _reply) => {
   const logger = getLogger();

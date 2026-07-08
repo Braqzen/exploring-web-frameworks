@@ -1,6 +1,6 @@
 import type { Handler } from "hono";
 import { AppErrors, sendError } from "../errors.js";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const invalidMethodHandler: Handler = (c) => {
   getLogger().warn(

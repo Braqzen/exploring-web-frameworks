@@ -4,7 +4,7 @@ import type { State } from "app";
 import { registerRoutes } from "./routes/router.js";
 import { invalidPathHandler, errorHandler } from "./routes/handlers/index.js";
 import { chaosMiddleware, logMiddleware } from "./routes/middleware/index.js";
-import { getLogger } from "./logger.js";
+import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "./routes/errors.js";
 
 export function createApp(state: State): Hono {

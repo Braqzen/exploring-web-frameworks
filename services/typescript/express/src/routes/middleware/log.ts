@@ -1,5 +1,5 @@
 import type { RequestHandler, Request, Response, NextFunction } from "express";
-import { getLogger } from "../../logger.js";
+import { getLogger } from "telemetry";
 
 export const logMiddleware: RequestHandler = (
   req: Request,

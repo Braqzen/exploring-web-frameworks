@@ -1,8 +1,7 @@
 import { type State, createState } from "app";
-import { initTelemetry } from "telemetry";
+import { initTelemetry, initLogger } from "telemetry";
 import { createApp } from "./app.js";
 import { startServer } from "./server.js";
-import { initLogger } from "./logger.js";
 
 function main(): void {
   const port = process.env.PORT;
