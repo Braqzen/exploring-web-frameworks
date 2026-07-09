@@ -5,7 +5,7 @@ The following table shows the frameworks that are implemented in the project
 | Language   | Framework                              |
 | ---------- | -------------------------------------- |
 | Rust       | Axum, Poem, Actix, Salvo, Warp, Rocket |
-| Typescript | Express, Fastify, Hono, Koa            |
+| Typescript | Express, Fastify, Hono, Koa, Elyisa    |
 | Go         |                                        |
 | Zig        |                                        |
 | C++        |                                        |
@@ -18,13 +18,12 @@ The following table shows the frameworks that are implemented in the project
 
 The following table lists languages and frameworks to potentially add to the project
 
-| Language   | Framework                                                |
-| ---------- | -------------------------------------------------------- |
-| Typescript | elyisa                                                   |
-| Go         | gin, chi, echo, fiber, std/net                           |
-| Zig        | zap, http.zig                                            |
-| C++        | drogon, crow, boost-beast, pistache, Restinio, CppCMS    |
-| Python     | fastapi, django, flask, starlette, sanic, quart, tornado |
-| Odin       |                                                          |
-| Nim        |                                                          |
-| Elixir     |                                                          |
+| Language | Framework                                                |
+| -------- | -------------------------------------------------------- |
+| Go       | gin, chi, echo, fiber, std/net                           |
+| Zig      | zap, http.zig                                            |
+| C++      | drogon, crow, boost-beast, pistache, Restinio, CppCMS    |
+| Python   | fastapi, django, flask, starlette, sanic, quart, tornado |
+| Odin     |                                                          |
+| Nim      |                                                          |
+| Elixir   |                                                          |

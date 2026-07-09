@@ -1,0 +1,3 @@
+allowBuilds:
+  "@datadog/pprof": true
+  protobufjs: true
