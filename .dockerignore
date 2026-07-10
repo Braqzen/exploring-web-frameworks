@@ -7,3 +7,7 @@
 **/node_modules
 **/dist
 **/pnpm-lock.yaml
+
+# PYTHON
+**/.venv
+**/__pycache__

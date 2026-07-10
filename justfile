@@ -2,11 +2,12 @@
 default: build-generator build-apis
 
 # Shorthand to build all the APIs
-build-apis: build-rust-apis build-typescript-apis
+build-apis: build-rust-apis build-typescript-apis build-python-apis
 
 # Shorthand to build the APIs per language
 build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 build-typescript-apis: build-express build-fastify build-hono build-koa build-elysia
+build-python-apis: build-flask
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
@@ -57,6 +58,11 @@ build-koa:
 build-elysia:
 	docker rmi servers-elysia:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl elysia
+
+# Python APIs
+build-flask:
+	docker rmi servers-flask:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl flask
 
 # Docker Compose Commands
 run:

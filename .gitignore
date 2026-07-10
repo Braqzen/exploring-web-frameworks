@@ -2,9 +2,14 @@
 
 # Rust
 target
-*.lock
+Cargo.lock
 
 # Node
 pnpm-lock.yaml
 node_modules
 dist
+
+# Python
+.venv
+uv.lock
+__pycache__

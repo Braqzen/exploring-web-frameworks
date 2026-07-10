@@ -92,6 +92,7 @@ pub enum ProviderName {
     Hono,
     Koa,
     Elysia,
+    Flask,
 }
 
 impl ToString for ProviderName {
@@ -108,6 +109,7 @@ impl ToString for ProviderName {
             Self::Hono => "hono".to_string(),
             Self::Koa => "koa".to_string(),
             Self::Elysia => "elysia".to_string(),
+            Self::Flask => "flask".to_string(),
         }
     }
 }
@@ -117,6 +119,7 @@ impl ToString for ProviderName {
 pub enum Language {
     Rust,
     Typescript,
+    Python,
 }
 
 impl ToString for Language {
@@ -124,6 +127,7 @@ impl ToString for Language {
         match self {
             Self::Rust => "rust".to_string(),
             Self::Typescript => "typescript".to_string(),
+            Self::Python => "python".to_string(),
         }
     }
 }
