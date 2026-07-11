@@ -12,6 +12,8 @@ def start_server(app: Flask, host: str, port: int) -> None:
         {
             "bind": f"{host}:{port}",
             "workers": 1,
+            "worker_class": "gevent",
+            "worker_connections": 1000,
             "accesslog": None,
             "errorlog": "/dev/null",
         },

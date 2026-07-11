@@ -1,5 +1,8 @@
 from flask import request
+import structlog
 
 
 def log_middleware():
-    pass
+    logger = structlog.get_logger()
+
+    logger.debug("Incoming request", method=request.method, path=request.path)
