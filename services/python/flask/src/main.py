@@ -2,20 +2,19 @@ from gevent import monkey
 
 monkey.patch_all()
 
-from flask import Flask
 from os import environ
-from application import create_app
-from server import start_server
-from telemetry.telemetry import init_telemetry
+from telemetry import Telemetry
+from server import Server
+
 
 if __name__ == "__main__":
     log_level = environ.get("LOG_LEVEL", "info")
-
-    provider = init_telemetry("flask", log_level)
-
     socket = environ["SOCKET"]
     host, _, port = socket.partition(":")
 
-    app: Flask = create_app()
+    telemetry = Telemetry("flask", log_level)
+    telemetry.start()
 
-    start_server(app, host, int(port), provider)
+    server = Server(host, int(port))
+    # TODO: passing in telemetry is a bad abstraction, but it doesn't make sense in init
+    server.run(telemetry)

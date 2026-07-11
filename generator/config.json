@@ -4,7 +4,7 @@
       "provider": "axum",
       "language": "rust",
       "url": "http://rust-axum:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -18,7 +18,7 @@
       "provider": "actix",
       "language": "rust",
       "url": "http://rust-actix:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -32,7 +32,7 @@
       "provider": "warp",
       "language": "rust",
       "url": "http://rust-warp:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -46,7 +46,7 @@
       "provider": "rocket",
       "language": "rust",
       "url": "http://rust-rocket:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -60,7 +60,7 @@
       "provider": "poem",
       "language": "rust",
       "url": "http://rust-poem:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -74,7 +74,7 @@
       "provider": "salvo",
       "language": "rust",
       "url": "http://rust-salvo:8000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -88,7 +88,7 @@
       "provider": "express",
       "language": "typescript",
       "url": "http://typescript-express:3000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -102,7 +102,7 @@
       "provider": "fastify",
       "language": "typescript",
       "url": "http://typescript-fastify:3000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -116,7 +116,7 @@
       "provider": "hono",
       "language": "typescript",
       "url": "http://typescript-hono:3000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -130,7 +130,7 @@
       "provider": "koa",
       "language": "typescript",
       "url": "http://typescript-koa:3000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,
@@ -144,7 +144,7 @@
       "provider": "elysia",
       "language": "typescript",
       "url": "http://typescript-elysia:3000",
-      "enabled": false,
+      "enabled": true,
       "methods": {
         "GET": true,
         "POST": true,

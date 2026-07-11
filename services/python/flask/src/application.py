@@ -9,7 +9,6 @@ from routes.handlers import (
     internal_error_handler,
 )
 
-
 # TODO: make configurable?
 MAX_BODY_SIZE = 64 * 1024
 
