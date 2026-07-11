@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from uuid import UUID
-from task import Task
+from .task import Task
 
 
 @dataclass

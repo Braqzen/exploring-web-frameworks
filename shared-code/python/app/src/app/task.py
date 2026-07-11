@@ -1,5 +1,5 @@
-from operation import Operation
 from pydantic import BaseModel
+from .operation import Operation
 
 
 class Task(BaseModel):

@@ -1,20 +1,19 @@
-from flask import current_app, jsonify
-from pydantic import TypeAdapter, ValidationError
-from pydantic.types import UUID4
-from state import AppState
+from flask import current_app
+from pydantic import ValidationError
+from app.state import AppState
+from app.params import parse_id
+from routes.errors import send_error, AppErrors
 
 
-def delete_handler(id):
+def delete_handler(id: str):
     try:
-        task_id = TypeAdapter(UUID4).validate_python(id)
+        task_id = parse_id(id)
     except ValidationError:
-        return jsonify({"error": "Invalid path"}), 404
+        return send_error(AppErrors.InvalidPath)
 
     state: AppState = current_app.extensions["state"]
 
-    task = state.tasks.pop(task_id, None)
-
-    if task is None:
-        return jsonify({"error": "Task not found"}), 404
+    if state.tasks.pop(task_id, None) is None:
+        return send_error(AppErrors.TaskNotFound)
 
     return "", 204

@@ -1,21 +1,21 @@
 from flask import current_app, jsonify, request
 from uuid import uuid4
 from pydantic import ValidationError
-from task import Task
-from state import AppState
+from app.task import Task
+from app.state import AppState
+from routes.errors import send_error, AppErrors
 
 
 def post_handler():
-
     body = request.get_json(silent=True)
 
     if body is None:
-        return jsonify({"error": "Invalid body JSON"}), 422
+        return send_error(AppErrors.InvalidJsonBody)
 
     try:
         task = Task.model_validate(body)
     except ValidationError:
-        return jsonify({"error": "Invalid body JSON"}), 422
+        return send_error(AppErrors.InvalidJsonBody)
 
     id = uuid4()
 

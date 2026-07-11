@@ -1,6 +1,6 @@
 from routes.router import register_routes, bp
 from flask import Flask
-from state import AppState
+from app.state import AppState
 
 
 # TODO: make configurable?
