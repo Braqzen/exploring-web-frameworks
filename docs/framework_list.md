@@ -9,7 +9,7 @@ The following table shows the frameworks that are implemented in the project
 | Go         |                                        |
 | Zig        |                                        |
 | C++        |                                        |
-| Python     |                                        |
+| Python     | Flask                                  |
 | Odin       |                                        |
 | Nim        |                                        |
 | Elixir     |                                        |
@@ -18,12 +18,12 @@ The following table shows the frameworks that are implemented in the project
 
 The following table lists languages and frameworks to potentially add to the project
 
-| Language | Framework                                                |
-| -------- | -------------------------------------------------------- |
-| Go       | gin, chi, echo, fiber, std/net                           |
-| Zig      | zap, http.zig                                            |
-| C++      | drogon, crow, boost-beast, pistache, Restinio, CppCMS    |
-| Python   | fastapi, django, flask, starlette, sanic, quart, tornado |
-| Odin     |                                                          |
-| Nim      |                                                          |
-| Elixir   |                                                          |
+| Language | Framework                                             |
+| -------- | ----------------------------------------------------- |
+| Go       | gin, chi, echo, fiber, std/net                        |
+| Zig      | zap, http.zig                                         |
+| C++      | drogon, crow, boost-beast, pistache, Restinio, CppCMS |
+| Python   | fastapi, django, starlette, sanic, quart, tornado     |
+| Odin     |                                                       |
+| Nim      |                                                       |
+| Elixir   |                                                       |

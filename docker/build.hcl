@@ -25,3 +25,14 @@ target "typescript-services" {
   tags       = ["servers-${service}:latest"]
   args       = { SERVICE = service }
 }
+
+target "python-services" {
+  matrix = {
+    service = ["flask"]
+  }
+  name = service
+  context    = "."
+  dockerfile = "docker/Dockerfile.python-services"
+  tags       = ["servers-${service}:latest"]
+  args       = { SERVICE = service }
+}

@@ -1,0 +1,15 @@
+[project]
+name = "app"
+version = "0.1.0"
+requires-python = "==3.12.3"
+dependencies = [
+    "pydantic==2.13.4",
+]
+
+[tool.pyrefly]
+python-interpreter-path = ".venv/bin/python"
+project-includes = ["src"]
+
+[build-system]
+requires = ["uv_build==0.11.18"]
+build-backend = "uv_build"
