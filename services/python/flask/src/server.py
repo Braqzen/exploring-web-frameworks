@@ -1,9 +1,11 @@
-from flask import Flask
 import structlog
+from functools import partial
+from flask import Flask
 from gunicorn.app.base import BaseApplication
+from opentelemetry.sdk._logs import LoggerProvider
 
 
-def start_server(app: Flask, host: str, port: int) -> None:
+def start_server(app: Flask, host: str, port: int, provider: LoggerProvider) -> None:
     logger = structlog.get_logger()
     logger.info("Starting router", socket=f"{host}:{port}")
 
@@ -16,6 +18,8 @@ def start_server(app: Flask, host: str, port: int) -> None:
             "worker_connections": 1000,
             "accesslog": None,
             "errorlog": "/dev/null",
+            "worker_exit": partial(worker_exit, provider),
+            "on_exit": partial(on_exit, provider),
         },
     )
 
@@ -35,3 +39,17 @@ class GunicornApp(BaseApplication):
 
     def load(self):
         return self.application
+
+
+def worker_exit(provider: LoggerProvider, server, worker) -> None:
+    try:
+        provider.shutdown()
+    except Exception:
+        structlog.get_logger().exception("Failed to shut down telemetry provider")
+
+
+def on_exit(provider: LoggerProvider, server) -> None:
+    try:
+        provider.shutdown()
+    except Exception:
+        structlog.get_logger().exception("Failed to shut down telemetry provider")
