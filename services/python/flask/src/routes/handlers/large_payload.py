@@ -5,7 +5,7 @@ from routes.errors import AppErrors, send_error
 
 
 def large_payload_handler(_error: RequestEntityTooLarge):
-    structlog.getLogger().warn(
+    structlog.get_logger().warn(
         "Invalid body JSON", method=request.method, path=request.path
     )
     return send_error(AppErrors.InvalidJsonBody)

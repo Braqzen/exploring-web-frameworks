@@ -21,7 +21,7 @@ def get_handler(id: str):
     task: Task | None = state.tasks.get(task_id)
 
     if task is None:
-        logger.warn("Task not found", id=task_id, method="GET", path=request.path)
+        logger.warn("Task not found", id=str(task_id), method="GET", path=request.path)
         return send_error(AppErrors.TaskNotFound)
 
     logger.info(

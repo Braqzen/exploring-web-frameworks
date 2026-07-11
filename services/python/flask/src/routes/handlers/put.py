@@ -33,7 +33,7 @@ def put_handler(id: str):
     task: Task | None = state.tasks.get(task_id)
 
     if task is None:
-        logger.warn("Task not found", id=task_id, method="PUT", path=request.path)
+        logger.warn("Task not found", id=str(task_id), method="PUT", path=request.path)
         return send_error(AppErrors.TaskNotFound)
 
     state.tasks[task_id] = new_task

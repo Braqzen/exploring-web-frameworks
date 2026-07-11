@@ -21,7 +21,9 @@ def delete_handler(id: str):
     task: Task | None = state.tasks.pop(task_id, None)
 
     if task is None:
-        logger.warn("Task not found", id=task_id, method="DELETE", path=request.path)
+        logger.warn(
+            "Task not found", id=str(task_id), method="DELETE", path=request.path
+        )
         return send_error(AppErrors.TaskNotFound)
 
     logger.info(

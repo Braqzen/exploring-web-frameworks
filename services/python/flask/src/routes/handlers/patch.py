@@ -34,7 +34,9 @@ def patch_handler(id: str):
     task: Task | None = state.tasks.get(task_id)
 
     if task is None:
-        logger.warn("Task not found", id=task_id, method="PATCH", path=request.path)
+        logger.warn(
+            "Task not found", id=str(task_id), method="PATCH", path=request.path
+        )
         return send_error(AppErrors.TaskNotFound)
 
     previous_operation: Operation = task.operation
