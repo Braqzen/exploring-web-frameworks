@@ -9,7 +9,7 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 
 | Tier | Frameworks                                                   |
 | ---- | ------------------------------------------------------------ |
-| S    | **Rust:** Axum                                               |
+| S    | **Rust:** Axum<br>**Python:** FastAPI                        |
 | A    | **Rust:** Poem                                               |
 | B    | **Rust:** Actix                                              |
 | C    | **Rust:** Rocket<br>**Typescript:** Fastify, Koa, Elyisa     |

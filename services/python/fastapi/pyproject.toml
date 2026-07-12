@@ -1,0 +1,20 @@
+[project]
+name = "myfastapi"
+version = "0.1.0"
+requires-python = "==3.12.3"
+dependencies = [
+    "app",
+    "telemetry",
+    "structlog==26.1.0",
+    "fastapi==0.139.0",
+    "uvicorn==0.50.0",
+]
+
+[tool.uv.sources]
+app = { path = "../../../shared-code/python/app" }
+telemetry = { path = "../../../shared-code/python/telemetry" }
+
+[tool.pyrefly]
+python-interpreter-path = ".venv/bin/python"
+project-includes = ["src"]
+search-path = ["src"]
