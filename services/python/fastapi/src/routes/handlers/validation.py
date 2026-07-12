@@ -1,11 +1,12 @@
 import structlog
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from routes.errors import send_error, AppErrors
 
 
-async def validation_handler(request: Request, exc: Exception):
+async def validation_handler(request: Request, exc: Exception) -> JSONResponse:
     if not isinstance(exc, RequestValidationError):
         raise exc
 

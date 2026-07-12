@@ -1,12 +1,17 @@
 import structlog
 from uuid import uuid4, UUID
 from fastapi import Request
+from typing import TypedDict
 
 from app.task import Task
 from app.state import AppState
 
 
-async def post_handler(request: Request, task: Task):
+class TaskId(TypedDict):
+    id: str
+
+
+async def post_handler(request: Request, task: Task) -> TaskId:
     logger = structlog.get_logger()
 
     id: UUID = uuid4()

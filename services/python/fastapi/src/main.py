@@ -4,8 +4,8 @@ from server import Server
 
 
 if __name__ == "__main__":
-    log_level = environ.get("LOG_LEVEL", "info")
-    socket = environ["SOCKET"]
+    log_level: str = environ.get("LOG_LEVEL", "info")
+    socket: str = environ["SOCKET"]
     host, _, port = socket.partition(":")
 
     telemetry = Telemetry("fastapi", log_level)

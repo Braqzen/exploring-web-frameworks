@@ -16,5 +16,5 @@ class AppErrors:
     Internal = AppError(500, "Internal server error")
 
 
-def send_error(error: AppError):
+def send_error(error: AppError) -> JSONResponse:
     return JSONResponse({"error": error.message}, status_code=error.status)

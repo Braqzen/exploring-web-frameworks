@@ -1,13 +1,16 @@
 import structlog
 from uuid import UUID
 from fastapi import Request
+from fastapi.responses import JSONResponse
 
 from app.task import Task
 from app.state import AppState
 from routes.errors import send_error, AppErrors
 
 
-async def put_handler(request: Request, id: UUID, new_task: Task):
+async def put_handler(
+    request: Request, id: UUID, new_task: Task
+) -> JSONResponse | Task:
     logger = structlog.get_logger()
 
     state: AppState = request.app.state.app_state
@@ -33,4 +36,4 @@ async def put_handler(request: Request, id: UUID, new_task: Task):
         method="PUT",
     )
 
-    return new_task.model_dump()
+    return new_task

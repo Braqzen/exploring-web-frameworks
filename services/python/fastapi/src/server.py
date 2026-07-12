@@ -1,9 +1,8 @@
 import structlog
 import uvicorn
-from fastapi import FastAPI
 
 from telemetry import Telemetry
-from application import create_app
+from application import Application
 
 
 class Server:
@@ -13,10 +12,10 @@ class Server:
 
     def run(self, telemetry: Telemetry) -> None:
         logger = structlog.get_logger()
-        app: FastAPI = create_app()
+        application = Application()
 
         config = uvicorn.Config(
-            app,
+            application.app,
             host=self.host,
             port=self.port,
             log_config=None,
