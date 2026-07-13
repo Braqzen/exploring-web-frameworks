@@ -1,0 +1,18 @@
+[project]
+name = "myquart"
+version = "0.1.0"
+requires-python = "==3.12.3"
+dependencies = [
+    "app",
+    "quart==0.20.0",
+    "telemetry",
+]
+
+[tool.uv.sources]
+app = { path = "../../../shared-code/python/app" }
+telemetry = { path = "../../../shared-code/python/telemetry" }
+
+[tool.pyrefly]
+python-interpreter-path = ".venv/bin/python"
+project-includes = ["src"]
+search-path = ["src"]

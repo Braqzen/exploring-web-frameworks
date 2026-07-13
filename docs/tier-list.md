@@ -9,12 +9,12 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 
 ## Tier List
 
-| Tier | Frameworks                                                   |
-| ---- | ------------------------------------------------------------ |
-| S    | **Rust:** Axum<br>**Python:** FastAPI, Sanic                 |
-| A    | **Rust:** Poem                                               |
-| B    | **Rust:** Actix                                              |
-| C    | **Rust:** Rocket<br>**Typescript:** Fastify, Koa, Elyisa     |
-| D    | **Rust:** Salvo<br>**Typescript:** Hono<br>**Python:** Flask |
-| E    | **Typescript:** Express                                      |
-| F    | **Rust:** Warp                                               |
+| Tier | Frameworks                                                          |
+| ---- | ------------------------------------------------------------------- |
+| S    | **Rust:** Axum<br>**Python:** FastAPI, Sanic                        |
+| A    | **Rust:** Poem                                                      |
+| B    | **Rust:** Actix                                                     |
+| C    | **Rust:** Rocket<br>**Typescript:** Fastify, Koa, Elyisa            |
+| D    | **Rust:** Salvo<br>**Typescript:** Hono<br>**Python:** Flask, Quart |
+| E    | **Typescript:** Express                                             |
+| F    | **Rust:** Warp                                                      |
