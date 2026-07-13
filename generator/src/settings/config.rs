@@ -95,6 +95,7 @@ pub enum ProviderName {
     Flask,
     FastApi,
     Sanic,
+    Quart,
 }
 
 impl ToString for ProviderName {
@@ -114,6 +115,7 @@ impl ToString for ProviderName {
             Self::Flask => "flask".to_string(),
             Self::FastApi => "fastapi".to_string(),
             Self::Sanic => "sanic".to_string(),
+            Self::Quart => "quart".to_string(),
         }
     }
 }
