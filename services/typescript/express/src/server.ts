@@ -1,15 +1,19 @@
 import type { Express } from "express";
 import type { Server } from "node:http";
+import type { SocketAddress } from "node:net";
 import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,
   app: Express,
-  port: number
+  address: SocketAddress
 ): Server {
   const logger = getLogger();
 
-  logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
+  logger.info(
+    { socket: `${address.address}:${address.port}` },
+    "Starting router"
+  );
 
   const shutdown = async (signal: string) => {
     const message =
@@ -38,8 +42,8 @@ export function startServer(
     process.exit(0);
   };
 
-  const server = app.listen(port, () => {
-    logger.info(`Server is running on port ${port}`);
+  const server = app.listen(address.port, address.address, () => {
+    logger.info(`Server is running on port ${address.port}`);
   });
 
   server.on("error", (err) => {

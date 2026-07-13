@@ -1,15 +1,19 @@
 import type { FastifyInstance } from "fastify";
 import type { Server } from "node:http";
+import type { SocketAddress } from "node:net";
 import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,
   app: FastifyInstance,
-  port: number
+  address: SocketAddress
 ): Server {
   const logger = getLogger();
 
-  logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
+  logger.info(
+    { socket: `${address.address}:${address.port}` },
+    "Starting router"
+  );
 
   const shutdown = async (signal: string) => {
     const message =
@@ -38,13 +42,13 @@ export function startServer(
     process.exit(0);
   };
 
-  app.listen({ port, host: "0.0.0.0" }, (err, address) => {
+  app.listen({ port: address.port, host: address.address }, (err) => {
     if (err) {
       logger.error({ err }, "Failed to start server");
       void shutdown("STARTUP");
       return;
     }
-    logger.info(`Server is running on ${address}`);
+    logger.info(`Server is running on port ${address.port}`);
   });
 
   process.once("SIGTERM", () => {

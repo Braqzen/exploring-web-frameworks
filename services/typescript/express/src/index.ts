@@ -1,13 +1,13 @@
+import { SocketAddress } from "node:net";
 import { createApp } from "./app.js";
 import { startServer } from "./server.js";
 import { createState, type State } from "app";
 import { initTelemetry, initLogger } from "telemetry";
 
 function main(): void {
-  const port = process.env.PORT;
-
-  if (!port) {
-    throw new Error("PORT is not set");
+  const addr = SocketAddress.parse(process.env.SOCKET ?? "");
+  if (!addr) {
+    throw new Error("SOCKET is not set or invalid");
   }
 
   const service = "express";
@@ -17,7 +17,7 @@ function main(): void {
 
   const state: State = createState();
 
-  startServer(telemetry, createApp(state), parseInt(port));
+  startServer(telemetry, createApp(state), addr);
 }
 
 main();
