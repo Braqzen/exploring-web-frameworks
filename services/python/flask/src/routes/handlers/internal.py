@@ -1,6 +1,7 @@
 import structlog
 from flask import request
 from werkzeug.exceptions import InternalServerError
+
 from routes.errors import AppErrors, send_error
 
 

@@ -1,15 +1,19 @@
 import type { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
+import type { SocketAddress } from "node:net";
 import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,
   app: Hono,
-  port: number
+  address: SocketAddress
 ): ServerType {
   const logger = getLogger();
 
-  logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
+  logger.info(
+    { socket: `${address.address}:${address.port}` },
+    "Starting router"
+  );
 
   const shutdown = async (signal: string) => {
     const message =
@@ -39,7 +43,7 @@ export function startServer(
   };
 
   const server = serve(
-    { fetch: app.fetch, port, hostname: "0.0.0.0" },
+    { fetch: app.fetch, port: address.port, hostname: address.address },
     (info) => {
       logger.info(`Server is running on port ${info.port}`);
     }

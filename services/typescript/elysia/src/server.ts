@@ -1,14 +1,18 @@
 import { Elysia } from "elysia";
+import type { SocketAddress } from "node:net";
 import { type Telemetry, getLogger } from "telemetry";
 
 export function startServer(
   telemetry: Telemetry,
   app: Elysia,
-  port: number
+  address: SocketAddress
 ): Elysia {
   const logger = getLogger();
 
-  logger.info({ socket: `0.0.0.0:${port}` }, "Starting router");
+  logger.info(
+    { socket: `${address.address}:${address.port}` },
+    "Starting router"
+  );
 
   const shutdown = async (signal: string) => {
     const message =
@@ -37,8 +41,8 @@ export function startServer(
     process.exit(0);
   };
 
-  app.listen({ port, hostname: "0.0.0.0" }, () => {
-    logger.info(`Server is running on port ${port}`);
+  app.listen({ port: address.port, hostname: address.address }, () => {
+    logger.info(`Server is running on port ${address.port}`);
   });
 
   process.once("SIGTERM", () => {

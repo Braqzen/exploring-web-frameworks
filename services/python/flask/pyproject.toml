@@ -18,3 +18,4 @@ telemetry = { path = "../../../shared-code/python/telemetry" }
 [tool.pyrefly]
 python-interpreter-path = ".venv/bin/python"
 project-includes = ["src"]
+search-path = ["src"]

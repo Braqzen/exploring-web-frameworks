@@ -2,8 +2,9 @@ import structlog
 from functools import partial
 from flask import Flask
 from gunicorn.app.base import BaseApplication
+
 from telemetry import Telemetry
-from application import create_app
+from application import Application
 
 
 class Server:
@@ -13,10 +14,10 @@ class Server:
 
     def run(self, telemetry: Telemetry) -> None:
         logger = structlog.get_logger()
-        app: Flask = create_app()
+        application = Application()
 
         server = GunicornApp(
-            app,
+            application.app,
             {
                 "bind": f"{self.host}:{self.port}",
                 "workers": 1,

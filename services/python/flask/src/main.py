@@ -2,14 +2,14 @@ from gevent import monkey
 
 monkey.patch_all()
 
-from os import environ
-from telemetry import Telemetry
-from server import Server
+from os import environ  # noqa: E402
+from telemetry import Telemetry  # noqa: E402
+from server import Server  # noqa: E402
 
 
 if __name__ == "__main__":
-    log_level = environ.get("LOG_LEVEL", "info")
-    socket = environ["SOCKET"]
+    log_level: str = environ.get("LOG_LEVEL", "info")
+    socket: str = environ["SOCKET"]
     host, _, port = socket.partition(":")
 
     telemetry = Telemetry("flask", log_level)

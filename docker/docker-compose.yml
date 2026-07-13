@@ -3,222 +3,119 @@ x-common: &common-setup
   deploy:
     resources:
       limits:
-        memory: 64M
-  memswap_limit: 64M
+        memory: 128M
+  memswap_limit: 128M
   restart: unless-stopped
+
+x-common-env-telemetry: &common-env-telemetry
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
+  OTEL_METRIC_EXPORT_INTERVAL: "1000"
+  PYROSCOPE_URL: http://telemetry-alloy:9999
+
+x-common-env-socket: &common-env-socket
+  SOCKET: 0.0.0.0:8000
 
 services:
   generator:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-generator:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: *common-env-telemetry
     depends_on:
       - telemetry-alloy
 
   rust-axum:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-axum:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   rust-actix:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-actix:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   rust-warp:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-warp:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   rust-rocket:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-rocket:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
       ROCKET_CLI_COLORS: "false"
+      <<: [*common-env-socket, *common-env-telemetry]
 
   rust-poem:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-poem:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   rust-salvo:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-salvo:latest
+    <<: *common-setup
     environment:
       RUST_LOG: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   typescript-express:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-express:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      PORT: 3000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   typescript-fastify:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-fastify:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      PORT: 3000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   typescript-hono:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-hono:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      PORT: 3000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   typescript-koa:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-koa:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      PORT: 3000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   typescript-elysia:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-elysia:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      PORT: 3000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   python-flask:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-flask:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   python-fastapi:
-    <<: *common-setup
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    memswap_limit: 128M
     image: servers-fastapi:latest
+    <<: *common-setup
     environment:
       LOG_LEVEL: info
-      SOCKET: 0.0.0.0:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry-alloy:4318
-      OTEL_METRIC_EXPORT_INTERVAL: "1000"
-      PYROSCOPE_URL: http://telemetry-alloy:9999
+      <<: [*common-env-socket, *common-env-telemetry]
 
   telemetry-grafana:
     image: grafana/grafana:12.2

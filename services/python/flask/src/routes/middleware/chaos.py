@@ -1,6 +1,7 @@
-from routes.errors import send_error, AppErrors
 from random import randrange
 from gevent import sleep
+
+from routes.errors import send_error, AppErrors
 
 
 def chaos_middleware():

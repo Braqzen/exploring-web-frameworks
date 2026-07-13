@@ -1,34 +1,53 @@
-from routes.middleware import log_middleware, chaos_middleware
-from flask import Flask
+from flask import Flask, Blueprint, request
+
 from app.state import AppState
-from routes.router import register_routes, bp
+from routes.middleware import log_middleware, chaos_middleware
+from routes.errors import send_error, AppErrors
 from routes.handlers import (
     invalid_path_handler,
     invalid_method_handler,
     large_payload_handler,
     internal_error_handler,
+    post_handler,
+    get_handler,
+    delete_handler,
+    put_handler,
+    patch_handler,
 )
 
 # TODO: make configurable?
-MAX_BODY_SIZE = 64 * 1024
+MAX_BODY_SIZE: int = 64 * 1024
 
 
-def create_app() -> Flask:
-    app = Flask(__name__, static_folder=None)
+class Application:
+    def __init__(self) -> None:
+        self.app = Flask(__name__, static_folder=None)
+        bp = Blueprint("flask", __name__)
 
-    app.config["MAX_CONTENT_LENGTH"] = MAX_BODY_SIZE
-    app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
-    app.extensions["state"] = AppState()
+        self.app.config["MAX_CONTENT_LENGTH"] = MAX_BODY_SIZE
+        self.app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
+        self.app.extensions["state"] = AppState()
 
-    app.before_request(log_middleware)
-    app.before_request(chaos_middleware)
+        self.app.before_request(log_middleware)
+        self.app.before_request(chaos_middleware)
 
-    app.register_error_handler(404, invalid_path_handler)
-    app.register_error_handler(405, invalid_method_handler)
-    app.register_error_handler(413, large_payload_handler)
-    app.register_error_handler(500, internal_error_handler)
+        self.app.register_error_handler(404, invalid_path_handler)
+        self.app.register_error_handler(405, invalid_method_handler)
+        self.app.register_error_handler(413, large_payload_handler)
+        self.app.register_error_handler(500, internal_error_handler)
 
-    register_routes()
-    app.register_blueprint(bp)
+        bp.before_request(reject_head)
 
-    return app
+        bp.post("/")(post_handler)
+        bp.get("/<id>")(get_handler)
+        bp.delete("/<id>")(delete_handler)
+        bp.put("/<id>")(put_handler)
+        bp.patch("/<id>")(patch_handler)
+
+        self.app.register_blueprint(bp)
+
+
+def reject_head():
+    if request.method == "HEAD":
+        return send_error(AppErrors.InvalidMethod)
+    return None

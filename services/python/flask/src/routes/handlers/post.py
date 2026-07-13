@@ -2,6 +2,7 @@ import structlog
 from uuid import uuid4, UUID
 from flask import current_app, jsonify, request
 from pydantic import ValidationError
+
 from app.task import Task
 from app.params import parse_task
 from app.state import AppState
