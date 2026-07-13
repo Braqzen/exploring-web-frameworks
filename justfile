@@ -7,7 +7,7 @@ build-apis: build-rust-apis build-typescript-apis build-python-apis
 # Shorthand to build the APIs per language
 build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 build-typescript-apis: build-express build-fastify build-hono build-koa build-elysia
-build-python-apis: build-flask build-fastapi
+build-python-apis: build-flask build-fastapi build-sanic
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
@@ -68,6 +68,9 @@ build-fastapi:
 	docker rmi servers-fastapi:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl fastapi
 
+build-sanic:
+	docker rmi servers-sanic:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl sanic
 
 # Docker Compose Commands
 run:
