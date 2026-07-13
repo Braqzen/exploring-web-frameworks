@@ -96,6 +96,7 @@ pub enum ProviderName {
     FastApi,
     Sanic,
     Quart,
+    Django,
 }
 
 impl ToString for ProviderName {
@@ -116,6 +117,7 @@ impl ToString for ProviderName {
             Self::FastApi => "fastapi".to_string(),
             Self::Sanic => "sanic".to_string(),
             Self::Quart => "quart".to_string(),
+            Self::Django => "django".to_string(),
         }
     }
 }
