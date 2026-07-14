@@ -1,7 +1,8 @@
 import structlog
 from fastapi import Request, Response
-from fastapi.responses import JSONResponse
 from collections.abc import Awaitable, Callable
+
+from routes.errors import send_error, AppErrors
 
 # TODO: make configurable?
 MAX_BODY_SIZE: int = 64 * 1024
@@ -17,6 +18,6 @@ async def body_size_middleware(
                 "Invalid body JSON", method=request.method, path=request.url.path
             )
 
-            return JSONResponse({"error": "Invalid body JSON"}, status_code=422)
+            return send_error(AppErrors.InvalidJsonBody)
 
     return await call_next(request)
