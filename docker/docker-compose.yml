@@ -145,6 +145,13 @@ services:
       LOG_LEVEL: info
       <<: [*common-env-socket, *common-env-telemetry]
 
+  python-starlette:
+    image: servers-starlette:latest
+    <<: *common-setup
+    environment:
+      LOG_LEVEL: info
+      <<: [*common-env-socket, *common-env-telemetry]
+
   telemetry-grafana:
     image: grafana/grafana:12.2
     ports:

@@ -11,7 +11,7 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 
 | Tier | Frameworks                                                          |
 | ---- | ------------------------------------------------------------------- |
-| S    | **Rust:** Axum<br>**Python:** FastAPI, Sanic                        |
+| S    | **Rust:** Axum<br>**Python:** FastAPI, Starlette, Sanic             |
 | A    | **Rust:** Poem                                                      |
 | B    | **Rust:** Actix                                                     |
 | C    | **Rust:** Rocket<br>**Typescript:** Fastify, Koa, Elyisa            |

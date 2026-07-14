@@ -237,6 +237,20 @@
         "PATCH": true,
         "HEAD": true
       }
+    },
+    {
+      "provider": "starlette",
+      "language": "python",
+      "url": "http://python-starlette:8000",
+      "enabled": true,
+      "methods": {
+        "GET": true,
+        "POST": true,
+        "PUT": true,
+        "DELETE": true,
+        "PATCH": true,
+        "HEAD": true
+      }
     }
   ],
   "sleep": 100
