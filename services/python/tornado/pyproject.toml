@@ -5,7 +5,7 @@ requires-python = "==3.12.3"
 dependencies = [
     "app",
     "telemetry",
-    "tornado>=6.5.7",
+    "tornado==6.5.7",
 ]
 
 [tool.uv.sources]
