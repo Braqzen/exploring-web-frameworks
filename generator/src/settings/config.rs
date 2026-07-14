@@ -97,6 +97,7 @@ pub enum ProviderName {
     Sanic,
     Quart,
     Django,
+    Tornado,
 }
 
 impl ToString for ProviderName {
@@ -118,6 +119,7 @@ impl ToString for ProviderName {
             Self::Sanic => "sanic".to_string(),
             Self::Quart => "quart".to_string(),
             Self::Django => "django".to_string(),
+            Self::Tornado => "tornado".to_string(),
         }
     }
 }

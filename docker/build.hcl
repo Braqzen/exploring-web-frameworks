@@ -28,7 +28,7 @@ target "typescript-services" {
 
 target "python-services" {
   matrix = {
-    service = ["flask", "fastapi", "sanic", "quart", "django"]
+    service = ["flask", "fastapi", "sanic", "quart", "django", "tornado"]
   }
   name = service
   context    = "."
