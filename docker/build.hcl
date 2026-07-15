@@ -36,3 +36,14 @@ target "python-services" {
   tags       = ["servers-${service}:latest"]
   args       = { SERVICE = service }
 }
+
+target "go-services" {
+  matrix = {
+    service = ["gin"]
+  }
+  name = service
+  context    = "."
+  dockerfile = "docker/Dockerfile.go-services"
+  tags       = ["servers-${service}:latest"]
+  args       = { SERVICE = service }
+}

@@ -99,6 +99,7 @@ pub enum ProviderName {
     Django,
     Tornado,
     Starlette,
+    Gin,
 }
 
 impl ToString for ProviderName {
@@ -122,6 +123,7 @@ impl ToString for ProviderName {
             Self::Django => "django".to_string(),
             Self::Tornado => "tornado".to_string(),
             Self::Starlette => "starlette".to_string(),
+            Self::Gin => "gin".to_string(),
         }
     }
 }
@@ -132,6 +134,7 @@ pub enum Language {
     Rust,
     Typescript,
     Python,
+    Go,
 }
 
 impl ToString for Language {
@@ -140,6 +143,7 @@ impl ToString for Language {
             Self::Rust => "rust".to_string(),
             Self::Typescript => "typescript".to_string(),
             Self::Python => "python".to_string(),
+            Self::Go => "go".to_string(),
         }
     }
 }

@@ -1,0 +1,17 @@
+FROM golang:1.26.3-bookworm AS builder
+
+ARG SERVICE
+WORKDIR /app
+
+COPY services/go/${SERVICE} /app
+COPY shared-code/go /shared-code/go
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -o /server .
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /server /app/server
+
+CMD ["/app/server"]
