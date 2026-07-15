@@ -13,3 +13,6 @@ dist
 .venv
 uv.lock
 __pycache__
+
+# Go
+go.sum

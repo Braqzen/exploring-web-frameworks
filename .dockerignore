@@ -11,3 +11,6 @@
 # PYTHON
 **/.venv
 **/__pycache__
+
+# Go
+**/go.sum
