@@ -13,9 +13,9 @@ import (
 )
 
 type Logger struct {
-	ServiceName string
-	LogLevel    string
-	Provider    *log.LoggerProvider
+	serviceName string
+	logLevel    string
+	provider    *log.LoggerProvider
 }
 
 type levelHandler struct {
@@ -29,18 +29,18 @@ func (h levelHandler) Enabled(ctx context.Context, level slog.Level) bool {
 
 func NewLogger(serviceName string, logLevel string) *Logger {
 	return &Logger{
-		ServiceName: serviceName,
-		LogLevel:    logLevel,
+		serviceName: serviceName,
+		logLevel:    logLevel,
 	}
 }
 
 func (l *Logger) Start() error {
-	if l.Provider != nil {
+	if l.provider != nil {
 		return nil
 	}
 
 	var level slog.Level
-	err := level.UnmarshalText([]byte(l.LogLevel))
+	err := level.UnmarshalText([]byte(l.logLevel))
 	if err != nil {
 		return err
 	}
@@ -52,18 +52,21 @@ func (l *Logger) Start() error {
 		return err
 	}
 
-	res, err := resource.Merge(resource.Default(), resource.NewWithAttributes(semconv.SchemaURL, semconv.ServiceName(l.ServiceName)))
+	res, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(semconv.SchemaURL, semconv.ServiceName(l.serviceName)),
+	)
 	if err != nil {
 		return err
 	}
 
 	provider := log.NewLoggerProvider(log.WithResource(res), log.WithProcessor(log.NewBatchProcessor(exporter)))
-	l.Provider = provider
+	l.provider = provider
 
 	global.SetLoggerProvider(provider)
 	handler := levelHandler{
 		Handler: otelslog.NewHandler(
-			l.ServiceName,
+			l.serviceName,
 			otelslog.WithLoggerProvider(provider),
 		),
 		level: level,
@@ -74,8 +77,8 @@ func (l *Logger) Start() error {
 }
 
 func (l *Logger) Shutdown(ctx context.Context) error {
-	if l.Provider == nil {
+	if l.provider == nil {
 		return nil
 	}
-	return l.Provider.Shutdown(ctx)
+	return l.provider.Shutdown(ctx)
 }

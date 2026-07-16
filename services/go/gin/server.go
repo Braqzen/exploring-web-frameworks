@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
 	"os/signal"
 	"syscall"
+	"telemetry"
 	"time"
 )
 
@@ -25,7 +27,7 @@ func NewServer(socket string) (*Server, error) {
 	return &Server{Socket: socket, App: *NewApplication()}, nil
 }
 
-func (s *Server) Run() error {
+func (s *Server) Run(tel *telemetry.Telemetry) error {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -51,12 +53,10 @@ func (s *Server) Run() error {
 	defer cancel()
 
 	shutdownErr := srv.Shutdown(shutdownCtx)
-	// TODO: telemetry shutdown here later
+	telemetryErr := tel.Shutdown(shutdownCtx)
 
-	if listenErr != nil {
-		return listenErr
-	}
-	return shutdownErr
+	return errors.Join(listenErr, shutdownErr, telemetryErr)
+
 }
 
 func serveHTTP(srv *http.Server, errCh chan<- error) {

@@ -23,6 +23,7 @@ func NewApplication() *Application {
 	engine.Use(gin.CustomRecovery(handlers.InternalHandler))
 	engine.Use(middleware.BodySizeMiddleware())
 	engine.Use(middleware.LogMiddleware())
+	engine.Use(middleware.ChaosMiddleware())
 	engine.SetTrustedProxies(nil)
 
 	engine.POST("/", handlers.PostHandler(state))

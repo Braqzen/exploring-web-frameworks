@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log/slog"
 	"os"
 	"telemetry"
@@ -14,10 +13,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger := telemetry.NewLogger("gin", logLevel)
-	err := logger.Start()
+	tel := telemetry.NewTelemetry("gin", logLevel)
+	err := tel.Start()
 	if err != nil {
-		slog.Error("Logger start failed", "err", err)
+		slog.Error("Telemetry start failed", "err", err)
 		os.Exit(1)
 	}
 
@@ -33,14 +32,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = server.Run()
-	shutdownErr := logger.Shutdown(context.Background())
+	err = server.Run(tel)
 	if err != nil {
-		slog.Error("Server crash")
-		os.Exit(1)
-	}
-	if shutdownErr != nil {
-		slog.Error("Logger shutdown failed")
+		slog.Error("Server crash", "err", err)
 		os.Exit(1)
 	}
 }
