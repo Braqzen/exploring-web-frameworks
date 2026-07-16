@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
+	"telemetry"
 )
 
 func main() {
@@ -12,16 +14,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO: move into telemetry
-	var level slog.Level
-	err := level.UnmarshalText([]byte(logLevel))
+	logger := telemetry.NewLogger("gin", logLevel)
+	err := logger.Start()
 	if err != nil {
-		slog.Error("Bad log level")
+		slog.Error("Logger start failed", "err", err)
 		os.Exit(1)
 	}
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: level,
-	})))
 
 	socket, ok := os.LookupEnv("SOCKET")
 	if !ok || socket == "" {
@@ -36,8 +34,13 @@ func main() {
 	}
 
 	err = server.Run()
+	shutdownErr := logger.Shutdown(context.Background())
 	if err != nil {
 		slog.Error("Server crash")
+		os.Exit(1)
+	}
+	if shutdownErr != nil {
+		slog.Error("Logger shutdown failed")
 		os.Exit(1)
 	}
 }
