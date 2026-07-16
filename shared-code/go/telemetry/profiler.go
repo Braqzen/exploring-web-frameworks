@@ -16,8 +16,8 @@ func NewProfiler(serviceName string) *Profiler {
 	return &Profiler{serviceName: serviceName}
 }
 
-func (p *Profiler) Start() error {
-	if p.client != nil {
+func (self *Profiler) Start() error {
+	if self.client != nil {
 		return nil
 	}
 
@@ -27,7 +27,7 @@ func (p *Profiler) Start() error {
 	}
 
 	config := pyroscope.Config{
-		ApplicationName: p.serviceName,
+		ApplicationName: self.serviceName,
 		ServerAddress:   serverAddress,
 		Tags:            map[string]string{"lang": "go"},
 	}
@@ -37,13 +37,13 @@ func (p *Profiler) Start() error {
 		return err
 	}
 
-	p.client = profiler
+	self.client = profiler
 	return nil
 }
 
-func (p *Profiler) Shutdown() error {
-	if p.client == nil {
+func (self *Profiler) Shutdown() error {
+	if self.client == nil {
 		return nil
 	}
-	return p.client.Stop()
+	return self.client.Stop()
 }

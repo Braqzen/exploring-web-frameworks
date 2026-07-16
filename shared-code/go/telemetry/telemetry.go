@@ -18,13 +18,13 @@ func NewTelemetry(serviceName string, logLevel string) *Telemetry {
 	}
 }
 
-func (t *Telemetry) Start() error {
-	logErr := t.logger.Start()
+func (self *Telemetry) Start() error {
+	logErr := self.logger.Start()
 	if logErr != nil {
 		return logErr
 	}
 
-	profErr := t.profiler.Start()
+	profErr := self.profiler.Start()
 	if profErr != nil {
 		return profErr
 	}
@@ -32,16 +32,16 @@ func (t *Telemetry) Start() error {
 	return nil
 }
 
-func (t *Telemetry) Shutdown(ctx context.Context) error {
+func (self *Telemetry) Shutdown(ctx context.Context) error {
 	var shutdownErr error
 
-	profErr := t.profiler.Shutdown()
+	profErr := self.profiler.Shutdown()
 	if profErr != nil {
 		slog.Error("Profiler shutdown failed", "err", profErr)
 		shutdownErr = errors.Join(shutdownErr, profErr)
 	}
 
-	logErr := t.logger.Shutdown(ctx)
+	logErr := self.logger.Shutdown(ctx)
 	if logErr != nil {
 		slog.Error("Logger shutdown failed", "err", logErr)
 		shutdownErr = errors.Join(shutdownErr, logErr)

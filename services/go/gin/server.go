@@ -14,8 +14,8 @@ import (
 )
 
 type Server struct {
-	Socket string
-	App    Application
+	socket string
+	app    *Application
 }
 
 func NewServer(socket string) (*Server, error) {
@@ -24,43 +24,43 @@ func NewServer(socket string) (*Server, error) {
 		return nil, fmt.Errorf("socket error: %w", err)
 	}
 
-	return &Server{Socket: socket, App: *NewApplication()}, nil
+	return &Server{socket: socket, app: NewApplication()}, nil
 }
 
-func (s *Server) Run(tel *telemetry.Telemetry) error {
+func (self *Server) Run(tel *telemetry.Telemetry) error {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	srv := &http.Server{
-		Addr:    s.Socket,
-		Handler: s.App.Engine,
+	server := &http.Server{
+		Addr:    self.socket,
+		Handler: self.app.Engine,
 	}
 
 	errCh := make(chan error, 1)
 
-	slog.Info("Starting router", "socket", s.Socket)
+	slog.Info("Starting router", "socket", self.socket)
 
-	go serveHTTP(srv, errCh)
+	go serveHTTP(server, errCh)
 
 	var listenErr error
 	select {
 	case listenErr = <-errCh:
 	case <-ctx.Done():
-		stop()
 	}
+
+	stop()
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	shutdownErr := srv.Shutdown(shutdownCtx)
+	shutdownErr := server.Shutdown(shutdownCtx)
 	telemetryErr := tel.Shutdown(shutdownCtx)
 
 	return errors.Join(listenErr, shutdownErr, telemetryErr)
-
 }
 
-func serveHTTP(srv *http.Server, errCh chan<- error) {
-	err := srv.ListenAndServe()
+func serveHTTP(server *http.Server, errCh chan<- error) {
+	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		errCh <- err
 		return
