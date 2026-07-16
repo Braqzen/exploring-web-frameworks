@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"os/signal"
@@ -34,6 +35,9 @@ func (s *Server) Run() error {
 	}
 
 	errCh := make(chan error, 1)
+
+	slog.Info("Starting router", "socket", s.Socket)
+
 	go serveHTTP(srv, errCh)
 
 	var listenErr error

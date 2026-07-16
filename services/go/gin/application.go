@@ -22,6 +22,7 @@ func NewApplication() *Application {
 	engine.HandleMethodNotAllowed = true
 	engine.Use(gin.CustomRecovery(handlers.InternalHandler))
 	engine.Use(middleware.BodySizeMiddleware())
+	engine.Use(middleware.LogMiddleware())
 	engine.SetTrustedProxies(nil)
 
 	engine.POST("/", handlers.PostHandler(state))
