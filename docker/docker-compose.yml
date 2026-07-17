@@ -152,6 +152,13 @@ services:
       LOG_LEVEL: info
       <<: [*common-env-socket, *common-env-telemetry]
 
+  go-gin:
+    image: servers-gin:latest
+    <<: *common-setup
+    environment:
+      LOG_LEVEL: info
+      <<: [*common-env-socket, *common-env-telemetry]
+
   telemetry-grafana:
     image: grafana/grafana:12.2
     ports:

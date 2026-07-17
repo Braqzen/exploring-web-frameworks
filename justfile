@@ -2,12 +2,13 @@
 default: build-generator build-apis
 
 # Shorthand to build all the APIs
-build-apis: build-rust-apis build-typescript-apis build-python-apis
+build-apis: build-rust-apis build-typescript-apis build-python-apis build-go-apis
 
 # Shorthand to build the APIs per language
 build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 build-typescript-apis: build-express build-fastify build-hono build-koa build-elysia
 build-python-apis: build-flask build-fastapi build-sanic build-quart build-django build-tornado build-starlette
+build-go-apis: build-gin
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
@@ -87,6 +88,11 @@ build-tornado:
 build-starlette:
 	docker rmi servers-starlette:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl starlette
+
+# Go APIs
+build-gin:
+	docker rmi servers-gin:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl gin
 
 # Docker Compose Commands
 run:
