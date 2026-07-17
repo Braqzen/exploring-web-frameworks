@@ -12,10 +12,8 @@ import (
 
 func GetHandler(state *app.AppState) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, err := app.ParseUUID(c.Param("id"))
+		id, err := ParseID(c)
 		if err != nil {
-			slog.Warn("Invalid path", "method", c.Request.Method, "path", c.Request.URL.Path)
-			routes.SendError(c, routes.AppErrors.InvalidPath)
 			return
 		}
 
@@ -25,7 +23,7 @@ func GetHandler(state *app.AppState) gin.HandlerFunc {
 
 		if !ok {
 			slog.Warn("Task not found", "method", c.Request.Method, "path", c.Request.URL.Path, "id", id.String())
-			routes.SendError(c, routes.AppErrors.TaskNotFound)
+			routes.AppErrors.TaskNotFound.Error(c)
 			return
 		}
 

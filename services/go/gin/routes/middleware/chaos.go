@@ -15,7 +15,7 @@ func ChaosMiddleware() gin.HandlerFunc {
 			time.Sleep(delay)
 		}
 		if rand.IntN(101) < 5 {
-			routes.SendError(c, routes.AppErrors.Internal)
+			routes.AppErrors.Internal.Error(c)
 			c.Abort()
 			return
 		}

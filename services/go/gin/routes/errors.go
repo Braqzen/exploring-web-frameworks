@@ -1,10 +1,14 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type AppError struct {
-	Status  int
-	Message string
+	status  int
+	message string
 }
 
 var AppErrors = struct {
@@ -14,13 +18,13 @@ var AppErrors = struct {
 	InvalidJsonBody AppError
 	Internal        AppError
 }{
-	TaskNotFound:    AppError{404, "Task not found"},
-	InvalidPath:     AppError{404, "Invalid path"},
-	InvalidMethod:   AppError{405, "Invalid method"},
-	InvalidJsonBody: AppError{422, "Invalid body JSON"},
-	Internal:        AppError{500, "Internal server error"},
+	TaskNotFound:    AppError{http.StatusNotFound, "Task not found"},
+	InvalidPath:     AppError{http.StatusNotFound, "Invalid path"},
+	InvalidMethod:   AppError{http.StatusMethodNotAllowed, "Invalid method"},
+	InvalidJsonBody: AppError{http.StatusUnprocessableEntity, "Invalid body JSON"},
+	Internal:        AppError{http.StatusInternalServerError, "Internal server error"},
 }
 
-func SendError(c *gin.Context, err AppError) {
-	c.JSON(err.Status, gin.H{"error": err.Message})
+func (self AppError) Error(c *gin.Context) {
+	c.JSON(self.status, gin.H{"error": self.message})
 }

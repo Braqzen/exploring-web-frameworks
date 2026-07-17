@@ -10,5 +10,5 @@ import (
 func InvalidMethodHandler(c *gin.Context) {
 	slog.Warn("Invalid method", "method", c.Request.Method, "path", c.Request.URL.Path)
 
-	routes.SendError(c, routes.AppErrors.InvalidMethod)
+	routes.AppErrors.InvalidMethod.Error(c)
 }

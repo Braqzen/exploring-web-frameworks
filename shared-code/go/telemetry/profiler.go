@@ -41,6 +41,7 @@ func (self *Profiler) Start() error {
 	return nil
 }
 
+// Shutdown stops the profiler and flushes remaining profiling data
 func (self *Profiler) Shutdown() error {
 	if self.client == nil {
 		return nil

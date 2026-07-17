@@ -10,7 +10,7 @@ import (
 
 type Application struct {
 	Engine *gin.Engine
-	State  *app.AppState
+	state  *app.AppState
 }
 
 func NewApplication() *Application {
@@ -20,11 +20,11 @@ func NewApplication() *Application {
 
 	engine := gin.New()
 	engine.HandleMethodNotAllowed = true
+	engine.SetTrustedProxies(nil)
 	engine.Use(gin.CustomRecovery(handlers.InternalHandler))
 	engine.Use(middleware.BodySizeMiddleware())
 	engine.Use(middleware.LogMiddleware())
 	engine.Use(middleware.ChaosMiddleware())
-	engine.SetTrustedProxies(nil)
 
 	engine.POST("/", handlers.PostHandler(state))
 	engine.GET("/:id", handlers.GetHandler(state))
@@ -35,5 +35,5 @@ func NewApplication() *Application {
 	engine.NoRoute(handlers.InvalidPathHandler)
 	engine.NoMethod(handlers.InvalidMethodHandler)
 
-	return &Application{Engine: engine, State: state}
+	return &Application{Engine: engine, state: state}
 }

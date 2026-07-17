@@ -77,6 +77,7 @@ type levelHandler struct {
 	level slog.Level
 }
 
+// Enabled filters log levels
 func (self levelHandler) Enabled(ctx context.Context, level slog.Level) bool {
 	return level >= self.level && self.Handler.Enabled(ctx, level)
 }
