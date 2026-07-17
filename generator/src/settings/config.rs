@@ -100,6 +100,7 @@ pub enum ProviderName {
     Tornado,
     Starlette,
     Gin,
+    Chi,
 }
 
 impl ToString for ProviderName {
@@ -124,6 +125,7 @@ impl ToString for ProviderName {
             Self::Tornado => "tornado".to_string(),
             Self::Starlette => "starlette".to_string(),
             Self::Gin => "gin".to_string(),
+            Self::Chi => "chi".to_string(),
         }
     }
 }

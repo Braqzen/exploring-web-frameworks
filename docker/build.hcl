@@ -39,7 +39,7 @@ target "python-services" {
 
 target "go-services" {
   matrix = {
-    service = ["gin"]
+    service = ["gin", "chi"]
   }
   name = service
   context    = "."
