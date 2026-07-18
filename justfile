@@ -8,7 +8,7 @@ build-apis: build-rust-apis build-typescript-apis build-python-apis build-go-api
 build-rust-apis: build-axum build-actix build-warp build-rocket build-poem build-salvo
 build-typescript-apis: build-express build-fastify build-hono build-koa build-elysia
 build-python-apis: build-flask build-fastapi build-sanic build-quart build-django build-tornado build-starlette
-build-go-apis: build-gin build-chi
+build-go-apis: build-gin build-chi build-fiber
 
 build-generator:
 	docker rmi servers-generator:latest 2>/dev/null || true
@@ -97,6 +97,10 @@ build-gin:
 build-chi:
 	docker rmi servers-chi:latest 2>/dev/null || true
 	docker buildx bake -f docker/build.hcl chi
+
+build-fiber:
+	docker rmi servers-fiber:latest 2>/dev/null || true
+	docker buildx bake -f docker/build.hcl fiber
 
 # Docker Compose Commands
 run:
