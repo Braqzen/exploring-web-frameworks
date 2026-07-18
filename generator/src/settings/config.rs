@@ -101,6 +101,7 @@ pub enum ProviderName {
     Starlette,
     Gin,
     Chi,
+    Fiber,
 }
 
 impl ToString for ProviderName {
@@ -126,6 +127,7 @@ impl ToString for ProviderName {
             Self::Starlette => "starlette".to_string(),
             Self::Gin => "gin".to_string(),
             Self::Chi => "chi".to_string(),
+            Self::Fiber => "fiber".to_string(),
         }
     }
 }
