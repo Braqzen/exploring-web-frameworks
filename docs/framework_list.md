@@ -6,7 +6,7 @@ The following table shows the frameworks that are implemented in the project
 | ---------- | -------------------------------------------------------- |
 | Rust       | Axum, Poem, Actix, Salvo, Warp, Rocket                   |
 | Typescript | Express, Fastify, Hono, Koa, Elyisa                      |
-| Go         | Gin, Chi, Fiber                                          |
+| Go         | Gin, Chi, Fiber, Echo                                    |
 | Zig        |                                                          |
 | C++        |                                                          |
 | Python     | Flask, FastAPI, Sanic, Quart, Django, Tornado, Starlette |
@@ -21,7 +21,6 @@ The following table lists languages and frameworks to potentially add to the pro
 
 | Language | Framework                                |
 | -------- | ---------------------------------------- |
-| Go       | echo                                     |
 | Zig      | zap                                      |
 | C++      | drogon, crow, pistache, Restinio, CppCMS |
 | Nim      | prologue, jester, happyx                 |
