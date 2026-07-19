@@ -1,6 +1,6 @@
 # Configuration
 
-You may edit the generator's [config](../generator/config.json) to specify which framework to send requests to and which HTTP methods to use.
+You may edit the generator's [config](../configs/generator.json) to specify which framework to send requests to and which HTTP methods to use.
 
 The generator is made to crash when
 

@@ -69,7 +69,7 @@ just clean
 
 #### Configuration
 
-You may alter the behaviour of the generator through its [config](./generator/config.json).
+You may alter the behaviour of the generator through its [config](./configs/generator.json).
 
 After making a change to the config you must rebuild the generator before running it.
 

@@ -2,10 +2,11 @@
 
 use crate::{
     methods::Method,
-    settings::json::{ApiJson, ConfigJson},
+    settings::json::{ConfigJson, MetaJson, ProviderJson},
 };
 use eyre::Result;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 pub struct Config {
     /// Which Providers to send load to
@@ -16,8 +17,14 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Self> {
-        let content = std::fs::read_to_string("/app/config.json")?;
-        let config = serde_json::from_str::<ConfigJson>(&content)?;
+        let config = std::fs::read_to_string("/app/config.json")?;
+        let config = serde_json::from_str::<ConfigJson>(&config)?;
+
+        let meta = std::fs::read_to_string("/app/meta.json")?;
+        let meta = serde_json::from_str::<Vec<MetaJson>>(&meta)?;
+
+        let meta: HashMap<ProviderName, MetaJson> =
+            meta.into_iter().map(|m| (m.provider.clone(), m)).collect();
 
         let mut api = Vec::new();
         for provider in config.api {
@@ -34,7 +41,15 @@ impl Config {
                 continue;
             }
 
-            api.push(ProviderOptions::new(provider, methods));
+            let Some(meta) = meta.get(&provider.provider).cloned() else {
+                tracing::error!(
+                    provider = provider.provider.to_string(),
+                    "No meta entry for provider"
+                );
+                continue;
+            };
+
+            api.push(ProviderOptions::new(provider, meta, methods));
         }
 
         if api.is_empty() {
@@ -68,11 +83,11 @@ pub struct ProviderOptions {
 }
 
 impl ProviderOptions {
-    fn new(provider: ApiJson, methods: Vec<Method>) -> Self {
+    fn new(provider: ProviderJson, meta: MetaJson, methods: Vec<Method>) -> Self {
         Self {
             provider: provider.provider,
-            language: provider.language,
-            url: provider.url,
+            language: meta.language,
+            url: meta.url,
             methods,
         }
     }
