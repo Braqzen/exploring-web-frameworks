@@ -2,8 +2,6 @@
   "api": [
     {
       "provider": "axum",
-      "language": "rust",
-      "url": "http://rust-axum:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -16,8 +14,6 @@
     },
     {
       "provider": "actix",
-      "language": "rust",
-      "url": "http://rust-actix:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -30,8 +26,6 @@
     },
     {
       "provider": "warp",
-      "language": "rust",
-      "url": "http://rust-warp:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -44,8 +38,6 @@
     },
     {
       "provider": "rocket",
-      "language": "rust",
-      "url": "http://rust-rocket:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -58,8 +50,6 @@
     },
     {
       "provider": "poem",
-      "language": "rust",
-      "url": "http://rust-poem:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -72,8 +62,6 @@
     },
     {
       "provider": "salvo",
-      "language": "rust",
-      "url": "http://rust-salvo:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -86,8 +74,6 @@
     },
     {
       "provider": "express",
-      "language": "typescript",
-      "url": "http://typescript-express:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -100,8 +86,6 @@
     },
     {
       "provider": "fastify",
-      "language": "typescript",
-      "url": "http://typescript-fastify:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -114,8 +98,6 @@
     },
     {
       "provider": "hono",
-      "language": "typescript",
-      "url": "http://typescript-hono:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -128,8 +110,6 @@
     },
     {
       "provider": "koa",
-      "language": "typescript",
-      "url": "http://typescript-koa:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -142,8 +122,6 @@
     },
     {
       "provider": "elysia",
-      "language": "typescript",
-      "url": "http://typescript-elysia:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -156,8 +134,6 @@
     },
     {
       "provider": "flask",
-      "language": "python",
-      "url": "http://python-flask:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -170,8 +146,6 @@
     },
     {
       "provider": "fastapi",
-      "language": "python",
-      "url": "http://python-fastapi:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -184,8 +158,6 @@
     },
     {
       "provider": "sanic",
-      "language": "python",
-      "url": "http://python-sanic:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -198,8 +170,6 @@
     },
     {
       "provider": "quart",
-      "language": "python",
-      "url": "http://python-quart:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -212,8 +182,6 @@
     },
     {
       "provider": "django",
-      "language": "python",
-      "url": "http://python-django:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -226,8 +194,6 @@
     },
     {
       "provider": "tornado",
-      "language": "python",
-      "url": "http://python-tornado:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -240,8 +206,6 @@
     },
     {
       "provider": "starlette",
-      "language": "python",
-      "url": "http://python-starlette:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -254,8 +218,6 @@
     },
     {
       "provider": "gin",
-      "language": "go",
-      "url": "http://go-gin:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -268,8 +230,6 @@
     },
     {
       "provider": "chi",
-      "language": "go",
-      "url": "http://go-chi:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -282,8 +242,6 @@
     },
     {
       "provider": "fiber",
-      "language": "go",
-      "url": "http://go-fiber:8000",
       "enabled": true,
       "methods": {
         "GET": true,
@@ -296,8 +254,6 @@
     },
     {
       "provider": "echo",
-      "language": "go",
-      "url": "http://go-echo:8000",
       "enabled": true,
       "methods": {
         "GET": true,

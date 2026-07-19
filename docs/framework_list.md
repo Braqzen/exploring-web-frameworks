@@ -14,6 +14,8 @@ The following table shows the frameworks that are implemented in the project
 | Elixir     |                                                          |
 | Gleam      |                                                          |
 | OCaml      |                                                          |
+| C#         |                                                          |
+| Kotlin     |                                                          |
 
 ## Consider Adding
 
@@ -27,3 +29,5 @@ The following table lists languages and frameworks to potentially add to the pro
 | Elixir   | pheonix                                  |
 | Gleam    | wisp                                     |
 | OCaml    | dream, opium, ocsigen                    |
+| C#       | ASP.NET Core                             |
+| Kotlin   | Ktor, Spring Boot, http4k, Javalin       |

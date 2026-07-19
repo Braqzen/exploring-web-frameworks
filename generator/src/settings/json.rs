@@ -9,23 +9,29 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct ConfigJson {
     /// Which Providers to send load to
-    pub api: Vec<ApiJson>,
+    pub api: Vec<ProviderJson>,
     /// How long to sleep between each request (miliseconds)
     pub sleep: u64,
 }
 
 #[derive(Debug, Deserialize, Clone)]
-pub struct ApiJson {
+pub struct ProviderJson {
+    /// Name to identify the provider
+    pub provider: ProviderName,
+    /// Whether the provider is loaded into the worker
+    pub enabled: bool,
+    /// Methods to send requests to
+    pub methods: MethodsJson,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct MetaJson {
     /// Name to identify the provider
     pub provider: ProviderName,
     /// Programming language
     pub language: Language,
     /// URL to send requests to
     pub url: String,
-    /// Whether the provider is loaded into the worker
-    pub enabled: bool,
-    /// Methods to send requests to
-    pub methods: MethodsJson,
 }
 
 #[derive(Debug, Deserialize, Clone)]
