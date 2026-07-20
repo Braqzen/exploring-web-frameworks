@@ -12,9 +12,9 @@ import {
 export function createApp(state: State): Express {
   const app = express();
 
-  app.use(express.json({ limit: "64kb" }));
+  app.use(express.json({ limit: `${state.config.request_size_limit}kb` }));
   app.use(logMiddleware);
-  app.use(chaosMiddleware);
+  app.use(chaosMiddleware(state));
   registerRoutes(app, state);
   app.use(invalidPathHandler);
   app.use(errorMiddleware);

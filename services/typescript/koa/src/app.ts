@@ -13,9 +13,9 @@ export function createApp(state: State): Koa {
   const app = new Koa();
 
   app.use(errorMiddleware);
-  app.use(bodyParser({ jsonLimit: "64kb" }));
+  app.use(bodyParser({ jsonLimit: `${state.config.request_size_limit}kb` }));
   app.use(logMiddleware);
-  app.use(chaosMiddleware);
+  app.use(chaosMiddleware(state));
   registerRoutes(app, state);
   app.use(invalidPathMiddleware);
 

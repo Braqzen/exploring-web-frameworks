@@ -7,13 +7,15 @@ import { chaosMiddleware, logMiddleware } from "./routes/middleware/index.js";
 import { getLogger } from "telemetry";
 import { AppErrors, sendError } from "./routes/errors.js";
 
+const BYTES = 1024;
+
 export function createApp(state: State): Hono {
   const app = new Hono();
 
   app.use(
     "*",
     bodyLimit({
-      maxSize: 64 * 1024,
+      maxSize: state.config.request_size_limit * BYTES,
       onError: (c) => {
         getLogger().warn(
           { method: c.req.method, path: c.req.path },
@@ -24,7 +26,7 @@ export function createApp(state: State): Hono {
     })
   );
   app.use(logMiddleware);
-  app.use(chaosMiddleware);
+  app.use(chaosMiddleware(state));
   registerRoutes(app, state);
   app.notFound(invalidPathHandler);
   app.onError(errorHandler);

@@ -1,5 +1,5 @@
 import { SocketAddress } from "node:net";
-import { type State, createState } from "app";
+import { type State, createState, createConfig } from "app";
 import { initTelemetry, initLogger } from "telemetry";
 import { createApp } from "./app.js";
 import { startServer } from "./server.js";
@@ -10,12 +10,17 @@ function main(): void {
     throw new Error("SOCKET is not set or invalid");
   }
 
-  const service = "koa";
+  const service = process.env.SERVICE;
+  if (service === undefined || service === "") {
+    throw new Error("SERVICE is not set");
+  }
+
   // Create before init logger
   const telemetry = initTelemetry(service);
   initLogger(service);
 
-  const state: State = createState();
+  const config = createConfig();
+  const state: State = createState(config);
 
   startServer(telemetry, createApp(state), addr);
 }
