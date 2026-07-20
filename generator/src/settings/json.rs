@@ -5,23 +5,43 @@ use crate::{
     settings::{Language, ProviderName},
 };
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 pub struct ConfigJson {
-    /// Which Providers to send load to
-    pub api: Vec<ProviderJson>,
+    /// Defaults applied to every provider in meta.json
+    pub default: ProviderJson,
+    #[serde(default)]
+    pub overrides: HashMap<ProviderName, ProviderOverrideJson>,
     /// How long to sleep between each request (miliseconds)
     pub sleep: u64,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct ProviderJson {
-    /// Name to identify the provider
-    pub provider: ProviderName,
     /// Whether the provider is loaded into the worker
     pub enabled: bool,
     /// Methods to send requests to
     pub methods: MethodsJson,
+}
+
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct ProviderOverrideJson {
+    #[serde(default)]
+    pub enabled: Option<bool>,
+    #[serde(default)]
+    pub methods: MethodsOverrideJson,
+}
+
+#[derive(Debug, Deserialize, Clone, Default)]
+#[serde(default, rename_all = "UPPERCASE")]
+pub struct MethodsOverrideJson {
+    pub get: Option<bool>,
+    pub post: Option<bool>,
+    pub put: Option<bool>,
+    pub delete: Option<bool>,
+    pub patch: Option<bool>,
+    pub head: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -37,12 +57,12 @@ pub struct MetaJson {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 pub struct MethodsJson {
-    get: bool,
-    post: bool,
-    put: bool,
-    delete: bool,
-    patch: bool,
-    head: bool,
+    pub get: bool,
+    pub post: bool,
+    pub put: bool,
+    pub delete: bool,
+    pub patch: bool,
+    pub head: bool,
 }
 
 impl MethodsJson {

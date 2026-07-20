@@ -8,10 +8,7 @@ pub async fn log_middleware(
     res: &mut Response,
     ctrl: &mut FlowCtrl,
 ) {
-    let method = req.method();
-    let path = req.uri();
-
-    debug!(%method, %path, "Incoming request");
+    debug!(method = %req.method(), path = %req.uri(), "Incoming request");
 
     ctrl.call_next(req, depot, res).await;
 }

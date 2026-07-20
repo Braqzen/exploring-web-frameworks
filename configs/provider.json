@@ -1,0 +1,14 @@
+{
+  "default": {
+    "latency": { "enabled": true, "rate": 5 },
+    "error": { "enabled": true, "rate": 5 },
+    "request_size_limit": 64
+  },
+  "overrides": {
+    "axum": {
+      "latency": { "enabled": true, "rate": 5 },
+      "error": { "enabled": true, "rate": 5 },
+      "request_size_limit": 64
+    }
+  }
+}

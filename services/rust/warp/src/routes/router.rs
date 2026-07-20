@@ -10,9 +10,14 @@ use std::{
 };
 use warp::{Filter, reply::Reply};
 
+/// The multipler for the maximum size of a request body
+const BYTES: usize = 1024;
+
 pub fn router(
     state: Arc<Mutex<AppState>>,
 ) -> impl Filter<Extract = impl Reply, Error = Infallible> + Clone {
+    let max_size = BYTES * state.lock().unwrap().config.request_size_limit as usize;
+
     let warp_state = warp::any().map({
         let state = state.clone();
         move || state.clone()
@@ -31,13 +36,13 @@ pub fn router(
     let post = warp::post()
         .and(warp::path::end())
         .and(warp_state.clone())
-        .and(task_body())
+        .and(task_body(max_size))
         .and_then(post_handler);
 
     let put = warp::put()
         .and(task_id())
         .and(warp_state.clone())
-        .and(task_body())
+        .and(task_body(max_size))
         .and_then(put_handler);
 
     let delete = warp::delete()
@@ -53,11 +58,11 @@ pub fn router(
     let patch = warp::patch()
         .and(task_id())
         .and(warp_state)
-        .and(patched_body())
+        .and(patched_body(max_size))
         .and_then(patch_handler);
 
     log_filter()
-        .and(chaos_filter())
+        .and(chaos_filter(state.clone()))
         .and(invalid_root.or(post).or(put).or(delete).or(get).or(patch))
         .recover(handle_rejection)
 }

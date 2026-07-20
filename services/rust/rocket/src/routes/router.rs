@@ -11,15 +11,15 @@ use rocket::{
 };
 use std::sync::{Arc, Mutex};
 
-// TODO: Make configurable?
-/// The maximum size of a request body in bytes (64KB)
-const MAX_BODY_SIZE: usize = 1024 * 64;
+/// The multipler for the maximum size of a request body
+const BYTES: usize = 1024;
 
 pub fn router(state: Arc<Mutex<AppState>>) -> Rocket<Build> {
-    let limit_figment = Config::figment().merge((
-        "limits",
-        Limits::default().limit("json", MAX_BODY_SIZE.bytes()),
-    ));
+    // SAFETY: Nothing should have locked on boot therefore cannot panic
+    let max_size = BYTES * state.lock().unwrap().config.request_size_limit as usize;
+
+    let limit_figment =
+        Config::figment().merge(("limits", Limits::default().limit("json", max_size.bytes())));
 
     rocket::custom(limit_figment)
         .manage(state)

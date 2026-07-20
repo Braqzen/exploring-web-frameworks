@@ -3,7 +3,7 @@ use crate::routes::{
     router,
 };
 use actix_web::{App, HttpServer, middleware::from_fn, web::Data};
-use app::state::AppState;
+use app::{config::AppConfig, state::AppState};
 use eyre::Result;
 use std::{
     net::SocketAddr,
@@ -17,10 +17,11 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new(socket: SocketAddr) -> Self {
+    pub fn new(socket: SocketAddr, app_config: AppConfig) -> Self {
+        let state = AppState::new(app_config);
         Self {
             socket,
-            state: Arc::new(Mutex::new(AppState::new())),
+            state: Arc::new(Mutex::new(state)),
         }
     }
 
@@ -32,7 +33,7 @@ impl Server {
                 .wrap(from_fn(chaos_middleware))
                 .wrap(from_fn(log_middleware))
                 .app_data(Data::from(self.state.clone()))
-                .configure(router)
+                .configure(|cfg| router(cfg, self.state.clone()))
         })
         .shutdown_timeout(2)
         .bind(self.socket)?
