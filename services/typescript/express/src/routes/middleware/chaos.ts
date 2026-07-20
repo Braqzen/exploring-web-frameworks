@@ -1,20 +1,21 @@
 import type { RequestHandler, Request, Response, NextFunction } from "express";
 import { randomInt } from "node:crypto";
 import { setTimeout } from "node:timers/promises";
+import type { State } from "app";
 import { AppErrors, sendError } from "../errors.js";
 
-export const chaosMiddleware: RequestHandler = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (randomInt(0, 101) < 5) {
-    // Note: can't do sub ms but logic is same
-    await setTimeout(randomInt(500, 1501) / 1000);
-  }
-  if (randomInt(0, 101) < 5) {
-    return sendError(res, AppErrors.Internal);
-  }
+export function chaosMiddleware(state: State): RequestHandler {
+  return async (_req: Request, res: Response, next: NextFunction) => {
+    const config = state.config;
 
-  return next();
-};
+    if (config.latency.enabled && randomInt(0, 101) < config.latency.rate) {
+      // Note: can't do sub ms but logic is same
+      await setTimeout(randomInt(500, 1501) / 1000);
+    }
+    if (config.error.enabled && randomInt(0, 101) < config.error.rate) {
+      return sendError(res, AppErrors.Internal);
+    }
+
+    return next();
+  };
+}

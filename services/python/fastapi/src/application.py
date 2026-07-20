@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
+from app.config import Config
 from app.state import AppState
 from routes.middleware import log_middleware, chaos_middleware, body_size_middleware
 from routes.handlers import (
@@ -41,6 +42,7 @@ class Application:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app.state.config = Config.new()
     app.state.app_state = AppState()
     app.state.tasks_lock = asyncio.Lock()
     yield

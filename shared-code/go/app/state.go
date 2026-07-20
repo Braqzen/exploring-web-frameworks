@@ -8,12 +8,14 @@ import (
 
 // TODO: fields should be private
 type AppState struct {
-	Mu    sync.RWMutex
-	Tasks map[uuid.UUID]Task
+	Mu     sync.RWMutex
+	Tasks  map[uuid.UUID]Task
+	Config AppConfig
 }
 
-func NewState() *AppState {
+func NewState(appConfig AppConfig) *AppState {
 	return &AppState{
-		Tasks: make(map[uuid.UUID]Task),
+		Tasks:  make(map[uuid.UUID]Task),
+		Config: appConfig,
 	}
 }

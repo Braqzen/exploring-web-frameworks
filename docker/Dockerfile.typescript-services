@@ -11,9 +11,12 @@ RUN pnpm build
 RUN pnpm prune --production
 
 FROM node:26-slim
+ARG SERVICE
+ENV SERVICE=${SERVICE}
 WORKDIR /app
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY configs/provider.json /app/provider.json
 
 CMD ["node", "dist/index.js"]

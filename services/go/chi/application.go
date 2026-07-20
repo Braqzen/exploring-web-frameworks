@@ -9,21 +9,21 @@ import (
 	chimw "github.com/go-chi/chi/v5/middleware"
 )
 
-const maxBodySize = 64 * 1024
+const BYTES = 1024
 
 type Application struct {
 	Engine *chi.Mux
 	state  *app.AppState
 }
 
-func NewApplication() *Application {
-	state := app.NewState()
+func NewApplication(appConfig app.AppConfig) *Application {
+	state := app.NewState(appConfig)
 
 	engine := chi.NewRouter()
-	engine.Use(chimw.RequestSize(maxBodySize))
+	engine.Use(chimw.RequestSize(int64(appConfig.RequestSizeLimit * BYTES)))
 	engine.Use(middleware.RecoverMiddleware)
 	engine.Use(middleware.LogMiddleware)
-	engine.Use(middleware.ChaosMiddleware)
+	engine.Use(middleware.ChaosMiddleware(state))
 
 	engine.Post("/", handlers.PostHandler(state))
 	engine.Get("/{id}", handlers.GetHandler(state))

@@ -3,22 +3,24 @@ use crate::routes::{
     middleware::{chaos_middleware, log_middleware},
 };
 use app::state::AppState;
-use salvo::{Router, affix_state::inject, size_limiter::max_size};
+use salvo::{Router, affix_state::inject, size_limiter::max_size as limiter};
 use std::sync::{Arc, Mutex};
 
-// TODO: Make configurable?
-/// The maximum size of a request body in bytes (64KB)
-const MAX_BODY_SIZE: usize = 1024 * 64;
+/// The multipler for the maximum size of a request body
+const BYTES: usize = 1024;
 
 pub fn router(state: Arc<Mutex<AppState>>) -> Router {
+    // SAFETY: Nothing should have locked on boot therefore cannot panic
+    let max_size = BYTES * state.lock().unwrap().config.request_size_limit as usize;
+
     Router::new()
+        .hoop(inject(state))
         .hoop(chaos_middleware)
         .hoop(log_middleware)
-        .hoop(inject(state))
         .push(
             Router::new()
                 .post(post_handler)
-                .hoop(max_size(MAX_BODY_SIZE as u64)),
+                .hoop(limiter(max_size as u64)),
         )
         .push(
             Router::with_path("{task_id}")
@@ -26,7 +28,7 @@ pub fn router(state: Arc<Mutex<AppState>>) -> Router {
                 .delete(delete_handler)
                 .push(
                     Router::new()
-                        .hoop(max_size(MAX_BODY_SIZE as u64))
+                        .hoop(limiter(max_size as u64))
                         .put(put_handler)
                         .patch(patch_handler),
                 ),

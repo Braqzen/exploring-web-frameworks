@@ -4,6 +4,7 @@ from asyncio import sleep
 
 from inspect import iscoroutinefunction
 from asgiref.sync import markcoroutinefunction
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 
 from routes.errors import send_error, AppErrors
@@ -21,8 +22,10 @@ class ChaosMiddleware:
             markcoroutinefunction(self)
 
     async def __call__(self, request: HttpRequest) -> HttpResponse:
-        if randrange(0, 101) < 5:
+        config = settings.APP_CONFIG
+
+        if config.latency.enabled and randrange(0, 101) < config.latency.rate:
             await sleep(randrange(500, 1501) / 1_000_000)
-        if randrange(0, 101) < 5:
+        if config.error.enabled and randrange(0, 101) < config.error.rate:
             return send_error(AppErrors.Internal)
         return await self.get_response(request)

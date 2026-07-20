@@ -9,16 +9,18 @@ use app::state::AppState;
 use axum::{
     Router,
     extract::DefaultBodyLimit,
-    middleware::from_fn,
+    middleware::{from_fn, from_fn_with_state},
     routing::{get, post},
 };
 use std::sync::{Arc, Mutex};
 
-// TODO: Make configurable?
-/// The maximum size of a request body in bytes (64KB)
-const MAX_BODY_SIZE: usize = 1024 * 64;
+/// The multipler for the maximum size of a request body
+const BYTES: usize = 1024;
 
 pub fn router(state: Arc<Mutex<AppState>>) -> Router {
+    // SAFETY: Nothing should have locked on boot therefore cannot panic
+    let max_size = BYTES * state.lock().unwrap().config.request_size_limit as usize;
+
     Router::new()
         .route("/", post(post_handler))
         .route(
@@ -28,10 +30,10 @@ pub fn router(state: Arc<Mutex<AppState>>) -> Router {
                 .patch(patch_handler)
                 .delete(delete_handler),
         )
-        .with_state(state)
+        .with_state(state.clone())
         .fallback(invalid_path_handler)
         .method_not_allowed_fallback(invalid_method_handler)
-        .layer(from_fn(chaos_middleware))
+        .layer(from_fn_with_state(state, chaos_middleware))
         .layer(from_fn(log_middleware))
-        .layer(DefaultBodyLimit::max(MAX_BODY_SIZE))
+        .layer(DefaultBodyLimit::max(max_size))
 }

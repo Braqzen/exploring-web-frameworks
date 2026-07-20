@@ -17,9 +17,6 @@ impl Fairing for LogFairing {
 
     #[instrument(skip_all)]
     async fn on_request(&self, req: &mut Request<'_>, _: &mut Data<'_>) {
-        let method = req.method();
-        let path = req.uri();
-
-        debug!(%method, %path, "Incoming request");
+        debug!(method = %req.method(), path = %req.uri(), "Incoming request");
     }
 }

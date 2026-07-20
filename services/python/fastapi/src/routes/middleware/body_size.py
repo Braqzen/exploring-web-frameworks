@@ -4,8 +4,7 @@ from collections.abc import Awaitable, Callable
 
 from routes.errors import send_error, AppErrors
 
-# TODO: make configurable?
-MAX_BODY_SIZE: int = 64 * 1024
+BYTES: int = 1024
 
 
 async def body_size_middleware(
@@ -13,7 +12,10 @@ async def body_size_middleware(
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
     if request.method in {"POST", "PUT", "PATCH"}:
-        if len(await request.body()) > MAX_BODY_SIZE:
+        if (
+            len(await request.body())
+            > request.app.state.config.request_size_limit * BYTES
+        ):
             structlog.get_logger().warn(
                 "Invalid body JSON", method=request.method, path=request.url.path
             )

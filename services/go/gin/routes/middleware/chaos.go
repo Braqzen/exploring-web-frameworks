@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"app"
 	"gin/routes"
 	"math/rand/v2"
 	"time"
@@ -8,13 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ChaosMiddleware() gin.HandlerFunc {
+func ChaosMiddleware(state *app.AppState) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if rand.IntN(101) < 5 {
+		latencyEnabled := state.Config.Latency.Enabled
+		latencyRate := state.Config.Latency.Rate
+		errorEnabled := state.Config.Error.Enabled
+		errorRate := state.Config.Error.Rate
+
+		if latencyEnabled && rand.IntN(101) < int(latencyRate) {
 			delay := time.Duration(500+rand.IntN(1001)) * time.Microsecond
 			time.Sleep(delay)
 		}
-		if rand.IntN(101) < 5 {
+		if errorEnabled && rand.IntN(101) < int(errorRate) {
 			routes.AppErrors.Internal.Error(c)
 			c.Abort()
 			return

@@ -5,10 +5,6 @@ use tracing::{instrument, warn};
 use uuid::Uuid;
 use warp::{Filter, filters::path::FullPath, http::Method, hyper::body::Bytes, reject::Rejection};
 
-// TODO: Make configurable?
-/// The maximum size of a request body in bytes (64KB)
-const MAX_BODY_SIZE: usize = 1024 * 64;
-
 /// Wrapper creating UUID or returning an error response
 pub fn task_id() -> impl Filter<Extract = (Uuid,), Error = Rejection> + Copy {
     warp::path::full()
@@ -16,17 +12,21 @@ pub fn task_id() -> impl Filter<Extract = (Uuid,), Error = Rejection> + Copy {
         .and_then(parse_task_id)
 }
 
-pub fn task_body() -> impl Filter<Extract = (Task,), Error = Rejection> + Copy {
+pub fn task_body(max_size: usize) -> impl Filter<Extract = (Task,), Error = Rejection> + Copy {
     warp::path::full()
         .and(warp::method())
         .and(warp::body::bytes())
+        .and(warp::any().map(move || max_size))
         .and_then(parse_task_body)
 }
 
-pub fn patched_body() -> impl Filter<Extract = (PatchedTask,), Error = Rejection> + Copy {
+pub fn patched_body(
+    max_size: usize,
+) -> impl Filter<Extract = (PatchedTask,), Error = Rejection> + Copy {
     warp::path::full()
         .and(warp::method())
         .and(warp::body::bytes())
+        .and(warp::any().map(move || max_size))
         .and_then(parse_patched_task_body)
 }
 
@@ -43,9 +43,14 @@ async fn parse_task_id(path: FullPath, method: Method) -> Result<Uuid, Rejection
 }
 
 #[instrument(skip_all)]
-async fn parse_task_body(path: FullPath, method: Method, body: Bytes) -> Result<Task, Rejection> {
+async fn parse_task_body(
+    path: FullPath,
+    method: Method,
+    body: Bytes,
+    max_size: usize,
+) -> Result<Task, Rejection> {
     let path = path.as_str();
-    deserialize::<Task>(&body, &method, path).map_err(warp::reject::custom)
+    deserialize::<Task>(&body, &method, path, max_size).map_err(warp::reject::custom)
 }
 
 #[instrument(skip_all)]
@@ -53,9 +58,10 @@ async fn parse_patched_task_body(
     path: FullPath,
     method: Method,
     body: Bytes,
+    max_size: usize,
 ) -> Result<PatchedTask, Rejection> {
     let path = path.as_str();
-    deserialize::<PatchedTask>(&body, &method, path).map_err(warp::reject::custom)
+    deserialize::<PatchedTask>(&body, &method, path, max_size).map_err(warp::reject::custom)
 }
 
 /// Deserializes a JSON body into a type T
@@ -64,8 +70,9 @@ fn deserialize<T: DeserializeOwned>(
     body: &[u8],
     method: &Method,
     path: &str,
+    max_size: usize,
 ) -> Result<T, AppError> {
-    if body.len() > MAX_BODY_SIZE {
+    if body.len() > max_size {
         warn!(%method, %path, "Invalid body size");
         return Err(AppError::InvalidBodySize);
     }

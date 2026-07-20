@@ -2,6 +2,7 @@ import asyncio
 from sanic import Sanic
 from sanic.exceptions import NotFound, MethodNotAllowed, PayloadTooLarge
 
+from app.config import Config
 from app.state import AppState
 from routes.hooks import log_hook, chaos_hook
 from routes.handlers import (
@@ -16,16 +17,17 @@ from routes.handlers import (
     large_payload_handler,
 )
 
-# TODO: make configurable?
-MAX_BODY_SIZE: int = 64 * 1024
+BYTES: int = 1024
 
 
 class Application:
     def __init__(self) -> None:
         self.app = Sanic("sanic", configure_logging=False)
+        config = Config.new()
+        self.app.ctx.config = config
         self.app.ctx.state = AppState()
         self.app.ctx.tasks_lock = asyncio.Lock()
-        self.app.config.REQUEST_MAX_SIZE = MAX_BODY_SIZE
+        self.app.config.REQUEST_MAX_SIZE = config.request_size_limit * BYTES
 
         self.app.on_request(chaos_hook)
         self.app.on_request(log_hook)

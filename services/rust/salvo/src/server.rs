@@ -1,5 +1,5 @@
 use crate::routes::{invalid_method_handler, invalid_path_handler, router};
-use app::state::AppState;
+use app::{config::AppConfig, state::AppState};
 use eyre::Result;
 use salvo::{Listener, Server as SalvoServer, Service, catcher::Catcher, prelude::TcpListener};
 use std::{
@@ -15,10 +15,11 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new(socket: SocketAddr) -> Self {
+    pub fn new(socket: SocketAddr, app_config: AppConfig) -> Self {
+        let state = AppState::new(app_config);
         Self {
             socket,
-            state: Arc::new(Mutex::new(AppState::new())),
+            state: Arc::new(Mutex::new(state)),
         }
     }
 

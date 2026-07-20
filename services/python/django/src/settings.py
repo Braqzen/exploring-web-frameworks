@@ -1,7 +1,10 @@
+from app.config import Config
+
 SECRET_KEY = "dev-only"
 ROOT_URLCONF = "urls"
 ALLOWED_HOSTS = ["*"]
-DATA_UPLOAD_MAX_MEMORY_SIZE = 64 * 1024  # TODO: make configurable?
+APP_CONFIG = Config.new()
+DATA_UPLOAD_MAX_MEMORY_SIZE = APP_CONFIG.request_size_limit * 1024
 MIDDLEWARE = [
     "routes.middleware.log.LogMiddleware",
     "routes.middleware.chaos.ChaosMiddleware",

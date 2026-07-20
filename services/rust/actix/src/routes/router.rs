@@ -3,12 +3,16 @@ use crate::routes::handlers::{
     post_handler, put_handler,
 };
 use actix_web::web::{self, JsonConfig, ServiceConfig, delete, get, patch, post, put, resource};
+use app::state::AppState;
+use std::sync::{Arc, Mutex};
 
-// TODO: Make configurable?
-/// The maximum size of a request body in bytes (64KB)
-const MAX_BODY_SIZE: usize = 1024 * 64;
+/// The multipler for the maximum size of a request body
+const BYTES: usize = 1024;
 
-pub fn router(config: &mut ServiceConfig) {
+pub fn router(config: &mut ServiceConfig, state: Arc<Mutex<AppState>>) {
+    // SAFETY: Nothing should have locked on boot therefore cannot panic
+    let max_size = BYTES * state.lock().unwrap().config.request_size_limit as usize;
+
     config
         .service(
             resource("/")
@@ -24,5 +28,5 @@ pub fn router(config: &mut ServiceConfig) {
                 .default_service(web::to(invalid_method_handler)),
         )
         .default_service(web::to(invalid_path_handler))
-        .app_data(JsonConfig::default().limit(MAX_BODY_SIZE));
+        .app_data(JsonConfig::default().limit(max_size));
 }

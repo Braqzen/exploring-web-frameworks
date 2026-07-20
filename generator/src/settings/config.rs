@@ -2,11 +2,10 @@
 
 use crate::{
     methods::Method,
-    settings::json::{ConfigJson, MetaJson, ProviderJson},
+    settings::json::{ConfigJson, MetaJson},
 };
 use eyre::Result;
 use serde::Deserialize;
-use std::collections::HashMap;
 
 pub struct Config {
     /// Which Providers to send load to
@@ -23,11 +22,34 @@ impl Config {
         let meta = std::fs::read_to_string("/app/meta.json")?;
         let meta = serde_json::from_str::<Vec<MetaJson>>(&meta)?;
 
-        let meta: HashMap<ProviderName, MetaJson> =
-            meta.into_iter().map(|m| (m.provider.clone(), m)).collect();
-
         let mut api = Vec::new();
-        for provider in config.api {
+        for obj in meta {
+            let mut provider = config.default.clone();
+
+            if let Some(provider_override) = config.overrides.get(&obj.provider) {
+                if let Some(enabled) = provider_override.enabled {
+                    provider.enabled = enabled;
+                }
+                if let Some(v) = provider_override.methods.get {
+                    provider.methods.get = v;
+                }
+                if let Some(v) = provider_override.methods.post {
+                    provider.methods.post = v;
+                }
+                if let Some(v) = provider_override.methods.put {
+                    provider.methods.put = v;
+                }
+                if let Some(v) = provider_override.methods.delete {
+                    provider.methods.delete = v;
+                }
+                if let Some(v) = provider_override.methods.patch {
+                    provider.methods.patch = v;
+                }
+                if let Some(v) = provider_override.methods.head {
+                    provider.methods.head = v;
+                }
+            }
+
             if !provider.enabled {
                 continue;
             }
@@ -35,21 +57,13 @@ impl Config {
             let methods = provider.methods.enabled();
             if methods.is_empty() {
                 tracing::error!(
-                    provider = provider.provider.to_string(),
+                    provider = obj.provider.to_string(),
                     "All HTTP methods disabled for provider"
                 );
                 continue;
             }
 
-            let Some(meta) = meta.get(&provider.provider).cloned() else {
-                tracing::error!(
-                    provider = provider.provider.to_string(),
-                    "No meta entry for provider"
-                );
-                continue;
-            };
-
-            api.push(ProviderOptions::new(provider, meta, methods));
+            api.push(ProviderOptions::new(obj, methods));
         }
 
         if api.is_empty() {
@@ -83,9 +97,9 @@ pub struct ProviderOptions {
 }
 
 impl ProviderOptions {
-    fn new(provider: ProviderJson, meta: MetaJson, methods: Vec<Method>) -> Self {
+    fn new(meta: MetaJson, methods: Vec<Method>) -> Self {
         Self {
-            provider: provider.provider,
+            provider: meta.provider,
             language: meta.language,
             url: meta.url,
             methods,
