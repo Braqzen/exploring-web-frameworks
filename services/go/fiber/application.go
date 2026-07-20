@@ -9,24 +9,24 @@ import (
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 )
 
-const maxBodySize = 64 * 1024
+const BYTES = 1024
 
 type Application struct {
 	Engine *fiber.App
 	state  *app.AppState
 }
 
-func NewApplication() *Application {
-	state := app.NewState()
+func NewApplication(appConfig app.AppConfig) *Application {
+	state := app.NewState(appConfig)
 
 	engine := fiber.New(fiber.Config{
-		BodyLimit:    maxBodySize,
+		BodyLimit:    int(appConfig.RequestSizeLimit * BYTES),
 		ErrorHandler: handlers.ErrorHandler,
 	})
 
 	engine.Use(recoverer.New())
 	engine.Use(middleware.LogMiddleware())
-	engine.Use(middleware.ChaosMiddleware())
+	engine.Use(middleware.ChaosMiddleware(state))
 
 	engine.Post("/", handlers.PostHandler(state))
 	engine.Get("/:id", handlers.GetHandler(state))

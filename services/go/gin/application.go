@@ -13,8 +13,8 @@ type Application struct {
 	state  *app.AppState
 }
 
-func NewApplication() *Application {
-	state := app.NewState()
+func NewApplication(appConfig app.AppConfig) *Application {
+	state := app.NewState(appConfig)
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -24,7 +24,7 @@ func NewApplication() *Application {
 	engine.Use(gin.CustomRecovery(handlers.InternalHandler))
 	engine.Use(middleware.BodySizeMiddleware())
 	engine.Use(middleware.LogMiddleware())
-	engine.Use(middleware.ChaosMiddleware())
+	engine.Use(middleware.ChaosMiddleware(state))
 
 	engine.POST("/", handlers.PostHandler(state))
 	engine.GET("/:id", handlers.GetHandler(state))

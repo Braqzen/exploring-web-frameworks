@@ -11,7 +11,10 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod tidy && go build -o /server .
 
 FROM debian:bookworm-slim
+ARG SERVICE
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /server /app/server
+COPY configs/provider.json /app/provider.json
+ENV SERVICE=${SERVICE}
 
 CMD ["/app/server"]

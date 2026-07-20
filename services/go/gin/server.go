@@ -1,6 +1,7 @@
 package main
 
 import (
+	"app"
 	"context"
 	"errors"
 	"fmt"
@@ -25,7 +26,12 @@ func NewServer(socket string) (*Server, error) {
 		return nil, fmt.Errorf("socket error: %w", err)
 	}
 
-	return &Server{socket: socket, app: NewApplication()}, nil
+	appConfig, err := app.NewAppConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Server{socket: socket, app: NewApplication(appConfig)}, nil
 }
 
 func (self *Server) Run(tel *telemetry.Telemetry) error {

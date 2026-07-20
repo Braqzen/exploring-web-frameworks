@@ -9,15 +9,15 @@ import (
 	echomw "github.com/labstack/echo/v5/middleware"
 )
 
-const maxBodySize = 64 * 1024
+const BYTES = 1024
 
 type Application struct {
 	Engine *echo.Echo
 	state  *app.AppState
 }
 
-func NewApplication() *Application {
-	state := app.NewState()
+func NewApplication(appConfig app.AppConfig) *Application {
+	state := app.NewState(appConfig)
 
 	engine := echo.NewWithConfig(echo.Config{
 		Router: echo.NewRouter(echo.RouterConfig{
@@ -25,10 +25,10 @@ func NewApplication() *Application {
 			MethodNotAllowedHandler: handlers.InvalidMethodHandler,
 		}),
 	})
-	engine.Use(echomw.BodyLimit(maxBodySize))
+	engine.Use(echomw.BodyLimit(int64(appConfig.RequestSizeLimit * BYTES)))
 	engine.Use(middleware.RecoverMiddleware)
 	engine.Use(middleware.LogMiddleware)
-	engine.Use(middleware.ChaosMiddleware)
+	engine.Use(middleware.ChaosMiddleware(state))
 
 	engine.POST("/", handlers.PostHandler(state))
 	engine.GET("/:id", handlers.GetHandler(state))
