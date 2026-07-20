@@ -3,6 +3,7 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.routing import Route
 
+from app.config import Config
 from app.state import AppState
 from routes.middleware import LogMiddleware, ChaosMiddleware, BodySizeMiddleware
 from routes.handlers import (
@@ -16,12 +17,12 @@ from routes.handlers import (
     invalid_path_handler,
 )
 
-# TODO: make configurable?
-MAX_BODY_SIZE: int = 64 * 1024
+BYTES: int = 1024
 
 
 class Application:
     def __init__(self) -> None:
+        config = Config.new()
         self.app = Starlette(
             routes=[
                 Route("/", endpoint=post_handler, methods=["POST"]),
@@ -33,7 +34,10 @@ class Application:
             middleware=[
                 Middleware(LogMiddleware),
                 Middleware(ChaosMiddleware),
-                Middleware(BodySizeMiddleware, max_size=MAX_BODY_SIZE),
+                Middleware(
+                    BodySizeMiddleware,
+                    max_size=config.request_size_limit * BYTES,
+                ),
             ],
             exception_handlers={
                 404: invalid_path_handler,
@@ -42,5 +46,6 @@ class Application:
             },
         )
 
+        self.app.state.config = config
         self.app.state.app_state = AppState()
         self.app.state.tasks_lock = asyncio.Lock()

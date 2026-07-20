@@ -8,12 +8,13 @@ WORKDIR /app
 
 COPY services/python/${SERVICE} /app
 COPY shared-code/python /shared-code/python
-
+COPY configs/provider.json /app/provider.json
+ENV SERVICE=${SERVICE}
 ENV UV_SYSTEM_PYTHON=1
 
 RUN uv pip install --no-cache --no-sources \
     -r /app/pyproject.toml \
     /shared-code/python/app \
     /shared-code/python/telemetry
-
+    
 CMD ["python", "/app/src/main.py"]

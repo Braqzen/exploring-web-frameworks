@@ -10,9 +10,11 @@ async def chaos_middleware(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
-    if randrange(0, 101) < 5:
+    config = request.app.state.config
+
+    if config.latency.enabled and randrange(0, 101) < config.latency.rate:
         await sleep(randrange(500, 1501) / 1_000_000)
-    if randrange(0, 101) < 5:
+    if config.error.enabled and randrange(0, 101) < config.error.rate:
         return send_error(AppErrors.Internal)
 
     return await call_next(request)

@@ -1,5 +1,6 @@
 from quart import Quart, Blueprint, request
 
+from app.config import Config
 from app.state import AppState
 from routes.middleware import log_middleware, chaos_middleware
 from routes.errors import send_error, AppErrors
@@ -15,8 +16,7 @@ from routes.handlers import (
     patch_handler,
 )
 
-# TODO: make configurable?
-MAX_BODY_SIZE: int = 64 * 1024
+BYTES: int = 1024
 
 
 class Application:
@@ -24,8 +24,10 @@ class Application:
         self.app = Quart(__name__, static_folder=None)
         bp = Blueprint("quart", __name__)
 
-        self.app.config["MAX_CONTENT_LENGTH"] = MAX_BODY_SIZE
+        config = Config.new()
+        self.app.config["MAX_CONTENT_LENGTH"] = config.request_size_limit * BYTES
         self.app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
+        self.app.extensions["config"] = config
         self.app.extensions["state"] = AppState()
 
         self.app.before_request(log_middleware)

@@ -7,9 +7,11 @@ from routes.errors import send_error, AppErrors
 
 
 async def chaos_hook(
-    _request: Request,
+    request: Request,
 ) -> JSONResponse | None:
-    if randrange(0, 101) < 5:
+    config = request.app.ctx.config
+
+    if config.latency.enabled and randrange(0, 101) < config.latency.rate:
         await sleep(randrange(500, 1501) / 1_000_000)
-    if randrange(0, 101) < 5:
+    if config.error.enabled and randrange(0, 101) < config.error.rate:
         return send_error(AppErrors.Internal)
