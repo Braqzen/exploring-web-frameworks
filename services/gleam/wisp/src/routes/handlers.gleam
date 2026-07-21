@@ -1,3 +1,5 @@
+// Re-export as 1 module
+
 import routes/handlers/get
 import routes/handlers/post
 

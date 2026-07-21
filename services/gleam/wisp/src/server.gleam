@@ -14,7 +14,13 @@ pub type Server {
 
 pub fn new_server(socket: String) -> Result(Server, String) {
   use socket <- result.try(parse_socket(socket))
-  let application = Application(state: new_app_state())
+
+  use state <- result.try(
+    new_app_state()
+    |> result.map_error(fn(_) { "failed to start state actor" }),
+  )
+
+  let application = Application(state)
   Ok(Server(socket, application))
 }
 
