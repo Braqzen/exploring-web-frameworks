@@ -132,6 +132,7 @@ pub enum ProviderName {
     Chi,
     Fiber,
     Echo,
+    Wisp,
 }
 
 impl ToString for ProviderName {
@@ -159,6 +160,7 @@ impl ToString for ProviderName {
             Self::Chi => "chi".to_string(),
             Self::Fiber => "fiber".to_string(),
             Self::Echo => "echo".to_string(),
+            Self::Wisp => "wisp".to_string(),
         }
     }
 }
@@ -170,6 +172,7 @@ pub enum Language {
     Typescript,
     Python,
     Go,
+    Gleam,
 }
 
 impl ToString for Language {
@@ -179,6 +182,7 @@ impl ToString for Language {
             Self::Typescript => "typescript".to_string(),
             Self::Python => "python".to_string(),
             Self::Go => "go".to_string(),
+            Self::Gleam => "gleam".to_string(),
         }
     }
 }

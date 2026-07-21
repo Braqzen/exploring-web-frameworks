@@ -1,6 +1,6 @@
 {
   "default": {
-    "enabled": true,
+    "enabled": false,
     "methods": {
       "GET": true,
       "POST": true,
@@ -20,6 +20,17 @@
         "DELETE": true,
         "PATCH": true,
         "HEAD": true
+      }
+    },
+    "wisp": {
+      "enabled": true,
+      "methods": {
+        "GET": true,
+        "POST": true,
+        "PUT": false,
+        "DELETE": false,
+        "PATCH": false,
+        "HEAD": false
       }
     }
   },
