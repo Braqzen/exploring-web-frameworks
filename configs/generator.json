@@ -27,10 +27,10 @@
       "methods": {
         "GET": true,
         "POST": true,
-        "PUT": false,
-        "DELETE": false,
-        "PATCH": false,
-        "HEAD": false
+        "PUT": true,
+        "DELETE": true,
+        "PATCH": true,
+        "HEAD": true
       }
     }
   },

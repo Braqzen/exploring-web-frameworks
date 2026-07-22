@@ -23,9 +23,9 @@ pub fn decode_operation() -> decode.Decoder(Operation) {
 
 pub fn encode_operation(operation: Operation) -> String {
   case operation {
-    Transform -> "transform"
-    Merge -> "merge"
-    Sort -> "sort"
-    Compute -> "compute"
+    Transform -> "Transform"
+    Merge -> "Merge"
+    Sort -> "Sort"
+    Compute -> "Compute"
   }
 }

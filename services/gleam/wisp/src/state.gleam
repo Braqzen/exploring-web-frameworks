@@ -46,3 +46,14 @@ pub fn get(state: AppState, id: Uuid) -> Result(Task, StateError) {
     Error(_) -> Error(Timeout)
   }
 }
+
+pub fn delete(state: AppState, id: Uuid) -> Result(Nil, StateError) {
+  let reply = process.new_subject()
+  process.send(state.tasks, message.Delete(id, reply))
+
+  case process.receive(reply, 1000) {
+    Ok(Ok(Nil)) -> Ok(Nil)
+    Ok(Error(Nil)) -> Error(NotFound)
+    Error(_) -> Error(Timeout)
+  }
+}

@@ -1,0 +1,22 @@
+import routes/error.{
+  internal, invalid_json_body, require, send_error, task_not_found,
+}
+import state.{type AppState, NotFound, Timeout, get, insert}
+import task.{Task, encode_task, parse_patched_task}
+import wisp.{type Request, type Response}
+import youid/uuid.{type Uuid}
+
+pub fn patch_handler(request: Request, state: AppState, id: Uuid) -> Response {
+  use body <- require(wisp.read_body_bits(request), invalid_json_body)
+  use patched_task <- require(parse_patched_task(body), invalid_json_body)
+
+  case get(state, id) {
+    Error(NotFound) -> send_error(task_not_found)
+    Error(Timeout) -> send_error(internal)
+    Ok(existing) -> {
+      let task = Task(..existing, operation: patched_task.operation)
+      use _ <- require(insert(state, id, task), internal)
+      wisp.json_response(encode_task(task), 200)
+    }
+  }
+}
