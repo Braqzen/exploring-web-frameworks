@@ -7,7 +7,7 @@ import youid/uuid.{type Uuid}
 pub type Message {
   Insert(id: Uuid, task: Task, reply: Subject(Nil))
   Get(id: Uuid, reply: Subject(Result(Task, Nil)))
-  Delete(id: Uuid, reply: Subject(Result(Nil, Nil)))
+  Delete(id: Uuid, reply: Subject(Result(Task, Nil)))
 }
 
 pub fn process_message(
@@ -25,12 +25,12 @@ pub fn process_message(
       actor.continue(tasks)
     }
     Delete(id, reply) -> {
-      case dict.has_key(tasks, id) {
-        True -> {
-          process.send(reply, Ok(Nil))
+      case dict.get(tasks, id) {
+        Ok(task) -> {
+          process.send(reply, Ok(task))
           actor.continue(dict.delete(tasks, id))
         }
-        False -> {
+        Error(_) -> {
           process.send(reply, Error(Nil))
           actor.continue(tasks)
         }

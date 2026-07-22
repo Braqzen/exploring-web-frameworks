@@ -11,5 +11,7 @@ mist = "== 6.0.3"
 wisp = "== 2.2.2"
 youid = "== 1.6.0"
 envoy = "== 1.2.0"
+palabres = ">= 1.0.4 and < 2.0.0"
+exception = ">= 2.1.1 and < 3.0.0"
 
 [dev-dependencies]

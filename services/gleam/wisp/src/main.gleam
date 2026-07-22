@@ -1,11 +1,19 @@
 import envoy
 import gleam/result
+import logger_
+import palabres/level
 import server.{new_server, run_server}
 
-// TODO: SOCKET="0.0.0.0:8000" ERL_FLAGS="+B" gleam run -m main
-// kill the output
-
 pub fn main() -> Nil {
+  let assert Ok(log_level) =
+    envoy.get("LOG_LEVEL")
+    |> result.map_error(fn(_) { panic as "LOG_LEVEL env error" })
+
+  case level.from_string(log_level) {
+    Ok(min) -> logger_.configure_logger(min)
+    Error(_) -> panic as "invalid LOG_LEVEL"
+  }
+
   let assert Ok(socket) =
     envoy.get("SOCKET")
     |> result.map_error(fn(_) { panic as "SOCKET not set" })

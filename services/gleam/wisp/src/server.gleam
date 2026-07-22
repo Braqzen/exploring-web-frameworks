@@ -4,6 +4,7 @@ import gleam/int
 import gleam/result
 import gleam/string
 import mist
+import palabres
 import state.{new_app_state}
 import wisp
 import wisp/wisp_mist
@@ -33,6 +34,16 @@ pub fn run_server(server: Server) {
     |> mist.new
     |> mist.bind(server.socket.host)
     |> mist.port(server.socket.port)
+
+  palabres.info("Starting router")
+  |> palabres.string(
+    "socket",
+    string.join(
+      [server.socket.host, int.to_string(server.socket.port)],
+      with: ":",
+    ),
+  )
+  |> palabres.log
 
   // Note: there is no graceful shutdowns without something like FFI into erlang
   case mist.start(builder) {
