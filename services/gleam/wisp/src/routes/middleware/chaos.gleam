@@ -1,7 +1,7 @@
+import app/state.{type AppState}
 import gleam/erlang/process
 import gleam/int
 import routes/error.{internal, send_error}
-import state.{type AppState}
 import wisp.{type Request, type Response}
 
 pub fn chaos_middleware(

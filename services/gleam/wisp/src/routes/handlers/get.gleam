@@ -1,10 +1,10 @@
+import app/operation.{encode_operation}
+import app/state.{type AppState, NotFound, Timeout, get}
+import app/task.{encode_task}
 import gleam/http
 import gleam/string
-import operation.{encode_operation}
 import palabres
 import routes/error.{internal, send_error, task_not_found}
-import state.{type AppState, NotFound, Timeout, get}
-import task.{encode_task}
 import wisp.{type Request, type Response}
 import youid/uuid.{type Uuid}
 

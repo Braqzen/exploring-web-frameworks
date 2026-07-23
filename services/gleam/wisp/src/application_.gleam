@@ -1,10 +1,10 @@
+import app/state.{type AppState}
 import gleam/http.{Delete, Get, Patch, Post, Put}
 import routes/error.{invalid_method, invalid_path, send_error}
 import routes/handlers.{
   delete_handler, get_handler, patch_handler, post_handler, put_handler,
 }
 import routes/middleware.{chaos_middleware, log_middleware, rescue_middleware}
-import state.{type AppState}
 import wisp.{type Request, type Response}
 import youid/uuid.{type Uuid}
 

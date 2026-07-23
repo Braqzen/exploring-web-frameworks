@@ -1,6 +1,6 @@
+import app/operation.{type Operation, decode_operation, encode_operation}
 import gleam/dynamic/decode
 import gleam/json.{type DecodeError}
-import operation.{type Operation, decode_operation, encode_operation}
 
 pub type Task {
   Task(secret: String, operation: Operation)

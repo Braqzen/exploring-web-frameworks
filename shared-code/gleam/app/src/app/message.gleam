@@ -1,7 +1,7 @@
+import app/task.{type Task}
 import gleam/dict.{type Dict}
 import gleam/erlang/process.{type Subject}
 import gleam/otp/actor
-import task.{type Task}
 import youid/uuid.{type Uuid}
 
 pub type Message {

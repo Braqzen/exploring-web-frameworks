@@ -1,12 +1,12 @@
+import app/config.{new_app_config}
+import app/state.{new_app_state}
 import application_.{type Application, Application, router}
-import config.{new_app_config}
 import gleam/erlang/process
 import gleam/int
 import gleam/result
 import gleam/string
 import mist
 import palabres
-import state.{new_app_state}
 import wisp
 import wisp/wisp_mist
 

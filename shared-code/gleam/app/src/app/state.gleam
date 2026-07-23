@@ -1,9 +1,9 @@
-import config.{type AppConfig}
+import app/config.{type AppConfig}
+import app/message.{type Message, process_message}
+import app/task.{type Task}
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/otp/actor
-import message.{type Message, process_message}
-import task.{type Task}
 import youid/uuid.{type Uuid}
 
 pub type AppState {
