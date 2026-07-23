@@ -1,3 +1,4 @@
+import config.{type AppConfig}
 import gleam/dict
 import gleam/erlang/process.{type Subject}
 import gleam/otp/actor
@@ -5,9 +6,8 @@ import message.{type Message, process_message}
 import task.{type Task}
 import youid/uuid.{type Uuid}
 
-// TODO: config
-pub opaque type AppState {
-  AppState(tasks: Subject(Message))
+pub type AppState {
+  AppState(tasks: Subject(Message), config: AppConfig)
 }
 
 pub type StateError {
@@ -15,13 +15,13 @@ pub type StateError {
   NotFound
 }
 
-pub fn new_app_state() -> Result(AppState, actor.StartError) {
+pub fn new_app_state(config: AppConfig) -> Result(AppState, actor.StartError) {
   case
     actor.new(dict.new())
     |> actor.on_message(process_message)
     |> actor.start
   {
-    Ok(started) -> Ok(AppState(tasks: started.data))
+    Ok(started) -> Ok(AppState(tasks: started.data, config:))
     Error(err) -> Error(err)
   }
 }

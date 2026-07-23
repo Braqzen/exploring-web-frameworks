@@ -21,7 +21,7 @@ pub fn patch_handler(request: Request, state: AppState, id: Uuid) -> Response {
 
       palabres.info("Patched task")
       |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("from_operation", encode_operation(task.operation))
+      |> palabres.string("from_operation", encode_operation(existing.operation))
       |> palabres.string("to_operation", encode_operation(new_task.operation))
       |> palabres.string("method", http.method_to_string(request.method))
       |> palabres.int("secret", string.length(task.secret))

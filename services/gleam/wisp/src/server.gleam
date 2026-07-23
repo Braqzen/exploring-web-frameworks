@@ -1,4 +1,5 @@
 import application_.{type Application, Application, router}
+import config.{new_app_config}
 import gleam/erlang/process
 import gleam/int
 import gleam/result
@@ -15,9 +16,13 @@ pub type Server {
 
 pub fn new_server(socket: String) -> Result(Server, String) {
   use socket <- result.try(parse_socket(socket))
+  use config <- result.try(
+    new_app_config()
+    |> result.map_error(fn(_) { "failed to load config" }),
+  )
 
   use state <- result.try(
-    new_app_state()
+    new_app_state(config)
     |> result.map_error(fn(_) { "failed to start state actor" }),
   )
 
@@ -48,7 +53,7 @@ pub fn run_server(server: Server) {
   // Note: there is no graceful shutdowns without something like FFI into erlang
   case mist.start(builder) {
     Ok(_) -> process.sleep_forever()
-    Error(_) -> Nil
+    Error(_) -> panic as "Failed to start server"
   }
 }
 

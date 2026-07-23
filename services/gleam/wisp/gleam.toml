@@ -13,5 +13,6 @@ youid = "== 1.6.0"
 envoy = "== 1.2.0"
 palabres = ">= 1.0.4 and < 2.0.0"
 exception = ">= 2.1.1 and < 3.0.0"
+simplifile = ">= 2.6.0 and < 3.0.0"
 
 [dev-dependencies]

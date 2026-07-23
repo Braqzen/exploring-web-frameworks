@@ -17,11 +17,12 @@ pub type Application {
 }
 
 pub fn router(app: Application, request: Request) -> Response {
-  let request = wisp.set_max_body_size(request, bytes)
+  let request =
+    wisp.set_max_body_size(request, app.state.config.request_size_limit * bytes)
 
   use <- rescue_middleware
   use <- log_middleware(request)
-  use <- chaos_middleware(request)
+  use <- chaos_middleware(request, app.state)
 
   case wisp.path_segments(request), request.method {
     [], Post -> post_handler(request, app.state)
