@@ -8,6 +8,7 @@ The goal is to explore what a "web-framework" is, how different frameworks imple
 
 For information about the technical aspects of the project [click here](./docs/project/overview.md).\
 For information about which language/frameworks are/may be implemented [click here](./docs/framework_list.md).\
+For an overview of service functionality [click here](./docs/project/functionality.md).\
 For a breakdown of what a framework is [click here](./docs/framework.md).\
 For a web-framework tier-list [click here](./docs/tier-list.md).
 
