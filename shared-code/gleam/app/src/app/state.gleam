@@ -26,7 +26,11 @@ pub fn new_app_state(config: AppConfig) -> Result(AppState, actor.StartError) {
   }
 }
 
-pub fn insert(state: AppState, id: Uuid, task: Task) -> Result(Nil, StateError) {
+pub fn insert_task(
+  state: AppState,
+  id: Uuid,
+  task: Task,
+) -> Result(Nil, StateError) {
   let reply = process.new_subject()
   process.send(state.tasks, message.Insert(id, task, reply))
 
@@ -36,7 +40,7 @@ pub fn insert(state: AppState, id: Uuid, task: Task) -> Result(Nil, StateError) 
   }
 }
 
-pub fn get(state: AppState, id: Uuid) -> Result(Task, StateError) {
+pub fn get_task(state: AppState, id: Uuid) -> Result(Task, StateError) {
   let reply = process.new_subject()
   process.send(state.tasks, message.Get(id, reply))
 
@@ -47,7 +51,7 @@ pub fn get(state: AppState, id: Uuid) -> Result(Task, StateError) {
   }
 }
 
-pub fn delete(state: AppState, id: Uuid) -> Result(Task, StateError) {
+pub fn delete_task(state: AppState, id: Uuid) -> Result(Task, StateError) {
   let reply = process.new_subject()
   process.send(state.tasks, message.Delete(id, reply))
 

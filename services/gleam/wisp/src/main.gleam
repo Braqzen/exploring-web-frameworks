@@ -1,8 +1,8 @@
 import envoy
 import gleam/result
-import logger_
 import palabres/level
 import server.{new_server, run_server}
+import telemetry/telemetry.{configure_logger}
 
 pub fn main() -> Nil {
   let assert Ok(log_level) =
@@ -10,7 +10,7 @@ pub fn main() -> Nil {
     |> result.map_error(fn(_) { panic as "LOG_LEVEL env error" })
 
   case level.from_string(log_level) {
-    Ok(min) -> logger_.configure_logger(min)
+    Ok(min) -> configure_logger(min)
     Error(_) -> panic as "invalid LOG_LEVEL"
   }
 

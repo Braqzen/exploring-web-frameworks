@@ -1,6 +1,6 @@
 {
   "default": {
-    "enabled": false,
+    "enabled": true,
     "methods": {
       "GET": true,
       "POST": true,
@@ -12,17 +12,6 @@
   },
   "overrides": {
     "axum": {
-      "enabled": true,
-      "methods": {
-        "GET": true,
-        "POST": true,
-        "PUT": true,
-        "DELETE": true,
-        "PATCH": true,
-        "HEAD": true
-      }
-    },
-    "wisp": {
       "enabled": true,
       "methods": {
         "GET": true,

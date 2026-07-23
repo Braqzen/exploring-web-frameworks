@@ -13,5 +13,6 @@ envoy = "== 1.2.0"
 palabres = "== 1.0.4"
 exception = "== 2.1.1"
 app = { path = "../../../shared-code/gleam/app" }
+telemetry = { path = "../../../shared-code/gleam/telemetry" }
 
 [dev-dependencies]

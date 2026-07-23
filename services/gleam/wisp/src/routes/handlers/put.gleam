@@ -1,12 +1,10 @@
-import app/operation.{encode_operation}
-import app/state.{type AppState, NotFound, Timeout, get, insert}
-import app/task.{encode_task, parse_task}
-import gleam/http
-import gleam/string
-import palabres
+import app/state.{type AppState, NotFound, Timeout, get_task, insert_task}
+import app/task.{task_to_json}
+import app/task_parsers.{parse_task}
 import routes/error.{
   internal, invalid_json_body, require, send_error, task_not_found,
 }
+import routes/logs.{log_not_found, log_overwrote}
 import wisp.{type Request, type Response}
 import youid/uuid.{type Uuid}
 
@@ -14,27 +12,16 @@ pub fn put_handler(request: Request, state: AppState, id: Uuid) -> Response {
   use body <- require(wisp.read_body_bits(request), invalid_json_body)
   use new_task <- require(parse_task(body), invalid_json_body)
 
-  case get(state, id) {
+  case get_task(state, id) {
     Ok(task) -> {
-      use _ <- require(insert(state, id, new_task), internal)
+      use _ <- require(insert_task(state, id, new_task), internal)
 
-      palabres.info("Overwrote task")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("from_operation", encode_operation(task.operation))
-      |> palabres.string("to_operation", encode_operation(new_task.operation))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.int("from_secret", string.length(task.secret))
-      |> palabres.int("to_secret", string.length(new_task.secret))
-      |> palabres.log
+      log_overwrote(id, request, task, new_task)
 
-      wisp.json_response(encode_task(new_task), 200)
+      wisp.json_response(task_to_json(new_task), 200)
     }
     Error(NotFound) -> {
-      palabres.warning("Task not found")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.log
-
+      log_not_found(id, request)
       send_error(task_not_found)
     }
     Error(Timeout) -> send_error(internal)

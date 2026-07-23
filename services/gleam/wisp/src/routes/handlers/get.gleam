@@ -1,31 +1,18 @@
-import app/operation.{encode_operation}
-import app/state.{type AppState, NotFound, Timeout, get}
-import app/task.{encode_task}
-import gleam/http
-import gleam/string
-import palabres
+import app/state.{type AppState, NotFound, Timeout, get_task}
+import app/task.{task_to_json}
 import routes/error.{internal, send_error, task_not_found}
+import routes/logs.{log_not_found, log_retrieved}
 import wisp.{type Request, type Response}
 import youid/uuid.{type Uuid}
 
 pub fn get_handler(request: Request, state: AppState, id: Uuid) -> Response {
-  case get(state, id) {
+  case get_task(state, id) {
     Ok(task) -> {
-      palabres.info("Retrieved task")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("operation", encode_operation(task.operation))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.int("secret", string.length(task.secret))
-      |> palabres.log
-
-      wisp.json_response(encode_task(task), 200)
+      log_retrieved(id, request, task)
+      wisp.json_response(task_to_json(task), 200)
     }
     Error(NotFound) -> {
-      palabres.warning("Task not found")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.log
-
+      log_not_found(id, request)
       send_error(task_not_found)
     }
     Error(Timeout) -> send_error(internal)

@@ -1,30 +1,17 @@
-import app/operation.{encode_operation}
-import app/state.{type AppState, NotFound, Timeout, delete}
-import gleam/http
-import gleam/string
-import palabres
+import app/state.{type AppState, NotFound, Timeout, delete_task}
 import routes/error.{internal, send_error, task_not_found}
+import routes/logs.{log_not_found, log_removed}
 import wisp.{type Request, type Response}
 import youid/uuid.{type Uuid}
 
 pub fn delete_handler(request: Request, state: AppState, id: Uuid) -> Response {
-  case delete(state, id) {
+  case delete_task(state, id) {
     Ok(task) -> {
-      palabres.info("Removed task")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("operation", encode_operation(task.operation))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.int("secret", string.length(task.secret))
-      |> palabres.log
-
+      log_removed(id, request, task)
       wisp.no_content()
     }
     Error(NotFound) -> {
-      palabres.warning("Task not found")
-      |> palabres.string("id", uuid.to_string(id))
-      |> palabres.string("method", http.method_to_string(request.method))
-      |> palabres.log
-
+      log_not_found(id, request)
       send_error(task_not_found)
     }
     Error(Timeout) -> send_error(internal)

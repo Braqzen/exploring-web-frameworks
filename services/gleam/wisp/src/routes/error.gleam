@@ -1,7 +1,7 @@
 import gleam/json
 import wisp.{type Response}
 
-pub type AppError {
+pub opaque type AppError {
   AppError(status: Int, message: String)
 }
 
@@ -19,6 +19,7 @@ pub fn send_error(error: AppError) -> Response {
   let body =
     json.object([#("error", json.string(error.message))])
     |> json.to_string
+
   wisp.json_response(body, error.status)
 }
 
