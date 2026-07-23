@@ -12,7 +12,7 @@ The following table shows the frameworks that are implemented in the project
 | Python     | Flask, FastAPI, Sanic, Quart, Django, Tornado, Starlette |
 | Nim        |                                                          |
 | Elixir     |                                                          |
-| Gleam      |                                                          |
+| Gleam      | Wisp                                                     |
 | OCaml      |                                                          |
 | C#         |                                                          |
 | Kotlin     |                                                          |
@@ -27,7 +27,6 @@ The following table lists languages and frameworks to potentially add to the pro
 | C++      | drogon, crow, pistache, Restinio, CppCMS |
 | Nim      | prologue, jester, happyx                 |
 | Elixir   | pheonix                                  |
-| Gleam    | wisp                                     |
 | OCaml    | dream, opium, ocsigen                    |
 | C#       | ASP.NET Core                             |
 | Kotlin   | Ktor, Spring Boot, http4k, Javalin       |

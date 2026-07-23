@@ -17,4 +17,4 @@ Reasoning might be re-added after enough web-frameworks have been implemented an
 | C    | **Rust:** Rocket<br>**Typescript:** Fastify, Koa, Elyisa<br>**Go:** Fiber |
 | D    | **Rust:** Salvo<br>**Typescript:** Hono<br>**Python:** Flask, Quart       |
 | E    | **Typescript:** Express<br>**Go:** Gin, Chi, Echo                         |
-| F    | **Rust:** Warp<br>**Python:** Django, Tornado                             |
+| F    | **Rust:** Warp<br>**Python:** Django, Tornado<br>**Gleam:** Wisp          |

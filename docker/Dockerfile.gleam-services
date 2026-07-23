@@ -1,0 +1,21 @@
+FROM ghcr.io/gleam-lang/gleam:v1.14.0-erlang AS builder
+
+ARG SERVICE
+WORKDIR /app
+
+COPY services/gleam/${SERVICE} /app
+COPY shared-code/gleam /shared-code/gleam
+
+RUN gleam deps download && gleam build
+
+FROM ghcr.io/gleam-lang/gleam:v1.14.0-erlang-slim
+ARG SERVICE
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app /app
+COPY --from=builder /shared-code/gleam /shared-code/gleam
+COPY configs/provider.json /app/provider.json
+ENV SERVICE=${SERVICE}
+ENV ERL_FLAGS="+B"
+
+CMD ["gleam", "run", "-m", "main"]

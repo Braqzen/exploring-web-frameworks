@@ -108,5 +108,10 @@
     "provider": "echo",
     "language": "go",
     "url": "http://go-echo:8000"
+  },
+  {
+    "provider": "wisp",
+    "language": "gleam",
+    "url": "http://gleam-wisp:8000"
   }
 ]

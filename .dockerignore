@@ -14,3 +14,7 @@
 
 # Go
 **/go.sum
+
+# Gleam
+**/build
+**/manifest.toml

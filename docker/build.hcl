@@ -47,3 +47,14 @@ target "go-services" {
   tags       = ["servers-${service}:latest"]
   args       = { SERVICE = service }
 }
+
+target "gleam-services" {
+  matrix = {
+    service = ["wisp"]
+  }
+  name = service
+  context    = "."
+  dockerfile = "docker/Dockerfile.gleam-services"
+  tags       = ["servers-${service}:latest"]
+  args       = { SERVICE = service }
+}
