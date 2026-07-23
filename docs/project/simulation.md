@@ -19,3 +19,5 @@ Payloads may be created with long `secret` strings to simulate large requests be
 
 For each received request a framework has a chance to sleep to simulate increased workload/latency.\
 Moreover, it may return an internal server error to simulate random failures.
+
+Sleep time should be between `500-1500µs`.

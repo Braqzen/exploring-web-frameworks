@@ -79,4 +79,21 @@ The only supported routes are `POST` to `/` and `GET`, `DELETE`, `PATCH`, `PUT` 
 
 Frameworks must always respond appropriately i.e. attempt to follow any RFCs for which status codes to return, when a body should be returned, and all bodies must have the same format i.e. json.
 
-> Note: status codes are inconsistent across frameworks rn
+| #   | Case                                                    | Status | Body                                        |
+| --- | ------------------------------------------------------- | ------ | ------------------------------------------- |
+| 1   | `POST /` with a valid body                              | `201`  | `{ "id": "<uuid>" }`                        |
+| 2   | `GET /:id` for a stored uuid                            | `200`  | `{ "secret": String, "operation": String }` |
+| 3   | `PUT /:id` for a stored uuid with a valid body          | `200`  | `{ "secret": String, "operation": String }` |
+| 4   | `PATCH /:id` for a stored uuid with a valid body        | `200`  | `{ "secret": String, "operation": String }` |
+| 5   | `DELETE /:id` for a stored uuid                         | `204`  | empty                                       |
+| 6   | Unsupported method (e.g. any other method on any route) | `405`  | `{ "error": "Invalid method" }`             |
+| 7   | Unknown path (e.g. any other path including non-uuid)   | `404`  | `{ "error": "Invalid path" }`               |
+| 8   | `/:id` is a uuid that is not stored                     | `404`  | `{ "error": "Task not found" }`             |
+| 9   | Body is not valid JSON                                  | `422`  | `{ "error": "Invalid body JSON" }`          |
+| 10  | Incorrect body shape for given route                    | `422`  | `{ "error": "Invalid body JSON" }`          |
+| 11  | Body exceeds the 64kb limit                             | `422`  | `{ "error": "Invalid body JSON" }`          |
+| 12  | Body uses `operation: Filter`                           | `422`  | `{ "error": "Invalid body JSON" }`          |
+| 13  | Chaos error or unhandled failure                        | `500`  | `{ "error": "Internal server error" }`      |
+
+> TODO: Case 11, possibly create new msg and use code 413. Case 9 can be 400 and 422 but idk if I care
+> TODO: validation precedence to determine which response to return given multiple request faults

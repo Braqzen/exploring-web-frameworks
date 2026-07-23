@@ -15,4 +15,5 @@ Navigate to your area of interest:
 - [**Simulation**](./simulation.md): Randomness injected into the system
 - [**System Configuration**](./configuration.md): How you can configure the system
 - [**Grafana Visualisations**](./visualisation.md): Navigating and understanding dashboards
+- [**Functionality**](./functionality.md): Overview of functionality in services
 - [**Known Issues**](./issues.md): Current problems and/or future work
